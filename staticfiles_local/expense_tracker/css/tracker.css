@@ -1,0 +1,1158 @@
+/* ==================== CSS Variables & Color System ==================== */
+:root {
+  /* Updated color palette */
+  --color-primary: #2191a5;
+  --color-primary-light: #2ba6bd;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #06b6d4;
+
+  /* Neutral colors */
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Semantic */
+  --color-dark: var(--color-gray-800);
+  --color-light: var(--color-gray-100);
+
+  /* Effects */
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-sm: 6px;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --sidebar-width: 260px;
+  --sidebar-bg: #2191a5;
+  --sidebar-text: #ffffff;
+  --sidebar-border: #1e7a8a;
+}
+
+/* ==================== General Styles ==================== */
+body {
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding-bottom: 80px;
+  color: var(--color-gray-800);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* ==================== Reduced Motion Support- ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .transaction-item,
+  .summary-card,
+  .budget-card,
+  .stat-card,
+  .metric-card,
+  .insight-card {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ==================== Grid System ==================== */
+.container-fluid {
+  width: 100%;
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -12px;
+  margin-left: -12px;
+}
+
+.col-12 { flex: 0 0 auto; width: 100%; }
+.col-md-3 { flex: 0 0 auto; width: 25%; }
+.col-md-4 { flex: 0 0 auto; width: 33.333333%; }
+.col-md-6 { flex: 0 0 auto; width: 50%; }
+.col-md-8 { flex: 0 0 auto; width: 66.666667%; }
+.col-md-12 { flex: 0 0 auto; width: 100%; }
+
+/* Spacing (Bootstrap-like gap) */
+.g-3 > * { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+.g-3 { --bs-gutter-x: 1rem; --bs-gutter-y: 1rem; }
+
+@media (max-width: 768px) {
+  .col-md-3,
+  .col-md-4,
+  .col-md-6,
+  .col-md-8,
+  .col-md-12 {
+    width: 100%;
+  }
+}
+
+/* ==================== Sidebar Navigation ==================== */
+.sidebar {
+  width: var(--sidebar-width);
+  height: calc(100vh - 56px);
+  background-color: var(--sidebar-bg);
+  position: fixed;
+  top: 56px;
+  left: 0;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.sidebar-sticky {
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 56px);
+  padding-top: 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.sidebar .nav {
+  padding: 0.5rem 0;
+}
+
+.sidebar .nav-item {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.sidebar .nav-link i {
+  width: 20px;
+  margin-right: 0.75rem;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--color-white);
+  border-left-color: var(--color-white);
+}
+
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: var(--color-white);
+  border-left-color: var(--color-white);
+  font-weight: 600;
+}
+
+/* ==================== Main Content Container ==================== */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: calc(100vh - 56px);
+  padding: 0;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.container-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+}
+
+/* ==================== Summary Cards (Dashboard) ==================== */
+.summary-card {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: clamp(12px, 3vw, 16px);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.2s ease;
+  border: 1px solid var(--color-gray-100);
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-gray-200);
+}
+
+.summary-card .card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  color: white;
+}
+
+.income-card .card-icon {
+  background: linear-gradient(135deg, var(--color-success), #0da26d);
+}
+
+.expense-card .card-icon {
+  background: linear-gradient(135deg, var(--color-danger), #dc2626);
+}
+
+.balance-card .card-icon {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+}
+
+.balance-card.negative .card-icon {
+  background: linear-gradient(135deg, var(--color-warning), #d97706);
+}
+
+.summary-card .card-label {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+  margin-bottom: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-card .card-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ==================== Transaction Cards ==================== */
+.transaction-item {
+  background: var(--color-white);
+  border-radius: var(--border-radius);
+  padding: clamp(8px, 2.5vw, 10px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+  border: 1px solid var(--color-gray-100);
+  max-width: 100%;
+  width: 100%;
+}
+
+.transaction-item.income {
+  border-left-color: var(--color-success);
+}
+
+.transaction-item.expense {
+  border-left-color: var(--color-danger);
+}
+
+.transaction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-gray-200);
+}
+
+.transaction-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--color-gray-100);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-category {
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin-bottom: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.transaction-description {
+  font-size: 0.6875rem;
+  color: var(--color-gray-500);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.transaction-time {
+  font-size: 0.6875rem;
+  color: var(--color-gray-400);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.3;
+}
+
+.transaction-amount {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+  min-width: 100px;
+  line-height: 1.4;
+}
+
+.transaction-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.transaction-actions .btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.transaction-actions .btn:hover,
+.transaction-actions .btn:focus {
+  transform: scale(1.05);
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* ==================== Compact Metric Cards (Charts Page) ==================== */
+.metric-card {
+  background: var(--color-white);
+  border-radius: var(--border-radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Colored backgrounds */
+.metric-card.bg-success {
+  background: linear-gradient(135deg, var(--color-success), #0da26d);
+}
+
+.metric-card.bg-danger {
+  background: linear-gradient(135deg, var(--color-danger), #dc2626);
+}
+
+.metric-card.bg-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+}
+
+.metric-card.bg-warning {
+  background: linear-gradient(135deg, var(--color-warning), #d97706);
+}
+
+/* ==================== Summary Cards (Transaction List) ==================== */
+.card.bg-success,
+.card.bg-danger,
+.card.bg-primary,
+.card.bg-info {
+  border: none;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.card.bg-success .card-body,
+.card.bg-danger .card-body,
+.card.bg-primary .card-body,
+.card.bg-info .card-body {
+  padding: clamp(10px, 2.5vw, 14px);
+  text-align: center;
+}
+
+.card.bg-success .card-body h6,
+.card.bg-danger .card-body h6,
+.card.bg-primary .card-body h6,
+.card.bg-info .card-body h6 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card.bg-success .card-body h4,
+.card.bg-danger .card-body h4,
+.card.bg-primary .card-body h4,
+.card.bg-info .card-body h4 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.card.bg-success:hover,
+.card.bg-danger:hover,
+.card.bg-primary:hover,
+.card.bg-info:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ==================== Chart Containers ==================== */
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 1/ 1;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+/* Fallback for older browsers */
+@supports not (aspect-ratio: 1) {
+  .chart-container {
+    height: 260px;
+  }
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+.card.h-100 {
+  height: auto !important;
+  min-height: 300px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    max-width: 100%;
+    aspect-ratio: 4 / 3;
+    padding: 15px;
+    height: 220px;
+  }
+  .card.h-100 {
+    min-height: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-container {
+    aspect-ratio: 4 / 3;
+    padding: 10px;
+    height: 180px;
+  }
+  .card.h-100 {
+    min-height: 200px;
+  }
+}
+
+/* ==================== Card Component ==================== */
+.card {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-gray-100);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-gray-200);
+}
+
+.card-header {
+  padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px);
+  border-bottom: 1px solid var(--color-gray-100);
+  background-color: var(--color-gray-50);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.card-body {
+  padding: clamp(16px, 4vw, 20px);
+}
+
+/* ==================== Insights Section ==================== */
+.insights-section {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: clamp(16px, 4vw, 20px);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-gray-100);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-gray-100);
+}
+
+.section-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.insights-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: clamp(12px, 3vw, 15px);
+  border-radius: var(--border-radius);
+  border-left: 4px solid;
+  background: var(--color-gray-50);
+  transition: all 0.2s ease;
+}
+
+.insight-card.insight-increase {
+  background: #fef2f2;
+  border-left-color: var(--color-danger);
+}
+
+.insight-card.insight-decrease {
+  background: #f0fdf4;
+  border-left-color: var(--color-success);
+}
+
+.insight-card.insight-budget_warning {
+  background: #fffbeb;
+  border-left-color: var(--color-warning);
+}
+
+.insight-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  background: var(--color-gray-200);
+}
+
+.insight-content h6 {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--color-gray-900);
+  font-size: 0.9375rem;
+}
+
+.insight-content p {
+  font-size: 0.875rem;
+  margin: 0;
+  color: var(--color-gray-600);
+}
+
+/* ==================== Quick Actions ==================== */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.quick-actions .btn {
+  flex: 1;
+  min-width: 130px;
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  border: none;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  transition: all 0.2s ease;
+}
+
+.quick-actions .btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.quick-actions .btn-primary:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ==================== Empty State ==================== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-gray-500);
+}
+
+.empty-state i {
+  color: var(--color-gray-300);
+  margin-bottom: 10px;
+}
+
+.empty-state h5 {
+  color: var(--color-gray-700);
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: var(--color-gray-500);
+  margin-bottom: 20px;
+}
+
+/* ==================== Comparison & Stats ==================== */
+.comparison-section,
+.stat-card,
+.budget-card {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: clamp(16px, 4vw, 20px);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-gray-100);
+}
+
+.stat-card .stat-content h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-content h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+.comparison-item h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  margin-bottom: 4px;
+}
+
+.comparison-item h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+}
+
+@media (max-width: 768px) {
+  /* Card Reduction for Mobile */
+  .summary-card {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .summary-card .card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .summary-card .card-label {
+    font-size: 0.65rem;
+  }
+  
+  .summary-card .card-value {
+    font-size: 1rem;
+  }
+  
+  .transaction-item {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  
+  .transaction-icon {
+    width: 26px;
+    height: 26px;
+    font-size: 0.6875rem;
+  }
+  
+  .transaction-category {
+    font-size: 0.75rem;
+  }
+  
+  .transaction-description {
+    font-size: 0.625rem;
+  }
+  
+  .transaction-time {
+    font-size: 0.625rem;
+  }
+  
+  .transaction-amount {
+    font-size: 0.6875rem;
+    min-width: 90px;
+  }
+  
+  .transaction-actions .btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.6875rem;
+  }
+  
+  /* Compact summary cards for mobile */
+  .card.bg-success .card-body,
+  .card.bg-danger .card-body,
+  .card.bg-primary .card-body,
+  .card.bg-info .card-body {
+    padding: 10px 12px;
+  }
+  
+  .card.bg-success .card-body h6,
+  .card.bg-danger .card-body h6,
+  .card.bg-primary .card-body h6,
+  .card.bg-info .card-body h6 {
+    font-size: 0.625rem;
+    margin-bottom: 4px;
+  }
+  
+  .card.bg-success .card-body h4,
+  .card.bg-danger .card-body h4,
+  .card.bg-primary .card-body h4,
+  .card.bg-info .card-body h4 {
+    font-size: 0.9375rem;
+  }
+  
+  .metric-card {
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .metric-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  
+  .metric-label {
+    font-size: 0.65rem;
+  }
+  
+  .metric-value {
+    font-size: 1rem;
+  }
+  
+  .card {
+    margin-bottom: 12px;
+  }
+  
+  .card-header {
+    padding: 10px 12px;
+  }
+  
+  .card-header h5 {
+    font-size: 0.9rem;
+  }
+  
+  .card-body {
+    padding: 12px;
+  }
+  
+  .insight-card {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .insight-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .insight-content h6 {
+    font-size: 0.8125rem;
+  }
+  
+  .insight-content p {
+    font-size: 0.75rem;
+  }
+  
+  .stat-card .stat-content h6,
+  .comparison-item h6 {
+    font-size: 0.75rem;
+  }
+  
+  .stat-card .stat-content h4 {
+    font-size: 1.125rem;
+  }
+  
+  .comparison-item h3 {
+    font-size: 1rem;
+  }
+  
+  .comparison-section,
+  .stat-card,
+  .budget-card {
+    padding: 12px;
+  }
+}
+
+/* ==================== Bottom Navigation (Mobile) ==================== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-white);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 1000;
+  border-top: 1px solid var(--color-gray-100);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-gray-500);
+  font-size: 0.65rem;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+  flex: 1;
+  max-width: 80px;
+  font-weight: 500;
+}
+
+.bottom-nav-item i {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.bottom-nav-item.active {
+  color: var(--color-primary);
+}
+
+.bottom-nav-item:hover {
+  color: var(--color-primary);
+}
+
+/* ==================== REFINED COLOR OVERRIDE (FIXES INVISIBLE TEXT) ==================== */
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+  color: white !important;
+}
+
+.btn-outline-primary {
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+  color: white !important;
+}
+
+/* Badges */
+.badge.bg-primary {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+/* Progress Bars */
+.progress-bar.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+/* Alerts */
+.alert.alert-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+/* Card Headers */
+.card-header.bg-primary {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+/* Text primary remains readable */
+.text-primary {
+  color: var(--color-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+/* ==================== MOBILE SIDEBAR & FORM FIXES ==================== */
+
+@media (max-width: 768px) {
+  /* Sidebar fully hides */
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 1050;
+    width: var(--sidebar-width);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  /* Main content fills screen */
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    min-height: auto;
+  }
+
+  body {
+    font-size: 14px;
+    padding-bottom: 60px;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+  }
+
+  /* Form optimization */
+  .card.budget-card .card-body,
+  .card.budget-card .card-header {
+    padding: 12px !important;
+  }
+
+  .form-control {
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .mb-3 { margin-bottom: 0.75rem !important; }
+  .btn { padding: 0.375rem 0.75rem !important; font-size: 0.875rem !important; }
+  .progress { height: 20px !important; }
+  .alert { padding: 0.5rem 0.75rem !important; font-size: 0.8125rem !important; }
+  label { font-size: 0.8125rem !important; }
+
+  /* Modals */
+  .modal-dialog {
+    margin: 0.5rem !important;
+    max-width: 95% !important;
+  }
+
+  /* Footer */
+  .bottom-nav { display: none !important; }
+  .mbl_footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: #2291a5 !important;
+    display: block !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 13px; }
+  .quick-actions .btn { padding: 8px 10px; font-size: 0.75rem; }
+  
+  /* Ultra-compact summary cards for small phones */
+  .card.bg-success .card-body,
+  .card.bg-danger .card-body,
+  .card.bg-primary .card-body,
+  .card.bg-info .card-body {
+    padding: 8px 10px;
+  }
+  
+  .card.bg-success .card-body h6,
+  .card.bg-danger .card-body h6,
+  .card.bg-primary .card-body h6,
+  .card.bg-info .card-body h6 {
+    font-size: 0.6rem;
+    margin-bottom: 3px;
+  }
+  
+  .card.bg-success .card-body h4,
+  .card.bg-danger .card-body h4,
+  .card.bg-primary .card-body h4,
+  .card.bg-info .card-body h4 {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  body { font-size: 12px; }
+}
+
+@media (min-width: 769px) {
+  .bottom-nav, .mbl_footer {
+    display: none !important;
+  }
+}
+
+/* Chart universal */
+.card canvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100% !important;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.transaction-item,
+.summary-card,
+.budget-card,
+.stat-card,
+.metric-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Print */
+@media print {
+  .bottom-nav, .navbar, .btn, .quick-actions, .mbl_footer {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    padding-bottom: 0;
+    color: black;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid var(--color-gray-200);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Mobile Footer */
+.mbl_footer {
+  background-color: #2291a5 !important;
+}
+
+.footer_button {
+  transition: all 0.2s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer_button:hover {
+  opacity: 0.8;
+}
+
+.footer_button:active {
+  transform: scale(0.95);
+}

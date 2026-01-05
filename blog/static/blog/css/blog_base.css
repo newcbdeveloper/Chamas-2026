@@ -1,0 +1,54 @@
+/* Blog-specific layout overrides */
+.blog-wrapper {
+  min-height: calc(100vh - 80px);
+  /* Increased top padding to prevent articles being cut by header */
+  padding-top: 4rem;
+  padding-bottom: 3rem;
+}
+
+.blog-header-section {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.blog-page-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #272556;
+  margin-bottom: 0.75rem;
+}
+
+.blog-page-subtitle {
+  font-size: 1.1rem;
+  color: #565578;
+  max-width: 700px;
+  margin: 0 auto 1.5rem;
+}
+
+/* Breadcrumb styling (if not already defined in pages.css) */
+.breadcrumb {
+  justify-content: center;
+  background: transparent;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .blog-page-title {
+    font-size: 1.8rem;
+  }
+  .blog-page-subtitle {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  /* Reduced top padding on mobile for better space usage */
+  .blog-wrapper {
+    padding-top: 3rem;
+  }
+}

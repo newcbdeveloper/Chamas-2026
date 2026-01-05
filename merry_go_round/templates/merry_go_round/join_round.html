@@ -1,0 +1,322 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}Join Round{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2><i class="fas fa-search"></i> Browse Available Rounds</h2>
+        <p class="text-muted">Find and join public savings rounds that match your goals</p>
+    </div>
+</div>
+
+<!-- Updated alert styling to match modern design system -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-info border-0 shadow-sm d-flex align-items-center">
+            <i class="fas fa-info-circle fa-2x me-3"></i>
+            <div>
+                <h6 class="mb-1">Earn Interest on Your Savings!</h6>
+                <p class="mb-0 small">All contributions earn interest while held in escrow. Earlier contributions earn more interest than later ones because they're held longer. Tax of {{ MGR_TAX_RATE }}% is deducted from interest earned.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Improved filter form layout for mobile responsiveness -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form method="get" id="filter-form">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            {{ filter_form.contribution_amount.label_tag }}
+                            {{ filter_form.contribution_amount }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            {{ filter_form.frequency.label_tag }}
+                            {{ filter_form.frequency }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            {{ filter_form.min_trust_score.label_tag }}
+                            {{ filter_form.min_trust_score }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            {{ filter_form.status.label_tag }}
+                            {{ filter_form.status }}
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            {{ filter_form.search.label_tag }}
+                            {{ filter_form.search }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Apply Filters
+                            </button>
+                            <a href="{% url 'merry_go_round:join_round' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-redo"></i> Clear Filters
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Updated grid layout for better mobile responsiveness (col-md-6 for tablet, col-lg-4 for desktop) -->
+<div class="row">
+    {% if page_obj %}
+        {% for round in page_obj %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100 round-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0">{{ round.name }}</h5>
+                        <span class="badge bg-primary">Marathon</span>
+                    </div>
+
+                    {% if round.description %}
+                    <p class="card-text text-muted small mb-3">{{ round.description|truncatewords:15 }}</p>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">
+                                <i class="fas fa-coins text-success"></i> Contribution
+                            </span>
+                            <strong>KES {{ round.contribution_amount|floatformat:0 }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">
+                                <i class="fas fa-calendar text-info"></i> Frequency
+                            </span>
+                            <strong>{{ round.get_frequency_display }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">
+                                <i class="fas fa-users text-primary"></i> Members
+                            </span>
+                            <strong>{{ round.current_members }}/{{ round.max_members }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">
+                                <i class="fas fa-trophy text-warning"></i> Min Trust Score
+                            </span>
+                            <strong>{{ round.min_trust_score }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="text-muted">Capacity</small>
+                            <small class="text-muted">{{ round.current_members }}/{{ round.max_members }}</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            {% widthratio round.current_members round.max_members 100 as progress %}
+                            <div class="progress-bar" role="progressbar" style="width: {{ progress }}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success border-0 bg-success bg-opacity-10 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="d-block text-muted">Expected Net Interest (After Tax)</small>
+                                <strong class="text-success">+KES {{ round.projected_interest|floatformat:2 }}</strong>
+                                <small class="d-block text-muted mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Tax: {{ MGR_TAX_RATE }}% on interest
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <small class="d-block text-muted">Total Expected Return</small>
+                                <strong>KES {{ round.total_expected|floatformat:2 }}</strong>
+                                <small class="d-block text-muted mt-1">
+                                    Principal + Net Interest
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add helpful tooltip explaining the calculation -->
+                    <div class="small text-muted mb-3">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>How interest works:</strong> 
+                        Each contribution earns interest from the day you pay until the round ends. 
+                        Earlier contributions earn more interest because they're held longer.
+                    </div>
+                    <button class="btn btn-primary w-100 join-round-btn" 
+                            data-round-id="{{ round.id }}"
+                            data-round-name="{{ round.name }}"
+                            data-amount="{{ round.contribution_amount }}">
+                        <i class="fas fa-user-plus"></i> Join This Round
+                    </button>
+                </div>
+
+                <div class="card-footer bg-light border-0">
+                    <small class="text-muted">
+                        <i class="fas fa-user"></i> Created by {{ round.creator.username }}
+                    </small>
+                    <small class="text-muted float-end">
+                        <i class="fas fa-clock"></i> {{ round.created_at|timesince }} ago
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                <h4>No rounds found</h4>
+                <p class="text-muted">Try adjusting your filters or create your own round</p>
+                <a href="{% url 'merry_go_round:create_round' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Round
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="row mt-4">
+    <div class="col-12">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
+
+<!-- Join Round Modal -->
+<div class="modal fade" id="joinRoundModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Join Round</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Before you join:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Ensure you can commit to regular contributions</li>
+                        <li>Understand the marathon model (payout at end)</li>
+                        <li>Your contributions will earn interest based on how long they're held</li>
+                        <li>{{ MGR_TAX_RATE }}% tax will be deducted from interest earned</li>
+                    </ul>
+                </div>
+
+                <h6>Round Details:</h6>
+                <p id="modal-round-name" class="fw-bold"></p>
+                <p><strong>Contribution Amount:</strong> <span id="modal-amount"></span></p>
+
+                <form method="post" id="join-round-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="round_id" id="modal-round-id">
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="agree_to_terms" 
+                               id="agree_to_terms" required>
+                        <label class="form-check-label" for="agree_to_terms">
+                            I agree to contribute on time and understand the round rules
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-join-btn">
+                    <i class="fas fa-check"></i> Confirm & Join
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .round-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .round-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('.join-round-btn').click(function() {
+        var roundId = $(this).data('round-id');
+        var roundName = $(this).data('round-name');
+        var amount = $(this).data('amount');
+        
+        $('#modal-round-id').val(roundId);
+        $('#modal-round-name').text(roundName);
+        $('#modal-amount').text('KES ' + parseFloat(amount).toFixed(2));
+        
+        $('#joinRoundModal').modal('show');
+    });
+    
+    $('#confirm-join-btn').click(function() {
+        var form = $('#join-round-form');
+        var roundId = $('#modal-round-id').val();
+        
+        if (!$('#agree_to_terms').is(':checked')) {
+            alert('Please agree to the terms before joining');
+            return;
+        }
+        
+        form.attr('action', '/merry-go-round/join/' + roundId + '/');
+        form.submit();
+    });
+});
+</script>
+{% endblock %}

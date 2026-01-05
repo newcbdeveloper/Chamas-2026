@@ -1,0 +1,801 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* Global container overrides for edge-to-edge content */
+html, body,
+.chamas-container, 
+.chamas-wrapper,
+.container,
+.container-fluid,
+.main-content,
+.content-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#main-row {
+    height: 100%;
+}
+
+/* ================================
+   CHAMAS BASE LAYOUT COMPATIBILITY
+   ================================ */
+
+/* Ensure compatibility with new responsive layout */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+/* Updated to work with the new layout system */
+.side-nav {
+  background-color: #2191a5 !important;
+  color: white !important;
+  min-height: 100vh !important;
+  padding: 20px !important;
+}
+
+.section-header {
+  background: white !important;
+  border-radius: 0 0 20px 20px !important;
+  border-bottom: 1px solid #e0e4e8 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  margin-bottom: 20px !important;
+}
+
+.section-header .title {
+  color: #2191a5 !important;
+  font-weight: 600 !important;
+  font-size: 1.5rem !important;
+  margin: 0 !important;
+}
+
+.header-icon {
+  color: #2191a5 !important;
+  margin: 0 8px !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.header-icon:hover {
+  color: #1a7589 !important;
+}
+
+/* ================================
+   PROFILE SECTION ENHANCEMENT
+   ================================ */
+
+/* Enhanced profile container styling */
+.profile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 25px !important;
+  background: rgba(33, 145, 165, 0.08) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+
+.profile:hover {
+  background: rgba(33, 145, 165, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(33, 145, 165, 0.15) !important;
+}
+
+/* Enhanced avatar styling */
+.avatar {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #2191a5 0%, #1a7589 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(33, 145, 165, 0.3) !important;
+  flex-shrink: 0 !important;
+}
+
+.avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+.avatar i {
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 500 !important;
+}
+
+/* Enhanced profile name styling */
+.profile-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  max-width: 120px !important;
+}
+
+/* Dropdown arrow styling */
+.profile .bx-chevron-down {
+  color: #64748b !important;
+  font-size: 16px !important;
+  transition: transform 0.3s ease !important;
+  margin-left: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.profile:hover .bx-chevron-down {
+  transform: rotate(180deg) !important;
+  color: #2191a5 !important;
+}
+
+/* Dropdown menu styling */
+.profile .dropdown-menu {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  background: white !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  padding: 8px 0 !important;
+  margin-top: 8px !important;
+  min-width: 180px !important;
+  z-index: 1050 !important;
+}
+
+.profile .dropdown-menu::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -6px !important;
+  right: 20px !important;
+  width: 12px !important;
+  height: 12px !important;
+  background: white !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-bottom: none !important;
+  border-right: none !important;
+  transform: rotate(45deg) !important;
+}
+
+.profile .dropdown-item {
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  background: none !important;
+}
+
+.profile .dropdown-item:hover {
+  background: #f8fafc !important;
+  color: #2191a5 !important;
+  padding-left: 20px !important;
+}
+
+/* Header-specific profile adjustments */
+.mobile-header .profile {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(33, 145, 165, 0.1) !important;
+}
+
+.desktop-header .profile {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(33, 145, 165, 0.1) !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .profile {
+    gap: 8px !important;
+    padding: 6px 10px !important;
+  }
+  
+  .avatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .profile-name {
+    font-size: 13px !important;
+    max-width: 100px !important;
+  }
+  
+  .mobile-actions {
+    gap: 12px !important;
+  }
+  
+  /* Mobile scrolling improvements */
+  .main-content {
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .page-content {
+    padding-bottom: 120px !important; /* Extra space for scrolling */
+    min-height: calc(100vh - 64px) !important; /* Account for mobile header */
+  }
+  
+  /* Ensure mobile header doesn't interfere with scrolling */
+  .mobile-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+  }
+}
+
+/* Desktop responsive adjustments */
+@media (min-width: 769px) {
+  .desktop-header .header-actions {
+    align-items: center !important;
+    gap: 24px !important;
+  }
+  
+  .desktop-header .profile {
+    margin-left: auto !important;
+    /* Reduced scale for desktop header profile */
+    gap: 8px !important;
+    padding: 6px 10px !important;
+  }
+  
+  .desktop-header .avatar {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .desktop-header .profile-name {
+    font-size: 13px !important;
+    max-width: 120px !important;
+  }
+  
+  .desktop-header .bx-chevron-down {
+    font-size: 14px !important;
+  }
+  
+  /* ================================
+     HEADER ALIGNMENT FIX FOR PC
+     ================================ */
+  
+  /* Ensure desktop header navbar uses proper flexbox alignment */
+  .page_header.hide_on_mobile.topnav {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+  }
+  
+  /* Force navigation list to align to the right */
+  .page_header.hide_on_mobile .nav {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    margin-left: auto !important;
+  }
+  
+  /* Ensure navbar spacer works correctly */
+  .page_header.hide_on_mobile .navbar {
+    display: flex !important;
+    width: 100% !important;
+  }
+  
+  /* Make sure avatar and icons stay right-aligned */
+  .page_header.hide_on_mobile .nav .nav-item {
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+}
+
+.dp-sect {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.name {
+  margin: 0 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+}
+
+/* Side navigation items */
+.header-sect p,
+.link-item p {
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  margin-bottom: 8px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+.header-sect p:hover,
+.link-item p:hover,
+.link-item a:hover p {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  transform: translateX(4px) !important;
+}
+
+.link-item a {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.link-item a:hover {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.header-sect p i,
+.link-item p i {
+  margin-right: 12px !important;
+  font-size: 16px !important;
+  width: 20px !important;
+  text-align: center !important;
+}
+
+/* Modal styling consistency */
+.mobile-input {
+  margin-bottom: 16px !important;
+}
+
+.mobile-input label {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #2191a5 !important;
+  font-weight: 500 !important;
+}
+
+.mobile-input .form-control {
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+.mobile-input .form-control:focus {
+  border-color: #2191a5 !important;
+  box-shadow: 0 0 0 0.2rem rgba(33, 145, 165, 0.25) !important;
+  outline: none !important;
+}
+
+/* Mobile input label section legacy support */
+.mobile-input-label-section {
+  margin-bottom: 16px !important;
+}
+
+.mobile-input-label {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #2191a5 !important;
+  font-weight: 500 !important;
+}
+
+.mobile-input-label-input {
+  width: 100% !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+.mobile-input-label-input:focus {
+  border-color: #2191a5 !important;
+  box-shadow: 0 0 0 0.2rem rgba(33, 145, 165, 0.25) !important;
+  outline: none !important;
+}
+
+/* Layout compatibility fixes */
+.container-fluid {
+  padding: 0 !important;
+}
+
+.row {
+  margin: 0 !important;
+}
+
+.col-lg-2, .col-md-3, .col-sm-12, .col-12 {
+  padding: 0 !important;
+}
+
+.col-lg-10, .col-md-9 {
+  padding: 0 !important;
+}
+
+/* Page title styling */
+.page-title {
+  color: #2191a5 !important;
+  font-weight: 600 !important;
+  font-size: 1.5rem !important;
+  margin: 0 !important;
+}
+
+/* Actions section */
+.actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+.svg-sect {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* ================================
+   RESPONSIVE LAYOUT ENHANCEMENTS
+   ================================ */
+
+/* Desktop View */
+@media (min-width: 769px) {
+  .main-content {
+    margin-left: 260px !important;
+  }
+  
+  .desktop-sidebar {
+    display: block !important;
+  }
+  
+  .desktop-header {
+    display: block !important;
+  }
+  
+  .mobile-header {
+    display: none !important;
+  }
+  
+  .side-nav {
+    display: block !important;
+  }
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .desktop-sidebar {
+    display: none !important;
+  }
+  
+  .desktop-header {
+    display: none !important;
+  }
+  
+  .mobile-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  
+  .side-nav {
+    display: none !important;
+  }
+  
+  .section-header {
+    margin: 16px !important;
+    border-radius: 20px !important;
+  }
+  
+  .page-content {
+    padding: 16px !important;
+  }
+}
+
+/* Ensure mobile navigation hamburger is visible on mobile */
+@media (max-width: 768px) {
+  .mobile-nav-toggle {
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  .menu-btn {
+    background: none !important;
+    border: none !important;
+    font-size: 24px !important;
+    color: #2191a5 !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    transition: background 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .menu-btn:hover {
+    background: rgba(33, 145, 165, 0.1) !important;
+  }
+}
+
+/* ================================
+   BOOTSTRAP FORM SWITCH STYLES
+   ================================ */
+
+/* Custom styling for Bootstrap form-switch */
+.form-check.form-switch {
+  margin: 0 !important;
+}
+
+.form-check-input {
+  cursor: pointer !important;
+}
+
+.form-check-input:checked {
+  background-color: #2191a5 !important;
+  border-color: #2191a5 !important;
+}
+
+.form-check-input:focus {
+  border-color: #2191a5 !important;
+  box-shadow: 0 0 0 0.25rem rgba(33, 145, 165, 0.25) !important;
+}
+
+.form-check-label {
+  cursor: pointer !important;
+  font-size: 12px !important;
+  color: #6c757d !important;
+}
+
+/* Switch label styling */
+.switch-label-member,
+.switch-label-admin {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.switch-label-member {
+  color: #2191a5 !important;
+}
+
+.switch-label-admin {
+  color: #28a745 !important;
+}
+
+/* Label switching */
+.form-check-input:checked ~ .form-check-label .switch-label-member {
+  display: none !important;
+}
+
+.form-check-input:checked ~ .form-check-label .switch-label-admin {
+  display: inline !important;
+}
+
+.form-check-input:not(:checked) ~ .form-check-label .switch-label-member {
+  display: inline !important;
+}
+
+.form-check-input:not(:checked) ~ .form-check-label .switch-label-admin {
+  display: none !important;
+}
+
+/* Disabled state */
+.form-check-input:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.form-check-input:disabled + .form-check-label {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+/* ================================
+   CSS OVERRIDE RULES
+   ================================ */
+
+/* Override conflicting styles from style.css and brand-colors.css */
+.mobile-header .profile,
+.desktop-header .profile,
+.header .profile,
+.profile {
+  /* Remove conflicting background from style.css */
+  background: rgba(33, 145, 165, 0.08) !important;
+  /* Ensure proper display and alignment */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-direction: row !important;
+  /* Override any padding conflicts */
+  padding: 8px 12px !important;
+  /* Ensure proper spacing */
+  gap: 12px !important;
+  /* Remove any conflicting borders */
+  border: 1px solid rgba(33, 145, 165, 0.1) !important;
+  border-radius: 25px !important;
+  /* Ensure proper positioning */
+  position: relative !important;
+  /* Override width constraints */
+  width: auto !important;
+  min-width: auto !important;
+  max-width: none !important;
+  /* Ensure text doesn't wrap */
+  white-space: nowrap !important;
+}
+
+/* Specific override for brand-colors.css spacing */
+.profile {
+  gap: 12px !important;
+}
+
+/* Ensure avatar maintains its enhanced styling */
+.mobile-header .avatar,
+.desktop-header .avatar,
+.header .avatar,
+.profile .avatar {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #2191a5 0%, #1a7589 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(33, 145, 165, 0.3) !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+/* Ensure profile name maintains enhanced styling */
+.mobile-header .profile-name,
+.desktop-header .profile-name,
+.header .profile-name,
+.profile .profile-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  max-width: 120px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 1 !important;
+}
+
+/* Override any conflicting dropdown arrow styles */
+.mobile-header .profile .bx-chevron-down,
+.desktop-header .profile .bx-chevron-down,
+.profile .bx-chevron-down {
+  color: #64748b !important;
+  font-size: 16px !important;
+  transition: transform 0.3s ease !important;
+  margin-left: 4px !important;
+  margin-right: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 768px) {
+  .mobile-header .profile {
+    background: rgba(255, 255, 255, 0.9) !important;
+    gap: 8px !important;
+    padding: 6px 10px !important;
+  }
+  
+  .mobile-header .avatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .mobile-header .profile-name {
+    font-size: 13px !important;
+    max-width: 100px !important;
+  }
+}
+
+/* Desktop-specific overrides */
+@media (min-width: 769px) {
+  .desktop-header .profile {
+    background: rgba(255, 255, 255, 0.8) !important;
+    margin-left: auto !important;
+  }
+}
+
+/* ================================
+   HEADER CONTAINER ENHANCEMENTS
+   ================================ */
+
+/* Mobile header improvements */
+.mobile-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 16px !important;
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  min-height: 64px !important;
+}
+
+.mobile-header .mobile-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-left: auto !important;
+}
+
+.mobile-header .mobile-nav-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Desktop header improvements */
+.desktop-header {
+  display: flex !important;
+  background: white !important;
+  border-radius: 0 0 20px 20px !important;
+  border-bottom: 1px solid #e0e4e8 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  padding: 16px 24px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  min-height: 80px !important;
+}
+
+.desktop-header .header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 24px !important;
+}
+
+.desktop-header .page-title {
+  color: #2191a5 !important;
+  font-weight: 600 !important;
+  font-size: 1.5rem !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.desktop-header .action-icons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+  flex-shrink: 0 !important;
+}
+
+.desktop-header .action-icons i {
+  font-size: 20px !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease !important;
+}
+
+.desktop-header .action-icons i:hover {
+  transform: scale(1.1) !important;
+}

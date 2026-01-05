@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pricing{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% block head %}{% endblock %}
+    {% block styles %}{% endblock %}
+    <style>
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+
+        @layer utilities {
+            .bg-primary {
+                background-color: #2191a5;
+            }
+            .text-primary {
+                color: #2191a5;
+            }
+            .border-primary {
+                border-color: #2191a5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    {% comment %} <header class="bg-white py-4 shadow">
+    </header> {% endcomment %}
+
+    <div class="container mx-auto py-8 px-5">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% comment %} <footer class="bg-gray-800 text-white py-4">
+    </footer> {% endcomment %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+
+

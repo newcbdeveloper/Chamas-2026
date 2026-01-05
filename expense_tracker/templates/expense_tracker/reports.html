@@ -1,0 +1,334 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-file-alt me-2"></i>Reports & Analytics</h2>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Period</label>
+                            <div class="position-relative">
+                                {{ form.period }}
+                                <i class="fas fa-chevron-down position-absolute" style="right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #6b7280;"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-3" id="custom-dates" style="display: none;">
+                            <label class="form-label">Start Date</label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-md-3" id="custom-dates-end" style="display: none;">
+                            <label class="form-label">End Date</label>
+                            {{ form.end_date }}
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Generate Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">Financial Report</h4>
+                            <p class="text-muted mb-0">
+                                {{ start_date|date:"d M Y" }} to {{ end_date|date:"d M Y" }} 
+                                ({{ days_in_period }} day{{ days_in_period|pluralize }})
+                            </p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{% url 'expense_tracker:export_csv' %}?period={{ form.period.value|default:'this_month' }}" 
+                               class="btn btn-outline-success">
+                                <i class="fas fa-file-csv me-2"></i>Export CSV
+                            </a>
+                            <a href="{% url 'expense_tracker:export_pdf' %}?period={{ form.period.value|default:'this_month' }}" 
+                               class="btn btn-outline-danger">
+                                <i class="fas fa-file-pdf me-2"></i>Export PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-success">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Total Income</h6>
+                    <h4>{{ summary.income|currency }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-danger">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Total Expenses</h6>
+                    <h4>{{ summary.expenses|currency }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Net Balance</h6>
+                    <h4>{{ summary.balance|currency }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-info">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Avg. Daily Expense</h6>
+                    <h4>{{ avg_daily_expense|currency }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison with Previous Period -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Comparison with Previous Period</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="comparison-item">
+                                <h6>Income Change</h6>
+                                <h3 class="{% if comparison.income_change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ comparison.income_change|format_change }}
+                                    <small>{{ comparison.income_change|trend_icon }}</small>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="comparison-item">
+                                <h6>Expense Change</h6>
+                                <h3 class="{% if comparison.expense_change <= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ comparison.expense_change|format_change }}
+                                    <small>{{ comparison.expense_change|trend_icon }}</small>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="comparison-item">
+                                <h6>Savings Rate</h6>
+                                <h3 class="text-primary">
+                                    {% widthratio summary.balance summary.income 100 %}%
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breakdown Tables -->
+    <div class="row g-4">
+        <!-- Expense Breakdown -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Expense Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if expense_breakdown %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th class="text-end">Amount</th>
+                                        <th class="text-end">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in expense_breakdown %}
+                                        <tr>
+                                            <td>
+                                                <span style="color: {{ item.color }}">{{ item.icon }}</span>
+                                                {{ item.category }}
+                                            </td>
+                                            <td class="text-end">{{ item.amount|currency }}</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-secondary">{{ item.percentage }}%</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th>Total</th>
+                                        <th class="text-end">{{ summary.expenses|currency }}</th>
+                                        <th class="text-end">100%</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No expense data available</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Breakdown -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Income Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if income_breakdown %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th class="text-end">Amount</th>
+                                        <th class="text-end">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in income_breakdown %}
+                                        <tr>
+                                            <td>
+                                                <span style="color: {{ item.color }}">{{ item.icon }}</span>
+                                                {{ item.category }}
+                                            </td>
+                                            <td class="text-end">{{ item.amount|currency }}</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-success">{{ item.percentage }}%</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th>Total</th>
+                                        <th class="text-end">{{ summary.income|currency }}</th>
+                                        <th class="text-end">100%</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No income data available</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 5 Spending Categories - Styled Like Expense Breakdown -->
+{% if top_expenses %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy me-2"></i>Top 5 Spending Categories
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Category</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in top_expenses %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary rounded-pill">{{ forloop.counter }}</span>
+                                    </td>
+                                    <td>
+                                        <span style="color: {{ category.category__color }}">{{ category.category__icon }}</span>
+                                        {{ category.category__name }}
+                                    </td>
+                                    <td class="text-end">{{ category.total|currency }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'expense_tracker/js/reports.js' %}"></script>
+<script>
+    // Show/hide custom date fields
+    document.querySelector('[name="period"]').addEventListener('change', function() {
+        const customDates = document.getElementById('custom-dates');
+        const customDatesEnd = document.getElementById('custom-dates-end');
+        
+        if (this.value === 'custom') {
+            customDates.style.display = 'block';
+            customDatesEnd.style.display = 'block';
+        } else {
+            customDates.style.display = 'none';
+            customDatesEnd.style.display = 'none';
+        }
+    });
+    
+    // Trigger on page load
+    document.querySelector('[name="period"]').dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

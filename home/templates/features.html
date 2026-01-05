@@ -1,0 +1,67 @@
+{% extends 'pages_base.html' %}
+{% load static %}
+
+{% block title %}Features - ChamaSpace{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <a href="{% url 'homepage' %}" class="back-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5m7-7l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Home
+    </a>
+    
+    <div class="page-header">
+        <h1>ChamaSpace Features</h1>
+        <p>The only integrated digital ecosystem built for Kenyan Chamas</p>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>WhatsApp Chama Assistant</h3>
+            <p>Manage your Chama directly from WhatsApp! Record contributions, loans, fines, add members, and get real-time updates—no app needed. Perfect for admins and members alike.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Digital Bookkeeping</h3>
+            <p>Transparent, real-time tracking of all Chama transactions—contributions, loans, expenses, and fines—accessible to every member. Say goodbye to notebooks and Excel sheets!</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Wekeza Goals</h3>
+            <p>Save as little as KSh 5 toward personal or group goals. Your savings earn competitive interest through pooled investments in high-yield instruments.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Smart Merry-Go-Round</h3>
+            <p>Automate your rota cycles while idle funds are temporarily invested to beat inflation—so your money works even before it’s your turn.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🤝</div>
+            <h3>Kopeshana (P2P Lending)</h3>
+            <p>Borrow or lend securely within your trusted Chama network. Digital agreements, repayment tracking, and no collateral required.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>Competitive Interest Rates</h3>
+            <p>Earn attractive returns on your savings and idle Chama funds. Rates are dynamic and optimized to maximize your growth.</p>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <button class="btn-primary" onclick="window.location.href='{% url 'Sign_up' %}'">
+            Start Saving Now
+        </button>
+    </div>
+</div>
+
+<!-- Load custom CSS -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/features.css' %}">
+{% endblock %}

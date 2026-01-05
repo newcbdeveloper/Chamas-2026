@@ -1,0 +1,282 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Pypal
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+
+      <main role="main" class="main-content">
+        <div class="container-fluid">
+
+            <section class="container my-4">
+			<h1 class="text-center mb-4 section-heading border-bottom pb-2">Transaction Details</h1>
+       <h5 style="text-decoration:#00a65a">{% include '_messages.html' %}</h5>
+				<table class="table table-bordered">
+					<thead class="table-warning">
+						<tr>
+							<th>Chama Details</th>
+							<th></th>
+							<th>Payment </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<table class="table-bordered table">
+									<tr>
+										<th>Chama Name</th>
+										<td>{{chamas_data.name}}</td>
+									</tr>
+									<tr>
+										<th>Amount</th>
+										<td>${{chamas_data.amount}}</td>
+									</tr>
+
+								</table>
+							</td>
+							<td>
+								<ul class="list-unstyled">
+
+					            </ul>
+							</td>
+
+						</tr>
+					</tbody>
+					<tfoot class="table-info">
+						<tr>
+							<td></td>
+							<th>Total Amount</th>
+							<td><b>$<span class="totalAmount">{{chamas_data.amount}}</span></b></td>
+						</tr>
+						<tr>
+							<td colspan="2"></td>
+							<td>
+                                <table class="table-bordered table">
+									<tr>
+										<th>Pay from Wallet</th>
+										<td>
+										<form method="post" action="{% url 'paypal_paymentcomplete'  %}">
+											{% csrf_token %}
+											<input type="hidden" value="{{chamas_data.name}}" name="name"/>
+											<input type="submit" value="Pay from your wallet"  class="btn btn-primary"/>
+										</form>
+                                        </td>
+
+
+
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+
+
+        var amount='{{plan.price}}'
+        var name='{{plan.title}}'
+        var planid='{{plan.id}}'
+        console.log(amount,name)
+
+
+
+        function completeorder(transno){
+
+            var url= "{% url 'paypal_paymentcomplete' %}"
+
+            console.log('here is url',url)
+
+            fetch(url,
+                {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+
+
+                body: JSON.stringify({'transaction_no': transno,'plan_id': planid,'name':name}),
+            })
+            console.log('transno posted done',transno)
+        }
+
+        paypal.Buttons({
+             style: {
+                shape:  'pill',
+                label:  'pay',
+                 height:40,
+
+            },
+            // Set up the transaction
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: amount
+                        }
+                    }]
+                });
+            },
+
+
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(orderData) {
+
+                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+
+                    var transaction = orderData.purchase_units[0].payments.captures[0];
+                    transno=transaction.id
+                    completeorder(transno)
+                    // alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+
+
+                    const element = document.getElementById('paypal-button-container');
+                    element.innerHTML = '';
+                    element.innerHTML = '<h3>Thank you for your payment! <br>Here is your transaction id:'+ transaction.id +'<br> Now you can  </h3>';
+
+                });
+            }
+
+
+        }).render('#paypal-button-container');
+    </script>
+										</td>
+									</tr>
+
+
+								</table>
+
+
+
+
+
+
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+		</section><!-- .col-12 -->
+          </div> <!-- .row -->
+
+
+
+
+
+        <!-- .container-fluid -->
+        <div id="abc" class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  {% for i in user_notifications %}
+                <div class="list-group list-group-flush my-n3">
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+
+                      <div class="col">
+
+                        <small><strong>{{i.notification_title}} </strong></small>
+                        <div class="my-0 text-muted small">{{i.notification_body}}</div>
+                        <small class="badge badge-pill badge-light text-muted">{{i.created_at}}</small>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                </div>
+                  {% endfor %}
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--
+        <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body px-5">
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-success justify-content-center">
+                      <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Control area</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Activity</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Droplet</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Upload</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Users</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Settings</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+-->
+      </main>
+    </div>
+
+
+{% endblock %}

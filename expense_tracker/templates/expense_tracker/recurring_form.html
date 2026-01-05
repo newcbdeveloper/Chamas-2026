@@ -1,0 +1,229 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-sync-alt me-2"></i>{{ title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="recurring-form">
+                        {% csrf_token %}
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>What are recurring transactions?</strong>
+                            <p class="mb-0 mt-2 small">
+                                Set up automatic transactions that repeat on a schedule, like monthly rent, weekly salary, or annual subscriptions. 
+                                The system will automatically create these transactions for you.
+                            </p>
+                        </div>
+                        
+                        <!-- Transaction Type -->
+                        <div class="mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-exchange-alt me-1"></i>Transaction Type
+                            </label>
+                            {{ form.type }}
+                            {% if form.type.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.type.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-tag me-1"></i>Category
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.category.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-money-bill-wave me-1"></i>Amount ({{ currency_symbol }})
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">{{ currency_symbol }}</span>
+                                {{ form.amount }}
+                            </div>
+                            {% if form.amount.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.amount.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-comment me-1"></i>Description
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                e.g., "Monthly rent payment" or "Weekly salary"
+                            </small>
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Recurrence Schedule</h5>
+
+                        <!-- Frequency -->
+                        <div class="mb-3">
+                            <label for="{{ form.frequency.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-redo me-1"></i>Frequency
+                            </label>
+                            {{ form.frequency }}
+                            {% if form.frequency.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.frequency.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-check me-1"></i>Start Date
+                                </label>
+                                {{ form.start_date }}
+                                {% if form.start_date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.start_date.errors }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    When should this recurring transaction start?
+                                </small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-times me-1"></i>End Date (Optional)
+                                </label>
+                                {{ form.end_date }}
+                                {% if form.end_date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.end_date.errors }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Leave blank for no end date
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Auto Generate -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                {{ form.auto_generate }}
+                                <label class="form-check-label" for="{{ form.auto_generate.id_for_label }}">
+                                    <strong>Automatically Generate Transactions</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        When enabled, transactions will be created automatically on schedule. 
+                                        Disable if you want to manually trigger them.
+                                    </small>
+                                </label>
+                            </div>
+                            {% if form.auto_generate.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.auto_generate.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Example Preview -->
+                        <div class="alert alert-light border" id="preview-section" style="display: none;">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-eye me-2"></i>Preview
+                            </h6>
+                            <p class="mb-0 small" id="preview-text"></p>
+                        </div>
+
+                        <!-- Form Errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>{{ submit_text }}
+                            </button>
+                            <a href="{% url 'expense_tracker:recurring_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update preview when form changes
+    function updatePreview() {
+        const type = document.querySelector('[name="type"]').value;
+        const amount = document.querySelector('[name="amount"]').value;
+        const frequency = document.querySelector('[name="frequency"]').selectedOptions[0]?.text;
+        const description = document.querySelector('[name="description"]').value;
+        
+        if (type && amount && frequency) {
+            const previewSection = document.getElementById('preview-section');
+            const previewText = document.getElementById('preview-text');
+            
+            const typeText = type === 'income' ? 'receive' : 'pay';
+            const amountText = `KSh ${parseFloat(amount).toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+            
+            previewText.innerHTML = `
+                You will ${typeText} <strong>${amountText}</strong> ${frequency.toLowerCase()}
+                ${description ? `for "${description}"` : ''}
+            `;
+            previewSection.style.display = 'block';
+        }
+    }
+    
+    // Add event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('[name="type"]')?.addEventListener('change', updatePreview);
+        document.querySelector('[name="amount"]')?.addEventListener('input', updatePreview);
+        document.querySelector('[name="frequency"]')?.addEventListener('change', updatePreview);
+        document.querySelector('[name="description"]')?.addEventListener('input', updatePreview);
+        
+        // Initial preview
+        updatePreview();
+        
+        // Set default start date to today if empty
+        const startDateInput = document.querySelector('[name="start_date"]');
+        if (startDateInput && !startDateInput.value) {
+            startDateInput.value = new Date().toISOString().split('T')[0];
+        }
+    });
+</script>
+{% endblock %}

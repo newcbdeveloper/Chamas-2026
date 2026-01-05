@@ -1,0 +1,164 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'expense_tracker/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-container py-4">
+    
+    <!-- Date Selector -->
+    {% include 'expense_tracker/partials/date_selector.html' %}
+    
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="summary-card income-card">
+                <div class="card-icon">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="card-content">
+                    <h6 class="card-label">Total Income</h6>
+                    <h3 class="card-value">{{ daily_summary.income|currency }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="summary-card expense-card">
+                <div class="card-icon">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="card-content">
+                    <h6 class="card-label">Total Expenses</h6>
+                    <h3 class="card-value">{{ daily_summary.expenses|currency }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="summary-card balance-card {% if daily_summary.balance < 0 %}negative{% endif %}">
+                <div class="card-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="card-content">
+                    <h6 class="card-label">Net Balance</h6>
+                    <h3 class="card-value">{{ daily_summary.balance|currency }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights Section -->
+    {% if recent_insights %}
+    <div class="insights-section mb-4">
+        <div class="section-header">
+            <h5><i class="fas fa-lightbulb me-2"></i>Recent Insights</h5>
+            <a href="{% url 'expense_tracker:insights' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="insights-container">
+            {% for insight in recent_insights %}
+                <div class="insight-card insight-{{ insight.type }}">
+                    <div class="insight-icon">
+                        {% if insight.type == 'increase' %}
+                            <i class="fas fa-arrow-trend-up"></i>
+                        {% elif insight.type == 'decrease' %}
+                            <i class="fas fa-arrow-trend-down"></i>
+                        {% elif insight.type == 'budget_warning' %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="insight-content">
+                        <h6>{{ insight.title }}</h6>
+                        <p>{{ insight.message }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="quick-actions mb-4">
+        <a href="{% url 'expense_tracker:transaction_create' %}?type=expense" class="btn btn-danger">
+            <i class="fas fa-minus-circle me-2"></i>Add Expense
+        </a>
+        <a href="{% url 'expense_tracker:transaction_create' %}?type=income" class="btn btn-success">
+            <i class="fas fa-plus-circle me-2"></i>Add Income
+        </a>
+        <a href="{% url 'expense_tracker:charts' %}" class="btn btn-info">
+            <i class="fas fa-chart-line me-2"></i>View Charts
+        </a>
+    </div>
+
+    <!-- Transactions List -->
+<div class="transactions-section">
+    <div class="section-header">
+        <h5><i class="fas fa-list me-2"></i>Today's Transactions</h5>
+        <div>
+            <span class="badge bg-secondary me-2">{{ transactions.count }} transaction{{ transactions.count|pluralize }}</span>
+            <a href="{% url 'expense_tracker:transaction_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+    </div>
+
+    {% if transactions %}
+        <!-- Grid container for 2 columns on md+ -->
+        <div class="row g-3">
+            {% for transaction in transactions %}
+                <div class="col-md-6 col-12">
+                    {% include 'expense_tracker/partials/transaction_card.html' %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h5>No transactions yet</h5>
+            <p>Start tracking by adding your first transaction</p>
+            <a href="{% url 'expense_tracker:transaction_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add a Transaction
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+    <!-- Monthly Comparison -->
+    <div class="comparison-section mt-4">
+        <h5>This Month vs Last Month</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="comparison-card">
+                    <div class="comparison-label">Income</div>
+                    <div class="comparison-values">
+                        <span class="current">{{ comparison.current.income|currency }}</span>
+                        <span class="change {% if comparison.income_change >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ comparison.income_change|format_change }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="comparison-card">
+                    <div class="comparison-label">Expenses</div>
+                    <div class="comparison-values">
+                        <span class="current">{{ comparison.current.expenses|currency }}</span>
+                        <span class="change {% if comparison.expense_change <= 0 %}positive{% else %}negative{% endif %}">
+                            {{ comparison.expense_change|format_change }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'expense_tracker/js/dashboard.js' %}"></script>
+{% endblock %}

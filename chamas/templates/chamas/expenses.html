@@ -1,0 +1,452 @@
+{%extends 'chamas/base.html'%}
+{% load humanize %}
+{% load static %}
+
+{%block head%}
+<title>Expenses</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/reports.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/loans.css'%}">
+{%endblock%}
+
+{%block body%}
+<div class="reports-container full-width">
+	<div class="reports-header">
+		<div class="reports-header-content">
+			<h1 class="reports-title text-brand-primary">Expenses Management</h1>
+			<p class="reports-subtitle">Create and review group expenses</p>
+		</div>
+	</div>
+
+	<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+	<div class="floating-actions desktop-floating admin" id="desktopActions">
+		<button class="btn-floating" id="createExpenseBtnDesktop" title="New Expense">
+			<i class='bx bx-plus'></i>
+			<span>New Expense</span>
+		</button>
+	</div>
+
+	<div class="fab-backdrop" id="fabBackdrop"></div>
+	<div class="fab-container">
+		<button class="fab-create" id="fabCreate">
+			<i class='bx bx-plus'></i>
+		</button>
+		<button class="mini-fab admin" id="createExpenseBtnMobile">
+			<i class='bx bx-receipt'></i>
+			<span class="fab-label">Create Expense</span>
+		</button>
+	</div>
+
+	<div class="reports-tabs-wrapper">
+		<ul class="reports-tabs" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active admin member" id="all-expenses-tab" data-bs-toggle="tab" href="#tab-all-expenses" role="tab">
+					<i class="bx bx-list-ul"></i>
+					All Expenses
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link member" id="my-expenses-tab" data-bs-toggle="tab" href="#tab-my-expenses" role="tab">
+					<i class="bx bx-user"></i>
+					My Expenses
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="reports-content">
+		<div class="tab-content">
+			<div class="tab-pane active" id="tab-all-expenses" role="tabpanel">
+				<div class="reports-grid">
+					<div class="report-card brand-card admin member">
+						<div class="report-card-header brand-card-header">
+							<div class="report-header-info">
+								<h3 class="report-title text-brand-primary">All Expenses</h3>
+								<p class="report-description">All recorded expenses for the chama</p>
+							</div>
+							<div class="report-actions">
+								<button class="btn-download-individual bg-brand-primary" id="download-all-expenses-report">
+									<i class="bx bx-download"></i>
+								</button>
+							</div>
+						</div>
+						<div class="report-data brand-card-body">
+							<div id="all-expenses-items" class="data-container">
+								{% if expenses %}
+								<div class="brand-table-responsive">
+									<table class="brand-table">
+										<thead>
+											<tr>
+												<th>ID</th>
+												<th>Name</th>
+												<th>Amount</th>
+												<th>Description</th>
+												<th>Created On</th>
+												<th>Created By</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for expense in expenses %}
+											<tr>
+												<td>E{{ expense.id|stringformat:'03d' }}</td>
+												<td class="font-weight-bold">{{ expense.name }}</td>
+												<td class="text-brand-primary">KSH {{ expense.amount|intcomma }}</td>
+												<td>{{ expense.description }}</td>
+												<td>{{ expense.created_on|date:"M d, Y" }}</td>
+												<td>{% if expense.created_by %}{{ expense.created_by.name }}{% else %}-{% endif %}</td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+								{% else %}
+								<div class="empty-state">
+									<i class="bx bx-inbox empty-state-icon"></i>
+									<p class="empty-state-message">No Expenses</p>
+									<p class="empty-state-description">There are no expenses recorded yet</p>
+								</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane" id="tab-my-expenses" role="tabpanel">
+					<div class="reports-grid">
+						<div class="report-card brand-card member">
+							<div class="report-card-header brand-card-header">
+								<div class="report-header-info">
+									<h3 class="report-title text-brand-primary">My Expenses</h3>
+									<p class="report-description">Expenses created by you</p>
+								</div>
+							</div>
+							<div class="report-data brand-card-body">
+								<div id="my-expenses-items" class="data-container">
+									{% if my_expenses %}
+									<div class="brand-table-responsive">
+										<table class="brand-table">
+											<thead>
+												<tr>
+													<th>ID</th>
+													<th>Name</th>
+													<th>Amount</th>
+													<th>Description</th>
+													<th>Created On</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for expense in my_expenses %}
+												<tr>
+													<td>E{{ expense.id|stringformat:'03d' }}</td>
+													<td class="font-weight-bold">{{ expense.name }}</td>
+													<td class="text-brand-primary">KSH {{ expense.amount|intcomma }}</td>
+													<td>{{ expense.description }}</td>
+													<td>{{ expense.created_on|date:"M d, Y" }}</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+									{% else %}
+									<div class="empty-state">
+										<i class="bx bx-inbox empty-state-icon"></i>
+										<p class="empty-state-message">No Expenses</p>
+										<p class="empty-state-description">You have not created any expenses yet</p>
+									</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Create Expense Modal -->
+<div class="modal fade brand-modal" id="createExpenseModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header brand-modal-header">
+				<h5 class="modal-title">Create Expense</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="createExpenseForm" class="brand-form">
+					<div class="form-group">
+						<label for="expenseName" class="form-label">Name</label>
+						<input type="text" id="expenseName" name="name" class="form-control" required>
+					</div>
+					<div class="form-group">
+						<label for="expenseAmount" class="form-label">Amount</label>
+						<input type="number" id="expenseAmount" name="amount" class="form-control" step="0.01" min="0.01" required>
+					</div>
+					<div class="form-group">
+						<label for="expenseDescription" class="form-label">Description</label>
+						<textarea id="expenseDescription" name="description" class="form-control" rows="3" required></textarea>
+					</div>
+					<div id="createExpenseFeedback" class="alert" style="display: none;"></div>
+				</form>
+			</div>
+			<div class="modal-footer brand-modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button type="submit" form="createExpenseForm" class="btn btn-success">
+					<i class='bx bx-check'></i>
+					Create Expense
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+/***** Use Loans FAB and floating styles already included via loans.css *****/
+/* Ensure desktop FAB shows on desktop and positions top-right; mobile uses existing .fab-container */
+.desktop-fab {
+	position: fixed;
+	top: 120px;
+	right: 24px;
+	z-index: 1050;
+	display: none;
+}
+@media (min-width: 769px) {
+	.desktop-fab { display: block !important; }
+}
+@media (max-width: 768px) {
+	.desktop-fab { display: none !important; }
+}
+
+/* Make sure mobile FAB is visible on mobile */
+@media (max-width: 768px) {
+	.fab-container { display: block !important; }
+}
+
+/* Desktop floating actions (copied from Loans) */
+.floating-actions.desktop-floating {
+	position: fixed;
+	top: 120px;
+	right: 20px;
+	display: flex;
+	flex-direction: row;
+	gap: 12px;
+	z-index: 900;
+}
+@media (max-width: 768px) {
+	.floating-actions.desktop-floating { display: none !important; }
+}
+.btn-floating {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	background: var(--color-primary);
+	color: white;
+	border: none;
+	border-radius: 30px;
+	box-shadow: var(--shadow-lg);
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-decoration: none;
+	min-width: 160px;
+	justify-content: center;
+}
+.btn-floating:hover {
+	background: var(--color-primary-light);
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-lg);
+	color: white;
+	text-decoration: none;
+}
+.btn-floating i { font-size: 16px; }
+
+/* Copy of Loans FAB styles to guarantee look/feel */
+.fab-backdrop {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1040;
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.3s ease;
+}
+.fab-backdrop.active {
+	display: block;
+	opacity: 1;
+	visibility: visible;
+}
+.fab-container {
+	display: none;
+	position: fixed;
+	bottom: 100px;
+	right: 24px;
+	z-index: 1050;
+}
+.fab-create {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	border: none;
+	background: var(--color-primary);
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.fab-create:hover {
+	background: var(--color-primary-light);
+	transform: scale(1.1);
+	box-shadow: 0 6px 20px rgba(33, 145, 165, 0.6);
+}
+.fab-create.active {
+	transform: rotate(45deg);
+	background: var(--color-primary-light);
+}
+.mini-fab {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	border: none;
+	background: var(--color-primary);
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+	cursor: pointer;
+	position: absolute;
+	bottom: 0;
+	right: 4px;
+	opacity: 0;
+	visibility: hidden;
+	transform: scale(0);
+	transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.mini-fab.show {
+	opacity: 1;
+	visibility: visible;
+	transform: scale(1);
+}
+.fab-label {
+	position: absolute;
+	right: 60px;
+	top: 50%;
+	transform: translateY(-50%) translateX(8px);
+	background: rgba(0, 0, 0, 0.8);
+	color: white;
+	padding: 8px 12px;
+	border-radius: 4px;
+	font-size: 12px;
+	white-space: nowrap;
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.3s ease;
+	pointer-events: none;
+}
+.mini-fab:hover .fab-label {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(-50%) translateX(-8px);
+}
+
+/* Show FAB only on mobile */
+@media (max-width: 768px) {
+	.fab-container { display: block !important; }
+	.fab-backdrop { display: none !important; }
+	.fab-backdrop.active { display: block !important; }
+}
+/* Hide mobile FAB on desktop */
+@media (min-width: 769px) {
+	.fab-container, .fab-backdrop { display: none !important; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+	tabs.forEach(tab => {
+		tab.addEventListener('click', function(e) {
+			e.preventDefault();
+			const target = this.getAttribute('href');
+			document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+			document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+			this.classList.add('active');
+			document.querySelector(target).classList.add('active');
+		});
+	});
+
+	const createExpenseBtnDesktop = document.getElementById('createExpenseBtnDesktop');
+	const createExpenseBtnMobile = document.getElementById('createExpenseBtnMobile');
+	if (createExpenseBtnDesktop) createExpenseBtnDesktop.addEventListener('click', openCreateExpenseModal);
+	if (createExpenseBtnMobile) createExpenseBtnMobile.addEventListener('click', function() { openCreateExpenseModal(); });
+
+	const fabCreate = document.getElementById('fabCreate');
+	if (fabCreate) fabCreate.addEventListener('click', function(e){ e.stopPropagation(); openCreateExpenseModal(); });
+
+	document.getElementById('createExpenseForm').addEventListener('submit', function(e){
+		e.preventDefault();
+		submitCreateExpense();
+	});
+});
+
+function getCsrfToken() {
+	const input = document.querySelector('[name=csrfmiddlewaretoken]');
+	if (input && input.value) return input.value;
+	const name = 'csrftoken';
+	const cookies = document.cookie ? document.cookie.split(';') : [];
+	for (let i=0; i<cookies.length; i++) { const c = cookies[i].trim(); if (c.substring(0, name.length + 1) === (name + '=')) return decodeURIComponent(c.substring(name.length + 1)); }
+	return '';
+}
+
+function openCreateExpenseModal() {
+	const modal = new bootstrap.Modal(document.getElementById('createExpenseModal'));
+	modal.show();
+}
+
+function showFeedback(elementId, message, type) {
+	const el = document.getElementById(elementId);
+	if (!el) return;
+	el.className = 'alert';
+	el.style.display = 'block';
+	if (type === 'success') el.classList.add('alert-success');
+	else if (type === 'error') el.classList.add('alert-danger');
+	else el.classList.add('alert-info');
+	el.textContent = message;
+}
+
+function submitCreateExpense() {
+	const name = document.getElementById('expenseName').value.trim();
+	const amount = document.getElementById('expenseAmount').value;
+	const description = document.getElementById('expenseDescription').value.trim();
+	if (!name || !amount || !description) { showFeedback('createExpenseFeedback', 'Please fill in all fields', 'error'); return; }
+	const chamaId = localStorage.getItem('groupId');
+	if (!chamaId) { showFeedback('createExpenseFeedback', 'Missing chama. Refresh and try again.', 'error'); return; }
+	showFeedback('createExpenseFeedback', 'Creating expense...', 'info');
+	fetch(`/chamas-bookeeping/create-expense/${chamaId}/`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+		body: JSON.stringify({ name, amount, description })
+	}).then(r => r.json()).then(result => {
+		if (result.status === 'success' || result.message) {
+			showFeedback('createExpenseFeedback', result.message || 'Expense created successfully', 'success');
+			setTimeout(()=>{ location.reload(); }, 1200);
+		} else {
+			showFeedback('createExpenseFeedback', result.message || 'Failed to create expense', 'error');
+		}
+	}).catch(() => {
+		showFeedback('createExpenseFeedback', 'Server error. Please try again.', 'error');
+	});
+}
+</script>
+{%endblock%}

@@ -1,0 +1,210 @@
+{
+  "design_system_name": "Cake Equity Dashboard (2025)",
+  "vendor": "Cake Equity + Mobbin curated",
+  "overall_style": "Modern SaaS / Fintech Minimal",
+  "visual_hierarchy": "Content-first with strong left sidebar navigation",
+  "color_palette": {
+    "primary": "#635BFF",
+    "primary_hover": "#5048CC",
+    "primary_light": "#F5F4FF",
+    "background_main": "#FFFFFF",
+    "background_surface": "#F9FAFC",
+    "background_sidebar": "#FAF9FF",
+    "text_primary": "#1A1A1A",
+    "text_secondary": "#666666",
+    "text_muted": "#999999",
+    "text_on_primary": "#FFFFFF",
+    "accent_success": "#10B981",
+    "accent_warning": "#F59E0B",
+    "accent_info": "#3B82F6",
+    "border_default": "#E5E7EB",
+    "border_light": "#EEE",
+    "chart_colors": [
+      "#635BFF",
+      "#10B981",
+      "#F59E0B",
+      "#8B5CF6",
+      "#EF4444",
+      "#06B6D4"
+    ]
+  },
+  "typography": {
+    "font_family_primary": "Inter, system-ui, -apple-system, sans-serif",
+    "font_weight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "scale": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem"
+    },
+    "line_height": "1.5",
+    "letter_spacing": "-0.01em for headings, normal for body"
+  },
+  "border_radius": {
+    "none": "0",
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "full": "9999px"
+  },
+  "shadows": {
+    "sm": "0 1px 3px rgba(0,0,0,0.1)",
+    "md": "0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04)",
+    "lg": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
+    "card_hover": "0 12px 24px -4px rgba(99,91,255,0.15)"
+  },
+  "spacing_scale": {
+    "0": "0",
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "24px",
+    "6": "32px",
+    "7": "40px",
+    "8": "48px",
+    "9": "64px"
+  },
+  "layout_structure": {
+    "page_container": "max-width 1440px, centered",
+    "header_height": "64px",
+    "sidebar_width_collapsed": "64px",
+    "sidebar_width_expanded": "240px",
+    "main_content_padding": "24px 32px",
+    "grid_gutter": "24px",
+    "card_padding": "24px"
+  },
+  "components": {
+    "sidebar": {
+      "background": "#FAF9FF",
+      "active_item_background": "#635BFF",
+      "active_item_text": "#FFFFFF",
+      "hover_item_background": "rgba(99,91,255,0.08)",
+      "icon_size": "20px",
+      "border_right": "1px solid #EEE"
+    },
+    "top_navigation_bar": {
+      "height": "64px",
+      "background": "#FFFFFF",
+      "border_bottom": "1px solid #EEE",
+      "logo_size": "28px height",
+      "company_name_style": "600 20px / 28px"
+    },
+    "cards": {
+      "background": "#FFFFFF",
+      "border": "1px solid #E5E7EB",
+      "border_radius": "12px",
+      "padding": "24px",
+      "hover_lift": "shadow-lg + translate-y-1px"
+    },
+    "buttons": {
+      "primary": {
+        "bg": "#635BFF",
+        "hover": "#5048CC",
+        "active": "#4239BB",
+        "text": "#FFFFFF",
+        "padding": "10px 20px",
+        "height": "40px",
+        "border_radius": "8px"
+      },
+      "secondary": {
+        "bg": "transparent",
+        "border": "1px solid #635BFF",
+        "text": "#635BFF",
+        "hover_bg": "#F5F4FF"
+      },
+      "ghost": {
+        "bg": "transparent",
+        "text": "#666666",
+        "hover_bg": "rgba(0,0,0,0.04)"
+      }
+    },
+    "badges": {
+      "style": "pill shape, 6px 12px padding, 20px height",
+      "free_plan": {
+        "bg": "#E5E7EB",
+        "text": "#374151",
+        "border_radius": "999px"
+      },
+      "action_items": {
+        "bg": "#FEF3C7",
+        "text": "#92400E",
+        "icon_color": "#F59E0B"
+      }
+    },
+    "charts": {
+      "donut_chart": {
+        "thickness": "20px stroke",
+        "background_ring": "#E5E7EB",
+        "highlight_color": "#635BFF and #10B981 gradient",
+        "center_icon_size": "48px"
+      },
+      "progress_bars": {
+        "height": "8px",
+        "border_radius": "4px",
+        "background": "#E5E7EB",
+        "fill": "linear gradient primary"
+      }
+    },
+    "avatars": {
+      "size": "32px",
+      "border_radius": "full",
+      "initials_font": "600 14px",
+      "backgrounds": [
+        "#635BFF",
+        "#10B981",
+        "#F59E0B",
+        "#8B5CF6"
+      ]
+    },
+    "toasts_notifications": {
+      "position": "top-center",
+      "background": "#FFFFFF",
+      "border": "1px solid #E5E7EB",
+      "shadow": "lg",
+      "border_left": "4px solid #635BFF"
+    },
+    "tabs": {
+      "inactive": "#666666",
+      "active": "#635BFF",
+      "underline": "3px thick #635BFF"
+    },
+    "tags_labels": {
+      "pool_tag": {
+        "bg": "#E0E7FF",
+        "text": "#4338CA",
+        "border_radius": "6px",
+        "font": "500 12px"
+      }
+    }
+  },
+  "iconography": {
+    "style": "Outline (similar to Heroicons / Lucide)",
+    "size_default": "20px",
+    "active_color": "#635BFF",
+    "inactive_color": "#666666"
+  },
+  "motion_interaction": {
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "duration": "200ms",
+    "hover_lift": "subtle 2px y-translation + shadow increase",
+    "sidebar_expand_collapse": "smooth 250ms width transition"
+  },
+  "data_visualization_style": {
+    "preference": "Clean, large numbers with subtle icons",
+    "metric_cards": "large bold number + muted label below + tiny trend arrow",
+    "trend_arrows": "colored triangle + percentage in same color"
+  },
+  "tone_of_voice_microcopy": "Friendly professional fintech – uses celebratory icons (cake, rocket), short action-oriented labels",
+  "recommended_usage_for_ai_prompts": "Use this JSON as system context when asking Cursor, Claude, or any code-generating AI to build admin dashboards, cap table tools, equity management platforms, or any modern B2B SaaS with a fintech feel. Specify: 'Follow the Cake Equity design system exactly for colors, spacing, cards, sidebar, and component styles.'"
+}

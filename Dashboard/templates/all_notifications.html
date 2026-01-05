@@ -1,0 +1,42 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Withdraw success
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper">
+
+
+
+    <main role="main" class="main-content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 mb-4">
+                <h2 class="page-title">All Notifications</h2>
+                <p class="lead text-muted">Here is the list of your all notifications</p>
+
+                <div class="row">
+                    {% for i in user_notifications %}
+                        <div class="col-12 mb-4">
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-heading">{{ i.notification_title }}</h4>
+                                <p>{{ i.notification_body|safe }}.</p>
+                                <hr>
+                                <p class="mb-0">{{ i.created_at }}.</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+
+                </div>
+                <!-- end section -->
+
+            </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+    </div>
+
+
+{% endblock %}
+

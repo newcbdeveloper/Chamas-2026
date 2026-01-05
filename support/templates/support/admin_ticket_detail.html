@@ -1,0 +1,363 @@
+{% extends 'support/base_support.html' %}
+{% load static %}
+
+{% block page_title %}{{ ticket.reference_number }} (Admin){% endblock %}
+{% block page_subtitle %}{{ ticket.subject }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'support:admin_tickets_list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Back to List
+</a>
+{% endblock %}
+
+{% block support_content %}
+<div class="row">
+    <!-- Main Content (Messages & Response) -->
+    <div class="col-lg-8">
+        <!-- Messages Chat -->
+        <div class="card chat-card mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-comments me-2"></i>Conversation</h6>
+                <small class="text-muted">{{ messages_list.count }} message{{ messages_list.count|pluralize }}</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="chat-messages" id="chatMessages" style="max-height: 500px; overflow-y: auto;">
+                    {% for message in messages_list %}
+                    <div class="chat-message {% if message.sender_type == 'user' %}user-message{% else %}admin-message{% endif %} {% if message.is_internal %}internal-message{% endif %}" style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="message-avatar" style="flex-shrink: 0;">
+                                {% if message.sender_type == 'admin' %}
+                                <div class="avatar-circle bg-primary" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                {% else %}
+                                <div class="avatar-circle bg-success" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="message-content" style="flex: 1;">
+                                <div class="message-header" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <strong style="color: #111827;">
+                                        {% if message.sender_type == 'admin' %}
+                                            {{ message.sender.get_full_name }} (Admin)
+                                            {% if message.is_internal %}
+                                            <span class="badge bg-warning text-dark ms-2">Internal Note</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {{ ticket.user.get_full_name }}
+                                        {% endif %}
+                                    </strong>
+                                    <span class="message-time" style="font-size: 0.75rem; color: #6b7280;">
+                                        {{ message.created_at|date:"M d, Y" }} at {{ message.created_at|time:"h:i A" }}
+                                    </span>
+                                </div>
+                                <div class="message-body" style="color: #374151; line-height: 1.6;">
+                                    {{ message.message|linebreaks }}
+                                </div>
+                                {% if message.attachment %}
+                                <div class="message-attachment" style="margin-top: 0.75rem;">
+                                    <a href="{{ message.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-paperclip me-1"></i>{{ message.attachment_filename }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="far fa-comments fa-3x mb-2 opacity-50"></i>
+                        <p>No messages yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Response Form -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-reply me-2"></i>Send Response to User</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'support:admin_respond' ticket.id %}" enctype="multipart/form-data" id="adminResponseForm">
+                    {% csrf_token %}
+                    
+                    <!-- Public Response (User Will See This) -->
+                    <div class="mb-3">
+                        <label for="id_message" class="form-label fw-bold">
+                            <i class="fas fa-comment me-1"></i>Response to User <span class="text-danger">*</span>
+                        </label>
+                        <textarea name="message" id="id_message" class="form-control" rows="5" required 
+                                  placeholder="Type your response to the user here..."></textarea>
+                        <small class="text-muted">This message will be visible to the user</small>
+                    </div>
+
+                    <!-- Attachment -->
+                    <div class="mb-3">
+                        <label for="id_attachment" class="form-label fw-bold">
+                            <i class="fas fa-paperclip me-1"></i>Attachment (Optional)
+                        </label>
+                        <input type="file" name="attachment" id="id_attachment" class="form-control" 
+                               accept=".jpg,.jpeg,.png,.pdf,.txt,.doc,.docx">
+                        <small class="text-muted">Max 5MB. Allowed: jpg, png, pdf, txt, doc, docx</small>
+                    </div>
+
+                    <!-- Update Status -->
+                    <div class="mb-3">
+                        <label for="id_update_status" class="form-label fw-bold">
+                            <i class="fas fa-flag me-1"></i>Update Status (Optional)
+                        </label>
+                        <select name="update_status" id="id_update_status" class="form-select">
+                            <option value="">Keep Current Status ({{ ticket.get_status_display }})</option>
+                            <option value="open">Open</option>
+                            <option value="pending">Pending User Response</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <small class="text-muted">Change status when sending response</small>
+                    </div>
+
+                    <!-- Internal Note (Admin Only) -->
+                    <div class="mb-3">
+                        <label for="id_internal_note" class="form-label fw-bold">
+                            <i class="fas fa-lock me-1"></i>Internal Note (Optional)
+                        </label>
+                        <textarea name="internal_note" id="id_internal_note" class="form-control" rows="3"
+                                  placeholder="Add internal notes for other admins (user will NOT see this)..."></textarea>
+                        <small class="text-warning">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Internal notes are NOT visible to the user
+                        </small>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="sendResponseBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Send Response to User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Internal Note Form (Shortcut) -->
+        <div class="card mt-3">
+            <div class="card-header bg-warning">
+                <h6 class="mb-0 text-dark">
+                    <i class="fas fa-sticky-note me-2"></i>Quick Internal Note (Admin Only)
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'support:add_internal_note' ticket.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea name="note" class="form-control" rows="3" required
+                                  placeholder="Add internal note for team (user will NOT see this)..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-plus me-2"></i>Add Internal Note
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar (User Context & Actions) -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-tasks me-2"></i>Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <!-- Assign Ticket -->
+                <form method="post" action="{% url 'support:assign_ticket' ticket.id %}" class="mb-3">
+                    {% csrf_token %}
+                    <label class="form-label fw-bold">Assign Ticket</label>
+                    <select name="assigned_to" class="form-select mb-2" required>
+                        <option value="">Select admin...</option>
+                        {% for admin in assign_form.fields.assigned_to.queryset %}
+                        <option value="{{ admin.id }}" {% if ticket.assigned_to == admin %}selected{% endif %}>
+                            {{ admin.get_full_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary w-100">
+                        <i class="fas fa-user-plus me-1"></i>Assign
+                    </button>
+                </form>
+
+                <!-- Update Status -->
+                <form method="post" action="{% url 'support:update_ticket_status' ticket.id %}">
+                    {% csrf_token %}
+                    <label class="form-label fw-bold">Update Status</label>
+                    <select name="status" class="form-select mb-2" required>
+                        <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="pending" {% if ticket.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="resolved" {% if ticket.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="closed" {% if ticket.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-warning w-100">
+                        <i class="fas fa-sync me-1"></i>Update Status
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Ticket Info -->
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Ticket Info</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <strong>Reference:</strong><br>
+                    <code>{{ ticket.reference_number }}</code>
+                </div>
+                <div class="mb-2">
+                    <strong>Status:</strong><br>
+                    <span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Priority:</strong><br>
+                    <span class="badge bg-light text-dark">{{ ticket.get_priority_display }}</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Category:</strong><br>
+                    <span class="badge bg-light text-dark">{{ ticket.get_category_display }}</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Created:</strong><br>
+                    {{ ticket.created_at|date:"M d, Y h:i A" }}
+                </div>
+                {% if ticket.assigned_to %}
+                <div>
+                    <strong>Assigned to:</strong><br>
+                    {{ ticket.assigned_to.get_full_name }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Context -->
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-user me-2"></i>User Context</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>User:</strong><br>
+                    {{ ticket.user.get_full_name }}<br>
+                    <small class="text-muted">{{ ticket.user.email }}</small>
+                </div>
+
+                <!-- Wallet Info -->
+                {% if user_context.wallet %}
+                <div class="mb-3">
+                    <strong>Wallet:</strong><br>
+                    Balance: KES {{ user_context.wallet.balance|floatformat:2 }}<br>
+                    <small class="text-muted">
+                        Available: KES {{ user_context.wallet.available_balance|floatformat:2 }}<br>
+                        Status: {{ user_context.wallet.status|title }}
+                    </small>
+                </div>
+                {% endif %}
+
+                <!-- KYC Status -->
+                {% if user_context.kyc_status %}
+                <div class="mb-3">
+                    <strong>KYC Status:</strong><br>
+                    {% if user_context.kyc_status.is_verified %}
+                    <span class="badge bg-success">Verified</span>
+                    {% else %}
+                    <span class="badge bg-warning">{{ user_context.kyc_status.status|title }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Active MGR Rounds -->
+                {% if user_context.active_mgr_rounds %}
+                <div class="mb-3">
+                    <strong>Active MGR Rounds:</strong><br>
+                    {% for round in user_context.active_mgr_rounds %}
+                    <small>• {{ round.round_name }} ({{ round.frequency }})</small><br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Active Goals -->
+                {% if user_context.active_goals %}
+                <div>
+                    <strong>Active Goals:</strong><br>
+                    {% for goal in user_context.active_goals %}
+                    <small>• {{ goal.name }} ({{ goal.percentage }}%)</small><br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Audit Log -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-history me-2"></i>Audit Log</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for log in audit_logs %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ log.get_action_display }}</strong>
+                            <small class="text-muted">{{ log.created_at|timesince }} ago</small>
+                        </div>
+                        {% if log.performed_by %}
+                        <small class="text-muted">by {{ log.performed_by.get_full_name }}</small>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-muted">No audit logs</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block support_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chatMessages');
+    const adminResponseForm = document.getElementById('adminResponseForm');
+    const sendResponseBtn = document.getElementById('sendResponseBtn');
+    
+    // Scroll to bottom of chat
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Handle form submission
+    if (adminResponseForm) {
+        adminResponseForm.addEventListener('submit', function(e) {
+            const messageField = document.getElementById('id_message');
+            if (!messageField.value.trim()) {
+                e.preventDefault();
+                alert('Please enter a response message');
+                messageField.focus();
+                return false;
+            }
+            
+            sendResponseBtn.disabled = true;
+            sendResponseBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+        });
+    }
+    
+    // Highlight internal notes
+    document.querySelectorAll('.internal-message').forEach(function(el) {
+        el.style.backgroundColor = '#fef3c7';
+        el.style.borderLeft = '4px solid #f59e0b';
+    });
+});
+</script>
+{% endblock %}

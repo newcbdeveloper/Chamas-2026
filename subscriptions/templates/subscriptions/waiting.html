@@ -1,0 +1,70 @@
+{% extends 'subscriptions/base_pricing.html' %}
+
+{% block title %}Waiting for Payment{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="px-6 py-8">
+        <div class="text-green-400 text-6xl text-center mb-6">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">Waiting for payment</h2>
+        <p class="text-center text-">A payment prompt will be sent to your phone momentarily!</p>
+        <p class="text-center text- my-2 text-red-600"> Please complete the payment and wait on the page while we process your payment</p>
+
+        <div class="flex justify-center items-center space-x-2 mt-5">
+            <div class="w-3 h-3 bg-gray-600 rounded-full animate-bounce"></div>
+            <div class="w-3 h-3 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
+            <div class="w-3 h-3 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var paymentSettled = false; 
+
+        $(window).on('beforeunload', function() {
+            return 'Please wait while we process your payment.';
+        });
+
+        $(window).on('beforeunload', function(event) {
+            if (!paymentSettled) {
+                var message = 'Please wait while we process your payment.';
+                event.returnValue = message;
+                return message;
+            }
+        });
+        
+
+        function checkPaymentStatus() {
+            $.ajax({
+                url: '{% url 'subscription_status' signature=signature %}',  
+                type: 'GET',
+                success: function(response) {
+                    paymentSettled = response.settled
+                    if(response.success){
+                        url = '{% url "subscription_success" %}'
+                        window.history.pushState({}, '', url);
+                        window.location.replace(url);
+                    } 
+                    if(!response.success && response.message){
+                        var error = response.message;
+                        url = '/subscriptions/failed/' + encodeURIComponent(error)
+                        window.location.replace(url)
+                    } 
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+        setInterval(checkPaymentStatus, 5000);
+    });
+</script>
+{% endblock %}

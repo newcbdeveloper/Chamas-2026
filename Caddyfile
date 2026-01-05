@@ -1,0 +1,3 @@
+chamaspace.com {
+    reverse_proxy chamaspace_app:8000
+}

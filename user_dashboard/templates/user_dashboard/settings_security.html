@@ -1,0 +1,244 @@
+{% extends "user_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}<title>Security Settings - ChamaSpace</title>{% endblock %}
+
+{% block settings_content %}
+<!-- Header section for security settings page -->
+<div class="page_header">
+    <div class="container">
+        <nav class="page_nav">
+            <!-- Brand -->
+            <div class="brand">
+                <a href="{% url 'user_dashboard:home' %}" class="d-flex align-items-center text-decoration-none">
+                    <div style="width: 32px; height: 32px; background: #0f766e; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">∞</div>
+                    <span class="brand-text ms-2">ChamaSpace</span>
+                </a>
+            </div>
+
+            <!-- Navigation Actions -->
+            <ul class="nav-list">
+                <!-- Search (Hidden on mobile) -->
+                <li class="d-none d-md-block">
+                    <button class="nav-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </li>
+
+                <!-- Notifications -->
+                <li>
+                    <button class="nav-btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                        <i class="far fa-bell"></i>
+                        {% if notifications|length > 0 %}
+                            <span class="badge-dot"></span>
+                        {% endif %}
+                    </button>
+                </li>
+
+                <!-- Profile Dropdown -->
+                <li class="dropdown">
+                    <button class="nav-btn p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user_profile.picture %}
+                            <img src="{{ user_profile.picture.url }}" alt="User" class="nav-avatar">
+                        {% else %}
+                            <img src="{% static 'assets/avatars/face-1.png' %}" alt="User" class="nav-avatar">
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 rounded-3">
+                        <li class="px-3 py-2 border-bottom mb-2">
+                            <p class="mb-0 fw-bold text-dark">{{ user_profile.owner.get_full_name }}</p>
+                            <small class="text-muted">{{ user_profile.owner.email }}</small>
+                        </li>
+                        <li><a class="dropdown-item py-2" href="{% url 'user_dashboard:settings' %}">
+                            <i class="fas fa-user-cog me-2 text-muted"></i> Settings
+                        </a></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'user_dashboard:settings_security' %}">
+                            <i class="fas fa-shield-alt me-2 text-muted"></i> Security
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger py-2" href="{% url 'Logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i> Log Out
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- User Info -->
+        <div class="welcome-section mb-5">
+            <div class="d-flex align-items-center gap-4">
+                <!-- Small Profile Picture (same size as dashboard header) -->
+                <div class="flex-shrink-0">
+                    {% if user_profile.picture %}
+                        <img src="{{ user_profile.picture.url }}" 
+                            alt="{{ user.get_full_name }}" 
+                            class="rounded-circle" 
+                            style="width: 80px; height: 80px; object-fit: cover; border: 4px solid var(--primary-light);">
+                    {% else %}
+                        <img src="{% static 'assets/avatars/face-1.png' %}" 
+                            alt="User" 
+                            class="rounded-circle" 
+                            style="width: 80px; height: 80px; object-fit: cover; border: 4px solid var(--primary-light);">
+                    {% endif %}
+                </div>
+
+                <!-- User Name (removed page title and email) -->
+                <div>
+                    <p class="text-muted h5 mb-0">
+                        <strong>{{ user.get_full_name }}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Security Form -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <form method="POST">
+                {% csrf_token %}
+                <h5 class="fw-bold mb-4">Change Password</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Current Password</label>
+                        <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Enter current password" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">New Password</label>
+                        <input type="password" name="new_password" id="fpassword" class="form-control" placeholder="Enter new password" required onkeyup="check();">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Confirm New Password</label>
+                        <input type="password" name="confirm_password" id="spassword" class="form-control" placeholder="Confirm new password" required onkeyup="check();">
+                        <span id="message"></span>
+                    </div>
+                </div>
+
+                <!-- Primary Actions -->
+                <div class="d-flex flex-column flex-sm-row gap-3 mt-5 pt-4 border-top">
+                    <button type="submit" class="btn btn-primary px-5 rounded-pill order-1 order-sm-1">
+                        Save Changes
+                    </button>
+                    <a href="{% url 'user_dashboard:home' %}" class="btn btn-outline-secondary px-5 rounded-pill order-2 order-sm-2">
+                        Cancel
+                    </a>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="mt-5 pt-5 border-top">
+                    <h6 class="text-danger fw-bold mb-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                    </h6>
+                    <p class="text-muted mb-4">
+                        Permanently delete your ChamaSpace account and all associated data. This action cannot be undone.
+                    </p>
+
+                    <button type="button" class="btn btn-outline-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        Delete Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-danger fw-bold">Delete Account Permanently?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">This will delete:</p>
+                <ul class="text-muted small">
+                    <li>All your chamas & contributions</li>
+                    <li>Your profile and personal data</li>
+                    <li>Everything — forever</li>
+                </ul>
+                <p class="mt-3 mb-1">Type <code class="bg-danger text-white px-2 py-1 rounded">DELETE</code> to confirm:</p>
+                <input type="text" class="form-control" id="deleteConfirmInput" placeholder="Type DELETE" autocomplete="off">
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger rounded-pill px-4" style="pointer-events: none; opacity: 0.6;">
+                    Yes, Delete My Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NOTIFICATIONS MODAL (added for consistency) -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-2">
+                <h5 class="modal-title fw-bold" id="notificationsModalLabel">
+                    <i class="fas fa-bell me-2"></i> Notifications
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                {% if notifications %}
+                    {% for item in notifications %}
+                    <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="fw-semibold mb-1">{{ item.notification_title }}</p>
+                            <p class="text-muted small mb-1">{{ item.notification_body|safe }}</p>
+                            <small class="text-muted"><i class="far fa-clock"></i> {{ item.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="far fa-bell-slash fa-3x mb-3"></i>
+                        <p class="lead">No notifications yet</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer border-0 justify-content-center pt-0">
+                <a href="{% url 'user_dashboard:all_notifications' %}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-list me-2"></i> View all notifications
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function check() {
+    let fp = document.getElementById('fpassword');
+    let sp = document.getElementById('spassword');
+    let msg = document.getElementById('message');
+    if (fp.value === sp.value && fp.value.length > 0) {
+        msg.style.color = '#00a65a';
+        msg.innerHTML = '✓ Passwords match';
+    } else if (sp.value.length > 0) {
+        msg.style.color = '#dc3545';
+        msg.innerHTML = '✗ Passwords do not match';
+    } else {
+        msg.innerHTML = '';
+    }
+}
+
+document.getElementById('deleteConfirmInput')?.addEventListener('input', function() {
+    const btn = document.getElementById('confirmDeleteBtn');
+    if (this.value.trim().toUpperCase() === 'DELETE') {
+        btn.href = "{% url 'delete-account' %}";
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+    } else {
+        btn.href = '#';
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
+    }
+});
+</script>
+{% endblock %}

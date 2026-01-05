@@ -1,0 +1,230 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Add fund to group goal
+{% endblock %}
+{% block content %}
+
+
+
+    <div class="wrapper">
+
+
+        <main role="main" class="main-content p-0">
+            <div class="page_header pt-3">
+                <div class="container">
+                    <nav class="page_nav mob_nav show_on_mobile">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+                            <li class="">
+                                <img src="{% static 'images/Notifications.png' %}" alt="">
+                            </li>
+                            <li class="">
+
+                                <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+
+                                    <img src="{% static 'images/menu.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="company_box d-flex flex-row justify-content-start align-items-center pt-0 mt-0">
+                        <div class="company_image">
+                            <img src="{% static 'images/Company.png' %}" alt="">
+                        </div>
+                        <div class="company_content">
+                            <h6>
+                                Good Morning <br>
+                                <b>Solomon!</b>
+                            </h6>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <section class="creat_goals">
+                <div class="container">
+                    <div class="creat_g_content">
+                        <h4 class="popup_heading">
+                            How much do you want to <br>save?
+                        </h4>
+
+                        <form action="" method="post" class="mt-25">
+                            {% csrf_token %}
+                            <label for="add_money">
+                                Add Money to {{ goal_info.goal_name }}
+                            </label>
+                            <input type="number" name="add_money" placeholder="Enter Amount" class="mt-1" required>
+
+                        <p class="mt-4">This money will be added to your {{ goal_info.goal_name }} deposits</p>
+                        <button type="submit" class="btn popup_btn">
+                            Save
+                        </button>
+                              </form>
+                    </div>
+                </div>
+            </section>
+
+
+            <footer class="mbl_footer">
+                <div class="container">
+                    <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                        <button class="footer_button btn active">
+                            <img class="homer_white" src="{% static 'images/Home_duotone.png' %}" alt="">
+
+                            <p>Home</p>
+                        </button>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/filter.png' %}" alt="">
+                            <p>Features</p>
+                        </button>
+                        <button class="footer_button btn coming_soon">
+                            <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                            <p>Account</p>
+                        </button>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/setting.png' %}" alt="">
+                            <p>Settings</p>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+
+            <!-- .container-fluid -->
+            <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog"
+                 aria-labelledby="defaultModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="list-group list-group-flush my-n3">
+                                <div class="list-group-item bg-transparent">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <small><strong>Your next contribution for Chama AA09gg is on Nov 27th
+                                            </strong></small>
+                                            <div class="my-0 text-muted small">Please pay load money before the date.
+                                            </div>
+                                            <small class="badge badge-pill badge-light text-muted">1m ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item bg-transparent">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <small><strong>You qualify to join another chama</strong></small>
+                                            <div class="my-0 text-muted small">You can be in more than two chamas at the
+                                                same time
+                                            </div>
+                                            <small class="badge badge-pill badge-light text-muted">42m ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="list-group-item bg-transparent">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <small><strong>Notifications have been sent</strong></small>
+                                            <div class="my-0 text-muted small">Fusce dapibus, tellus ac cursus commodo
+                                            </div>
+                                            <small class="badge badge-pill badge-light text-muted">30m ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="list-group-item bg-transparent">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <small><strong>Link was attached to menu</strong></small>
+                                            <div class="my-0 text-muted small">New layout has been attached to the menu
+                                            </div>
+                                            <small class="badge badge-pill badge-light text-muted">1h ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear
+                                All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+

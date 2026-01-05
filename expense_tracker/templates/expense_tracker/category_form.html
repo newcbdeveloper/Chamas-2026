@@ -1,0 +1,188 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-tag me-2"></i>{{ title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Category Name -->
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <i class="fas fa-pencil-alt me-1"></i>Category Name
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.name.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category Type -->
+                        <div class="mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">
+                                <i class="fas fa-exchange-alt me-1"></i>Type
+                            </label>
+                            {{ form.type }}
+                            {% if form.type.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.type.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Icon -->
+                        <div class="mb-3">
+                            <label for="{{ form.icon.id_for_label }}" class="form-label">
+                                <i class="fas fa-icons me-1"></i>Icon (Emoji)
+                            </label>
+                            {{ form.icon }}
+                            {% if form.icon.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.icon.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Enter an emoji (e.g., 🍔, 🚗, 💼) or leave default
+                            </small>
+                            
+                            <!-- Common Icon Suggestions -->
+                            <div class="mt-2">
+                                <small class="d-block mb-2"><strong>Quick picks:</strong></small>
+                                <div class="icon-suggestions">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="🍽️">🍽️ Food</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="🚗">🚗 Transport</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="🏠">🏠 Home</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="💼">💼 Work</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="🎬">🎬 Entertainment</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="🏥">🏥 Health</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="📚">📚 Education</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" data-icon="💰">💰 Money</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="mb-3">
+                            <label for="{{ form.color.id_for_label }}" class="form-label">
+                                <i class="fas fa-palette me-1"></i>Color
+                            </label>
+                            <div class="d-flex gap-2 align-items-center">
+                                {{ form.color }}
+                                <span id="color-preview" class="badge" style="background-color: #3498db; padding: 10px 20px;">Preview</span>
+                            </div>
+                            {% if form.color.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.color.errors }}
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Common Color Suggestions -->
+                            <div class="mt-2">
+                                <small class="d-block mb-2"><strong>Suggested colors:</strong></small>
+                                <div class="color-suggestions">
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#e74c3c" style="background-color: #e74c3c;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#3498db" style="background-color: #3498db;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#2ecc71" style="background-color: #2ecc71;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#f39c12" style="background-color: #f39c12;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#9b59b6" style="background-color: #9b59b6;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#1abc9c" style="background-color: #1abc9c;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#34495e" style="background-color: #34495e;"></button>
+                                    <button type="button" class="btn btn-sm color-btn" data-color="#e91e63" style="background-color: #e91e63;"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>{{ submit_text }}
+                            </button>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Icon quick select
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.dataset.icon;
+            document.getElementById('{{ form.icon.id_for_label }}').value = icon;
+        });
+    });
+    
+    // Color quick select
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const color = this.dataset.color;
+            document.getElementById('{{ form.color.id_for_label }}').value = color;
+            document.getElementById('color-preview').style.backgroundColor = color;
+        });
+    });
+    
+    // Update color preview on change
+    document.getElementById('{{ form.color.id_for_label }}').addEventListener('input', function() {
+        document.getElementById('color-preview').style.backgroundColor = this.value;
+    });
+    
+    // Set initial color preview
+    const initialColor = document.getElementById('{{ form.color.id_for_label }}').value || '#3498db';
+    document.getElementById('color-preview').style.backgroundColor = initialColor;
+</script>
+
+<style>
+    .icon-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .color-suggestions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .color-btn {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .color-btn:hover {
+        transform: scale(1.1);
+        border-color: #333;
+    }
+</style>
+{% endblock %}

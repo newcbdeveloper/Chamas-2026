@@ -1,0 +1,148 @@
+{
+  "design_system_name": "MyFitnessPal Mobile App (2024–2025)",
+  "vendor": "MyFitnessPal (Under Armour)",
+  "overall_style": "Modern health & wellness mobile-first, friendly, motivational, blue-centric",
+  "platform": "iOS + Android native (iOS shown)",
+  "visual_hierarchy": "Card-based vertical scrolling with large hero metrics, heavy use of whitespace and breathing room",
+  "color_palette": {
+    "primary": "#007AFF",
+    "primary_dark": "#0051D4",
+    "primary_light": "#E5F1FF",
+    "accent_orange": "#FF9500",
+    "accent_red": "#FF3B30",
+    "accent_green": "#34C759",
+    "background_main": "#FFFFFF",
+    "background_card": "#FFFFFF",
+    "background_surface": "#F2F2F7",
+    "text_primary": "#000000",
+    "text_secondary": "#666666",
+    "text_muted": "#8E8E93",
+    "text_on_primary": "#FFFFFF",
+    "border_light": "#E5E5EA",
+    "progress_empty": "#E5E5EA",
+    "progress_fill_blue": "#007AFF",
+    "progress_fill_orange": "#FF9500"
+  },
+  "typography": {
+    "font_family_primary": "SF Pro Display / SF Pro Text (Apple system font), Roboto on Android",
+    "font_weight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "heavy": 900
+    },
+    "scale": {
+      "xs": "12px",
+      "sm": "14px",
+      "base": "16px",
+      "lg": "17px",
+      "xl": "20px",
+      "2xl": "24px",
+      "3xl": "32px",
+      "4xl": "40px",
+      "hero_number": "64px bold"
+    },
+    "hero_metric_style": "64px–80px bold, tracking tight, line-height 1.0",
+    "section_header": "32px bold",
+    "card_title": "20px semibold"
+  },
+  "border_radius": {
+    "card": "16px",
+    "button": "12px",
+    "small_pill": "8px",
+    "progress_bar": "6px",
+    "full": "9999px"
+  },
+  "shadows": {
+    "card_resting": "0 1px 3px rgba(0,0,0,0.08)",
+    "card_lifted": "0 8px 24px rgba(0,0,0,0.12)",
+    "floating_button": "0 4px 12px rgba(0,122,255,0.3)"
+  },
+  "spacing_scale": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "7": "32px",
+    "8": "40px",
+    "9": "48px",
+    "section": "32px–40px vertical between cards"
+  },
+  "layout_structure": {
+    "safe_area_top": true,
+    "status_bar": "light content on white",
+    "header": "sticky with large title + right-aligned Edit button",
+    "main_scroll": "single column, full-bleed cards with 16px horizontal padding",
+    "card_style": "white background, 16px corner radius, subtle shadow, 20–24px internal padding",
+    "bottom_navigation_bar": "solid blue #007AFF background, white icons + text, 83px height including safe area"
+  },
+  "components": {
+    "header": {
+      "logo": "circular purple gradient with white figure",
+      "app_name": "blue #007AFF, bold, 24px",
+      "premium_crown": "small black crown icon + PREMIUM label",
+      "edit_button": "light blue filled pill, white text, 12px radius"
+    },
+    "hero_calorie_card": {
+      "type": "large white card",
+      "donut_chart": {
+        "diameter": "~200px",
+        "stroke_width": "16px",
+        "empty_track": "#E5E5EA",
+        "filled_track_blue": "#007AFF",
+        "filled_track_orange": "#FF9500",
+        "center_number": "64px–80px bold",
+        "center_label": "17px regular below"
+      },
+      "breakdown_list": "icon + label + large bold number, right-aligned, colored icons (gray scale, fork/knife blue, flame orange)"
+    },
+    "metric_cards": {
+      "steps_card": "red shoe icon, large bold current value, muted goal below, thin progress bar with red dot handle",
+      "exercise_card": "orange flame + checkmark, two lines with large bold values",
+      "weight_card": "full-width background image (mountain, snow, etc.), dark overlay optional, large bold current weight"
+    },
+    "add_button": "large white circle with bold blue '+' , floating style, subtle shadow",
+    "progress_bars": {
+      "height": "6px",
+      "corner_radius": "3px",
+      "track": "#E5E5EA",
+      "fill": "gradient or solid primary/accent",
+      "handle_dot": "colored 10px circle at start"
+    },
+    "bottom_navigation": {
+      "background": "#007AFF",
+      "active_icon_text": "#FFFFFF",
+      "inactive_icon_text": "rgba(255,255,255,0.6)",
+      "icon_size": "24px",
+      "label": "12px medium",
+      "active_indicator": "none (relies on color change)",
+      "height": "49px + safe area"
+    },
+    "search_bar": {
+      "style": "large white pill in blue bar",
+      "height": "44px",
+      "corner_radius": "22px",
+      "magnifier_icon": "blue",
+      "placeholder": "gray"
+    },
+    "pagination_dots": "center below hero card, active blue #007AFF, inactive light gray, 8px diameter"
+  },
+  "iconography": {
+    "style": "custom bold filled + SF Symbols hybrid",
+    "primary_color": "#007AFF",
+    "accent_orange": "#FF9500",
+    "accent_red": "#FF3B30",
+    "size": "28px–32px for card icons"
+  },
+  "motion_interaction": {
+    "card_entrance": "subtle fade + slight upward slide",
+    "button_press": "scale 0.95 + opacity dip",
+    "bottom_bar": "no blur, solid color"
+  },
+  "data_visualization_style": "Large bold numbers are the hero, progress rings and bars are secondary, motivational and never punitive",
+  "tone_of_voice": "Encouraging, friendly, coach-like, uses celebratory icons (flame, crown, checkmark)",
+  "recommended_usage_for_ai_prompts": "Use this JSON when building fitness trackers, calorie counters, health dashboards, wellness apps, or any consumer mobile app that needs a clean, friendly, Apple-inspired aesthetic with strong blue branding and large metric focus."
+}

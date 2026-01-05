@@ -1,0 +1,1866 @@
+{%extends 'chamas/base.html'%} {% load humanize %} {%load static%} {% load custom_filters %} {%block head%}
+<title>Loans</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/reports.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/loans.css'%}" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{%endblock%} {%block body%}
+
+<div class="reports-container full-width">
+    <!-- Page Header -->
+    <div class="reports-header">
+        <div class="reports-header-content">
+            <h1 class="reports-title text-brand-primary">Loans Management</h1>
+            <p class="reports-subtitle">Manage loan types, applications, and active loans</p>
+        </div>
+    </div>
+    
+    <!-- CSRF Token for JavaScript -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- Desktop Floating Action Buttons -->
+    <div class="floating-actions desktop-floating">
+        <button class="btn-floating admin" id="createLoanTypeBtnDesktop" title="Create Loan Type">
+            <i class='bx bx-plus'></i>
+            <span>Create Loan Type</span>
+        </button>
+        <button class="btn-floating admin" id="issueLoanBtnDesktop" title="Issue Loan">
+            <i class='bx bx-money'></i>
+            <span>Issue Loan</span>
+        </button>
+        <button class="btn-floating member" id="applyLoanBtnDesktop" title="Apply for Loan">
+            <i class='bx bx-wallet'></i>
+            <span>Apply for Loan</span>
+        </button>
+    </div>
+
+    <!-- Mobile FAB Container -->
+    <div class="fab-backdrop" id="fabBackdrop"></div>
+    <div class="fab-container">
+        <button class="fab-create" id="fabCreate">
+            <i class='bx bx-plus'></i>
+        </button>
+
+          <button class="mini-fab mini-fab-apply-loan member" id="applyLoanBtnMobile">
+            <i class='bx bx-wallet'></i>
+            <span class="fab-label">Apply for Loan</span>
+        </button>
+        
+        <button class="mini-fab mini-fab-create-type admin" id="createLoanTypeBtnMobile">
+            <i class='bx bx-plus'></i>
+            <span class="fab-label">Create Loan Type</span>
+        </button>
+    
+        <button class="mini-fab mini-fab-issue-loan admin" id="issueLoanBtnMobile">
+            <i class='bx bx-money'></i>
+            <span class="fab-label">Issue Loan</span>
+        </button>
+        
+      
+    </div>
+
+    <!-- Loans Tabs Navigation -->
+    <div class="reports-tabs-wrapper">
+        <ul class="reports-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active admin member" id="active-loans-tab" data-bs-toggle="tab" href="#tab-active-loans" role="tab">
+                    <i class="bx bx-credit-card"></i>
+                    Active Loans
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin" id="loan-applications-tab" data-bs-toggle="tab" href="#tab-loan-applications" role="tab">
+                    <i class="bx bx-file-find"></i>
+                    Loan Applications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin" id="loan-types-tab" data-bs-toggle="tab" href="#tab-loan-types" role="tab">
+                    <i class="bx bx-list-ul"></i>
+                    Loan Types
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link member" id="my-loans-tab" data-bs-toggle="tab" href="#tab-my-loans" role="tab">
+                    <i class="bx bx-user"></i>
+                    My Loans
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="reports-content">
+        <div class="tab-content">
+            <!-- Active Loans Tab -->
+            <div class="tab-pane active" id="tab-active-loans" role="tabpanel">
+                <div class="reports-grid">
+                    <!-- Active Loans Report Card -->
+                    <div class="report-card brand-card admin member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Active Loans</h3>
+                                <p class="report-description">All currently active loans in the chama</p>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-download-individual bg-brand-primary" id="download-active-loans-report">
+                                    <i class="bx bx-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="active-loans-items" class="data-container">
+                                {% if active_loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Balance</th>
+                                                <th>Interest Rate</th>
+                                                <th>Start Date</th>
+                                                <th>Next Due</th>
+                                                <th>Status</th>
+                                                <th class="admin">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in active_loans %}
+                                            <tr>
+                                                <td>{{ loan.member.name }}</td>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ loan.balance | intcomma }}</td>
+                                                <td>{{ loan.intrest_rate }}%</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.next_due|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                                                                                 <td class="admin">
+                                                     <button class="btn-action btn-success-sm" onclick="openPayLoanModal({{ loan.id }}, '{{ loan.member.name }}', {{ loan.balance }})">
+                                                         <i class="bx bx-credit-card"></i>
+                                                         Pay
+                                                     </button>
+                                                    
+                                                 </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-credit-card empty-state-icon"></i>
+                                    <p class="empty-state-message">No Active Loans</p>
+                                    <p class="empty-state-description">There are currently no active loans in the chama</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Loans Report Card -->
+                    <div class="report-card brand-card admin member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Completed Loans</h3>
+                                <p class="report-description">Successfully completed loan repayments</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="completed-loans-items" class="data-container">
+                                {% if completed_loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Total Paid</th>
+                                                <th>Start Date</th>
+                                                <th>Completion Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in completed_loans %}
+                                            <tr>
+                                                <td>{{ loan.member.name }}</td>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-success">KSH {{ loan.total_paid | intcomma }}</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.last_updated|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-check-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Completed Loans</p>
+                                    <p class="empty-state-description">No loans have been completed yet</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Defaulted Loans Report Card -->
+                    <div class="report-card brand-card admin member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Defaulted Loans</h3>
+                                <p class="report-description">Loans that are in default status</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="defaulted-loans-items" class="data-container">
+                                {% if defaulted_loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Balance</th>
+                                                <th>Start Date</th>
+                                                <th>Last Due</th>
+                                                <th>Status</th>
+                                                <th class="admin">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in defaulted_loans %}
+                                            <tr>
+                                                <td>{{ loan.member.name }}</td>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-error">KSH {{ loan.balance | intcomma }}</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.next_due|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                                <td class="admin">
+                                                    <button class="btn-action btn-primary-sm" onclick="viewLoanDetails({{ loan.id }})">
+                                                        <i class="bx bx-eye"></i>
+                                                    </button>
+                                                    <button class="btn-action btn-warning-sm" onclick="contactMember({{ loan.member.id }})">
+                                                        <i class="bx bx-phone"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-error-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Defaulted Loans</p>
+                                    <p class="empty-state-description">All loans are in good standing</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loan Applications Tab -->
+            <div class="tab-pane" id="tab-loan-applications" role="tabpanel">
+                <div class="reports-grid">
+                    <!-- Loan Applications Report Card -->
+                    <div class="report-card brand-card admin">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Pending Loan Applications</h3>
+                                <p class="report-description">Review and process loan applications</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="loan-applications-items" class="data-container">
+                                {% if applications %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Loan Type</th>
+                                                <th>Requested Amount</th>
+                                                <th>Duration</th>
+                                                <th>Applied On</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for application in applications %}
+                                            <tr id="application-row-{{ application.id }}">
+                                                <td>{{ application.member.name }}</td>
+                                                <td>{{ application.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ application.amount | intcomma }}</td>
+                                                <td>{{ application.due }} {{ application.schedule }}{% if application.due > 1 %}s{% endif %}</td>
+                                                <td>{{ application.applied_on|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ application.status }}">{{ application.status|title }}</span></td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <button class="btn-action btn-success-sm" onclick="approveLoanApplication({{ application.id }})" title="Approve">
+                                                            <i class="bx bx-check"></i>
+                                                            Approve
+                                                        </button>
+                                                        <button class="btn-action btn-error-sm" onclick="declineLoanApplication({{ application.id }})" title="Decline">
+                                                            <i class="bx bx-x"></i>
+                                                            Decline
+                                                        </button>
+                                                        <button class="btn-action btn-primary-sm" onclick="viewApplicationDetails({{ application.id }})" title="View Details">
+                                                            <i class="bx bx-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-file-find empty-state-icon"></i>
+                                    <p class="empty-state-message">No Pending Applications</p>
+                                    <p class="empty-state-description">All loan applications have been processed</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loan Types Tab -->
+            <div class="tab-pane" id="tab-loan-types" role="tabpanel">
+                <div class="reports-grid">
+                    <!-- Loan Types Report Card -->
+                    <div class="report-card brand-card admin">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Available Loan Types</h3>
+                                <p class="report-description">Manage loan type configurations</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="loan-types-items" class="data-container">
+                                {% if loan_types %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Max Amount</th>
+                                                <th>Interest Rate</th>
+                                                <th>Max Duration</th>
+                                                <th>Schedule</th>
+                                                <th>Late Fine</th>
+                                                <th>Grace Period</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan_type in loan_types %}
+                                            <tr id="loan-type-row-{{ loan_type.id }}">
+                                                <td class="font-weight-bold">{{ loan_type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan_type.max_loan_amount | intcomma }}</td>
+                                                <td>{{ loan_type.intrest_rate }}%</td>
+                                                <td>{{ loan_type.max_due }} {{ loan_type.schedule }}{% if loan_type.max_due > 1 %}s{% endif %}</td>
+                                                <td><span class="schedule-badge">{{ loan_type.schedule|title }}</span></td>
+                                                <td class="text-warning">KSH {{ loan_type.late_fine | intcomma }}</td>
+                                                <td>{{ loan_type.grace_period }} days</td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <button class="btn-action btn-primary-sm" onclick="editLoanType({{ loan_type.id }})" title="Edit">
+                                                            <i class="bx bx-edit"></i>
+                                                        </button>
+                                                        <button class="btn-action btn-error-sm" onclick="deleteLoanType({{ loan_type.id }})" title="Delete">
+                                                            <i class="bx bx-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-list-ul empty-state-icon"></i>
+                                    <p class="empty-state-message">No Loan Types</p>
+                                    <p class="empty-state-description">Create your first loan type to get started</p>
+                                    <button class="btn-primary" onclick="openCreateLoanTypeModal()">
+                                        <i class="bx bx-plus"></i>
+                                        Create Loan Type
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Loans Tab -->
+            <div class="tab-pane" id="tab-my-loans" role="tabpanel">
+                <div class="reports-grid">
+                    <!-- My Active Loans Report Card -->
+                    <div class="report-card brand-card member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">My Active Loans</h3>
+                                <p class="report-description">Your currently active loans</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="my-active-loans-items" class="data-container">
+                                {% if my_active_loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Balance</th>
+                                                <th>Interest Rate</th>
+                                                <th>Start Date</th>
+                                                <th>Next Due</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in my_active_loans %}
+                                            <tr>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ loan.balance | intcomma }}</td>
+                                                <td>{{ loan.intrest_rate }}%</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.next_due|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                                <td>
+                                                    <button class="btn-action btn-primary-sm" onclick="makePayment({{ loan.id }})">
+                                                        <i class="bx bx-credit-card"></i>
+                                                        Pay
+                                                    </button>
+                                                    <button class="btn-action btn-secondary-sm" onclick="viewMyLoanDetails({{ loan.id }})">
+                                                        <i class="bx bx-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-credit-card empty-state-icon"></i>
+                                    <p class="empty-state-message">No Active Loans</p>
+                                    <p class="empty-state-description">You don't have any active loans</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Completed Loans Report Card -->
+                    <div class="report-card brand-card member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">My Completed Loans</h3>
+                                <p class="report-description">Your loan history</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="my-completed-loans-items" class="data-container">
+                                {% if my_completed_loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Total Paid</th>
+                                                <th>Start Date</th>
+                                                <th>Completion Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in my_completed_loans %}
+                                            <tr>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-success">KSH {{ loan.total_paid | intcomma }}</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.last_updated|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-check-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Completed Loans</p>
+                                    <p class="empty-state-description">You haven't completed any loans yet</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Defaulted Loans Report Card -->
+                    <div class="report-card brand-card member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">My Defaulted Loans</h3>
+                                <p class="report-description">Loans requiring attention</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="my-defaulted-loans-items" class="data-container">
+                                {% if my_defaulted_loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Balance</th>
+                                                <th>Start Date</th>
+                                                <th>Last Due</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in my_defaulted_loans %}
+                                            <tr>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-error">KSH {{ loan.balance | intcomma }}</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.next_due|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                                <td>
+                                                    <button class="btn-action btn-warning-sm" onclick="makePayment({{ loan.id }})">
+                                                        <i class="bx bx-credit-card"></i>
+                                                        Pay Now
+                                                    </button>
+                                                    <button class="btn-action btn-secondary-sm" onclick="contactAdmin()">
+                                                        <i class="bx bx-phone"></i>
+                                                        Contact
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-check-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Defaulted Loans</p>
+                                    <p class="empty-state-description">All your loans are in good standing</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Loan Type Modal -->
+<div class="modal fade" id="createLoanTypeModal" tabindex="-1" aria-labelledby="createLoanTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="createLoanTypeModalLabel">
+                    <i class='bx bx-plus'></i>
+                    Create New Loan Type
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createLoanTypeForm" class="brand-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanTypeName" class="form-label">Loan Type Name *</label>
+                                <input type="text" id="loanTypeName" name="name" class="form-control" placeholder="e.g., Emergency Loan" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanTypeSchedule" class="form-label">Repayment Schedule *</label>
+                                <select id="loanTypeSchedule" name="schedule"  required>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanTypeMaxAmount" class="form-label">Maximum Amount (KSH) *</label>
+                                <input type="number" id="loanTypeMaxAmount" name="max" class="form-control" placeholder="50000" min="1000" required>
+                            </div>
+                        </div>
+                                                 <div class="col-md-6">
+                             <div class="form-group">
+                                 <label for="loanTypeMaxDue" class="form-label">Maximum Duration *</label>
+                                 <input type="number" id="loanTypeMaxDue" name="max_due" class="form-control" placeholder="12" min="1" max="60" required>
+                                <small class="form-text text-muted">Duration in months/weeks based on schedule</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanTypeInterestRate" class="form-label">Interest Rate (% annually) *</label>
+                                <input type="number" id="loanTypeInterestRate" name="intrest_rate" class="form-control" placeholder="15" min="0" max="100" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanTypeLateFine" class="form-label">Late Payment Fine (KSH) *</label>
+                                <input type="number" id="loanTypeLateFine" name="late_fine" class="form-control" placeholder="500" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanTypeGracePeriod" class="form-label">Grace Period (days) *</label>
+                                <input type="number" id="loanTypeGracePeriod" name="grace_period" class="form-control" placeholder="7" min="0" max="30" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="loanTypeDescription" class="form-label">Description</label>
+                        <textarea id="loanTypeDescription" name="description" class="form-control" rows="3" placeholder="Describe the loan type purpose and conditions"></textarea>
+                    </div>
+                    <div id="createLoanTypeFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="createLoanTypeForm" class="btn btn-primary">
+                    <i class='bx bx-plus'></i>
+                    Create Loan Type
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apply for Loan Modal -->
+<div class="modal fade" id="applyLoanModal" tabindex="-1" aria-labelledby="applyLoanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="applyLoanModalLabel">
+                    <i class='bx bx-wallet'></i>
+                    Apply for Loan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="applyLoanForm" class="brand-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanApplicationType" class="form-label">Loan Type *</label>
+                                <select id="loanApplicationType" name="loan_type"  required>
+                                    <option value="">Select loan type</option>
+                                    {% for loan_type in loan_types %}
+                                    <option value="{{ loan_type.id }}" data-max="{{ loan_type.max_loan_amount }}" data-rate="{{ loan_type.intrest_rate }}" data-max-due="{{ loan_type.max_due }}">
+                                        {{ loan_type.name }} (Max: KSH {{ loan_type.max_loan_amount | intcomma }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanApplicationAmount" class="form-label">Requested Amount (KSH) *</label>
+                                <input type="number" id="loanApplicationAmount" name="amount" class="form-control" placeholder="25000" min="1000" required>
+                                <small class="form-text text-muted" id="maxAmountHint">Select a loan type to see maximum amount</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="loanApplicationDuration" class="form-label">Repayment Duration *</label>
+                                <input type="number" id="loanApplicationDuration" name="due" class="form-control" placeholder="6" min="1" required>
+                                <small class="form-text text-muted" id="maxDurationHint">Duration in months/weeks</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="loanApplicationPurpose" class="form-label">Purpose of Loan</label>
+                        <textarea id="loanApplicationPurpose" name="purpose" class="form-control" rows="3" placeholder="Briefly describe why you need this loan"></textarea>
+                    </div>
+                    <div id="loanCalculation" class="loan-calculation" style="display: none;">
+                        <h6 class="text-brand-primary">Loan Calculation</h6>
+                        <div class="calculation-details">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="calculation-item">
+                                        <span class="calculation-label">Principal Amount:</span>
+                                        <span class="calculation-value" id="principalAmount">KSH 0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="calculation-item">
+                                        <span class="calculation-label">Interest Rate:</span>
+                                        <span class="calculation-value" id="interestRate">0%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="calculation-item">
+                                        <span class="calculation-label">Total Amount:</span>
+                                        <span class="calculation-value text-brand-primary" id="totalAmount">KSH 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="applyLoanFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="applyLoanForm" class="btn btn-primary">
+                    <i class='bx bx-send'></i>
+                    Submit Application
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Issue Loan Modal -->
+<div class="modal fade" id="issueLoanModal" tabindex="-1" aria-labelledby="issueLoanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="issueLoanModalLabel">
+                    <i class='bx bx-money'></i>
+                    Issue Loan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="issueLoanForm" class="brand-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="issueLoanMember" class="form-label">Member *</label>
+                                <select id="issueLoanMember" name="member"  required>
+                                    <option value="">Select member</option>
+                                    {% for member in members %}
+                                    <option value="{{ member.id }}">{{ member.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="issueLoanType" class="form-label">Loan Type *</label>
+                                                                 <select id="issueLoanType" name="type" required>
+                                    <option value="">Select loan type</option>
+                                    {% for loan_type in loan_types %}
+                                    <option value="{{ loan_type.id }}" data-max="{{ loan_type.max_loan_amount }}" data-rate="{{ loan_type.intrest_rate }}" data-max-due="{{ loan_type.max_due }}">
+                                        {{ loan_type.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                                         <div class="row">
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <label for="issueLoanAmount" class="form-label">Amount (KSH) *</label>
+                                 <input type="number" id="issueLoanAmount" name="amount" class="form-control" placeholder="25000" min="1000" required>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <label for="issueLoanDuration" class="form-label">Duration *</label>
+                                 <input type="number" id="issueLoanDuration" name="due" class="form-control" placeholder="6" min="1" required>
+                                 <small class="form-text text-muted">Duration in months/weeks</small>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="row">
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <label for="issueLoanStartDate" class="form-label">Start Date *</label>
+                                 <input type="date" id="issueLoanStartDate" name="start_date" class="form-control" required>
+                             </div>
+                         </div>
+                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="issueLoanNotes" class="form-label">Notes</label>
+                        <textarea id="issueLoanNotes" name="notes" class="form-control" rows="3" placeholder="Additional notes for this loan"></textarea>
+                    </div>
+                    <div id="issueLoanFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="issueLoanForm" class="btn btn-primary">
+                    <i class='bx bx-check'></i>
+                    Issue Loan
+                </button>
+            </div>
+        </div>
+     </div>
+ </div>
+
+ <!-- Pay Loan Modal -->
+ <div class="modal fade" id="payLoanModal" tabindex="-1" aria-labelledby="payLoanModalLabel" aria-hidden="true">
+     <div class="modal-dialog modal-lg">
+         <div class="modal-content brand-modal">
+             <div class="modal-header brand-modal-header">
+                 <h5 class="modal-title text-brand-primary" id="payLoanModalLabel">
+                     <i class='bx bx-credit-card'></i>
+                     Process Loan Payment
+                 </h5>
+                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+                 <div class="loan-payment-info mb-3">
+                     <div class="row">
+                         <div class="col-md-6">
+                             <strong>Member:</strong> <span id="payLoanMemberName"></span>
+                         </div>
+                         <div class="col-md-6">
+                             <strong>Current Balance:</strong> <span id="payLoanCurrentBalance" class="text-warning"></span>
+                         </div>
+                     </div>
+                 </div>
+                 <form id="payLoanForm" class="brand-form">
+                     <input type="hidden" id="payLoanId" name="loan_id">
+                     <div class="row">
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <label for="paymentAmount" class="form-label">Payment Amount (KSH) *</label>
+                                 <input type="number" id="paymentAmount" name="loan_amount" class="form-control" placeholder="5000" min="1" step="0.01" required>
+                                 <small class="form-text text-muted">Enter the amount being paid</small>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group">
+                                 <label for="paymentDate" class="form-label">Payment Date *</label>
+                                 <input type="date" id="paymentDate" name="payment_date" class="form-control" required>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="form-group col-md-6">
+                         <label for="paymentNotes" class="form-label">Payment Notes</label>
+                         <textarea id="paymentNotes" name="notes" class="form-control" rows="3" placeholder="Additional notes about this payment"></textarea>
+                     </div>
+                     <div id="payLoanFeedback" class="alert" style="display: none;"></div>
+                 </form>
+             </div>
+             <div class="modal-footer brand-modal-footer">
+                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                 <button type="submit" form="payLoanForm" class="btn btn-success">
+                     <i class='bx bx-check'></i>
+                     Process Payment
+                 </button>
+             </div>
+         </div>
+     </div>
+ </div>
+
+ <style>
+   /* Desktop Floating Action Buttons */
+  .floating-actions.desktop-floating {
+      position: fixed;
+      top: 120px;
+      right: 20px;
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      z-index: 900;
+  }
+ 
+ /* Hide desktop floating buttons on mobile */
+ @media (max-width: 768px) {
+     .floating-actions.desktop-floating {
+         display: none !important;
+     }
+ }
+
+.btn-floating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    box-shadow: var(--shadow-lg);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.btn-floating:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-floating i {
+    font-size: 16px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-success-sm {
+    background: var(--color-success);
+    color: white;
+}
+
+.btn-success-sm:hover {
+    background: #059669;
+    color: white;
+}
+
+.btn-error-sm {
+    background: var(--color-error);
+    color: white;
+}
+
+.btn-error-sm:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-primary-sm {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-primary-sm:hover {
+    background: var(--color-primary-light);
+    color: white;
+}
+
+.btn-secondary-sm {
+    background: var(--color-gray-500);
+    color: white;
+}
+
+.btn-secondary-sm:hover {
+    background: var(--color-gray-600);
+    color: white;
+}
+
+.btn-warning-sm {
+    background: var(--color-warning);
+    color: white;
+}
+
+.btn-warning-sm:hover {
+    background: #d97706;
+    color: white;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+ .status-badge.completed,
+ .status-badge.cleared {
+     background: #dbeafe;
+     color: #1e40af;
+ }
+
+.status-badge.application {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.defaulted {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.schedule-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+/* Modal Styling */
+.brand-modal {
+    border-radius: 12px;
+    border: none;
+    overflow: hidden;
+}
+
+.brand-modal-header {
+    background: var(--color-gray-50);
+    border-bottom: 1px solid var(--color-gray-200);
+    padding: 20px 24px;
+}
+
+.brand-modal-footer {
+    background: var(--color-gray-50);
+    border-top: 1px solid var(--color-gray-200);
+    padding: 16px 24px;
+}
+
+.brand-form .form-group {
+    margin-bottom: 20px;
+}
+
+.brand-form .form-label {
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.brand-form .form-control {
+    border: 1px solid var(--color-gray-300);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.brand-form .form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(33, 145, 165, 0.1);
+    outline: none;
+}
+
+/* Loan Calculation */
+.loan-calculation {
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.calculation-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.calculation-label {
+    font-weight: 500;
+    color: var(--color-gray-600);
+}
+
+.calculation-value {
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+ /* Responsive Design */
+ @media (max-width: 768px) {     
+     .action-buttons {
+         justify-content: center;
+     }
+     
+     .btn-action {
+         padding: 4px 8px;
+         font-size: 11px;
+     }
+ }
+
+/* Hide elements based on role */
+.admin {
+    display: var(--admin-display, block);
+}
+
+.member {
+    display: var(--member-display, block);
+}
+
+/* Toast notifications for feedback */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-gray-200);
+    min-width: 300px;
+}
+
+.toast.success {
+    border-left: 4px solid var(--color-success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--color-error);
+}
+
+ .toast.warning {
+     border-left: 4px solid var(--color-warning);
+ }
+
+ /* Mobile FAB Styles */
+ .fab-backdrop {
+     display: none;
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0.5);
+     z-index: 1040;
+     opacity: 0;
+     visibility: hidden;
+     transition: all 0.3s ease;
+ }
+
+ .fab-backdrop.active {
+     display: block;
+     opacity: 1;
+     visibility: visible;
+ }
+
+ .fab-container {
+     display: none;
+     position: fixed;
+     bottom: 100px;
+     right: 24px;
+     z-index: 1050;
+ }
+
+ .fab-create {
+     width: 56px;
+     height: 56px;
+     border-radius: 50%;
+     border: none;
+     background: var(--color-primary);
+     color: white;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 20px;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+ }
+
+ .fab-create:hover {
+     background: var(--color-primary-light);
+     transform: scale(1.1);
+     box-shadow: 0 6px 20px rgba(33, 145, 165, 0.6);
+ }
+
+ .fab-create.active {
+     transform: rotate(45deg);
+     background: var(--color-primary-light);
+ }
+
+ /* Mini FABs */
+ .mini-fab {
+     width: 48px;
+     height: 48px;
+     border-radius: 50%;
+     border: none;
+     background: var(--color-primary);
+     color: white;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 16px;
+     cursor: pointer;
+     position: absolute;
+     bottom: 0;
+     right: 4px;
+     opacity: 0;
+     visibility: hidden;
+     transform: scale(0);
+     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+ }
+
+ .mini-fab.show {
+     opacity: 1;
+     visibility: visible;
+     transform: scale(1);
+ }
+
+ .mini-fab-create-type.show {
+     transform: scale(1) translateY(-80px);
+     transition-delay: 0.1s;
+ }
+
+ .mini-fab-issue-loan.show {
+     transform: scale(1) translateY(-140px);
+     transition-delay: 0.15s;
+ }
+
+ .mini-fab-apply-loan.show {
+     transform: scale(1) translateY(-200px);
+     transition-delay: 0.2s;
+ }
+
+ .mini-fab:hover {
+     background: var(--color-primary-light);
+     transform: scale(1.1) translateY(var(--translate-y));
+ }
+
+ .mini-fab-create-type:hover {
+     --translate-y: -80px;
+ }
+
+ .mini-fab-issue-loan:hover {
+     --translate-y: -140px;
+ }
+
+ .mini-fab-apply-loan:hover {
+     --translate-y: -200px;
+ }
+
+ /* FAB Labels */
+ .fab-label {
+     position: absolute;
+     right: 60px;
+     top: 50%;
+     transform: translateY(-50%) translateX(8px);
+     background: rgba(0, 0, 0, 0.8);
+     color: white;
+     padding: 8px 12px;
+     border-radius: 4px;
+     font-size: 12px;
+     white-space: nowrap;
+     transition: all 0.3s ease;
+     pointer-events: none;
+     opacity: 1 !important;
+    visibility: visible !important;
+ }
+ 
+
+ .mini-fab:hover .fab-label {
+     opacity: 1;
+     visibility: visible;
+     transform: translateY(-50%) translateX(-8px);
+ }
+
+ /* Show FAB only on mobile */
+ @media (max-width: 768px) {
+     .fab-container {
+         display: block !important;
+     }
+     
+     .fab-backdrop {
+         display: none !important;
+     }
+     
+     .fab-backdrop.active {
+         display: block !important;
+     }
+ }
+
+ /* Hide FAB on desktop */
+ @media (min-width: 769px) {
+     .fab-container,
+     .fab-backdrop {
+         display: none !important;
+     }
+ }
+ </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tabs
+    const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = this.getAttribute('href');
+            
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            this.classList.add('active');
+            document.querySelector(target).classList.add('active');
+        });
+    });
+    
+         // Desktop floating action button handlers
+     const createLoanTypeBtnDesktop = document.getElementById('createLoanTypeBtnDesktop');
+     const applyLoanBtnDesktop = document.getElementById('applyLoanBtnDesktop');
+     const issueLoanBtnDesktop = document.getElementById('issueLoanBtnDesktop');
+     
+     if (createLoanTypeBtnDesktop) {
+         createLoanTypeBtnDesktop.addEventListener('click', function() {
+             openCreateLoanTypeModal();
+         });
+     }
+     
+     if (applyLoanBtnDesktop) {
+         applyLoanBtnDesktop.addEventListener('click', function() {
+             openApplyLoanModal();
+         });
+     }
+     
+     if (issueLoanBtnDesktop) {
+         issueLoanBtnDesktop.addEventListener('click', function() {
+             openIssueLoanModal();
+         });
+     }
+
+     // Mobile FAB functionality
+     const fabCreate = document.getElementById('fabCreate');
+     const fabBackdrop = document.getElementById('fabBackdrop');
+     const miniFabs = document.querySelectorAll('.mini-fab');
+     const createLoanTypeBtnMobile = document.getElementById('createLoanTypeBtnMobile');
+     const applyLoanBtnMobile = document.getElementById('applyLoanBtnMobile');
+     const issueLoanBtnMobile = document.getElementById('issueLoanBtnMobile');
+     let isExpanded = false;
+
+     function expandFAB() {
+         isExpanded = true;
+         if (fabCreate) fabCreate.classList.add('active');
+         if (fabBackdrop) {
+             fabBackdrop.style.display = 'block';
+             fabBackdrop.classList.add('active');
+         }
+         miniFabs.forEach(function(fab) {
+             fab.classList.add('show');
+         });
+     }
+
+     function collapseFAB() {
+         isExpanded = false;
+         if (fabCreate) fabCreate.classList.remove('active');
+         if (fabBackdrop) {
+             fabBackdrop.classList.remove('active');
+             setTimeout(() => {
+                 fabBackdrop.style.display = 'none';
+             }, 300);
+         }
+         miniFabs.forEach(function(fab) {
+             fab.classList.remove('show');
+         });
+     }
+
+     function toggleFAB() {
+         if (isExpanded) {
+             collapseFAB();
+         } else {
+             expandFAB();
+         }
+     }
+
+     // FAB event handlers
+     if (fabCreate) {
+         fabCreate.addEventListener('click', function(e) {
+             e.stopPropagation();
+             toggleFAB();
+         });
+     }
+
+     if (fabBackdrop) {
+         fabBackdrop.addEventListener('click', function() {
+             collapseFAB();
+         });
+     }
+
+     // Mobile mini-fab handlers
+     if (createLoanTypeBtnMobile) {
+         createLoanTypeBtnMobile.addEventListener('click', function() {
+             collapseFAB();
+             openCreateLoanTypeModal();
+         });
+     }
+
+     if (applyLoanBtnMobile) {
+         applyLoanBtnMobile.addEventListener('click', function() {
+             collapseFAB();
+             openApplyLoanModal();
+         });
+     }
+
+     if (issueLoanBtnMobile) {
+         issueLoanBtnMobile.addEventListener('click', function() {
+             collapseFAB();
+             openIssueLoanModal();
+         });
+     }
+    
+    // Form submission handlers
+    document.getElementById('createLoanTypeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitCreateLoanType();
+    });
+    
+    document.getElementById('applyLoanForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitLoanApplication();
+    });
+    
+         document.getElementById('issueLoanForm').addEventListener('submit', function(e) {
+         e.preventDefault();
+         submitIssueLoan();
+     });
+     
+     document.getElementById('payLoanForm').addEventListener('submit', function(e) {
+         e.preventDefault();
+         submitPayLoan();
+     });
+    
+    // Loan application calculation
+    document.getElementById('loanApplicationType').addEventListener('change', updateLoanCalculation);
+    document.getElementById('loanApplicationAmount').addEventListener('input', updateLoanCalculation);
+    document.getElementById('loanApplicationDuration').addEventListener('input', updateLoanCalculation);
+});
+
+ // Modal functions
+ function openCreateLoanTypeModal() {
+     const modal = new bootstrap.Modal(document.getElementById('createLoanTypeModal'));
+     modal.show();
+ }
+
+ function openPayLoanModal(loanId, memberName, balance) {
+     document.getElementById('payLoanId').value = loanId;
+     document.getElementById('payLoanMemberName').textContent = memberName;
+     document.getElementById('payLoanCurrentBalance').textContent = `KSH ${balance.toLocaleString()}`;
+     
+     // Set today's date as default
+     const today = new Date().toISOString().split('T')[0];
+     document.getElementById('paymentDate').value = today;
+     
+     const modal = new bootstrap.Modal(document.getElementById('payLoanModal'));
+     modal.show();
+ }
+
+function openApplyLoanModal() {
+    const modal = new bootstrap.Modal(document.getElementById('applyLoanModal'));
+    modal.show();
+}
+
+function openIssueLoanModal() {
+    const modal = new bootstrap.Modal(document.getElementById('issueLoanModal'));
+    modal.show();
+}
+
+// Form submission functions
+function submitCreateLoanType() {
+    const form = document.getElementById('createLoanTypeForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Show loading state
+    showFeedback('createLoanTypeFeedback', 'Creating loan type...', 'info');
+    
+         fetch(`/chamas-bookeeping/create-loan-type/${localStorage.getItem('groupId')}/`, {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+             'X-CSRFToken': getCsrfToken()
+         },
+         body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showFeedback('createLoanTypeFeedback', result.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showFeedback('createLoanTypeFeedback', result.message, 'error');
+        }
+    })
+    .catch(error => {
+        showFeedback('createLoanTypeFeedback', 'Error creating loan type. Please try again.', 'error');
+    });
+}
+
+function submitLoanApplication() {
+    const form = document.getElementById('applyLoanForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Show loading state
+    showFeedback('applyLoanFeedback', 'Submitting application...', 'info');
+    
+         fetch(`/chamas-bookeeping/apply-loan/${localStorage.getItem('groupId')}/`, {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+             'X-CSRFToken': getCsrfToken()
+         },
+         body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showFeedback('applyLoanFeedback', result.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showFeedback('applyLoanFeedback', result.message, 'error');
+        }
+    })
+    .catch(error => {
+        showFeedback('applyLoanFeedback', 'Error submitting application. Please try again.', 'error');
+    });
+}
+
+ function submitIssueLoan() {
+     const form = document.getElementById('issueLoanForm');
+     const formData = new FormData(form);
+     const data = Object.fromEntries(formData);
+     
+     // Show loading state
+     showFeedback('issueLoanFeedback', 'Issuing loan...', 'info');
+     
+     fetch(`/chamas-bookeeping/issue-loan/${localStorage.getItem('groupId')}/`, {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+             'X-CSRFToken': getCsrfToken()
+         },
+         body: JSON.stringify(data)
+     })
+     .then(response => response.json())
+     .then(result => {
+         if (result.status === 'success') {
+             showFeedback('issueLoanFeedback', result.message, 'success');
+             setTimeout(() => {
+                 location.reload();
+             }, 1500);
+         } else {
+             showFeedback('issueLoanFeedback', result.message, 'error');
+         }
+     })
+     .catch(error => {
+         showFeedback('issueLoanFeedback', 'Error issuing loan. Please try again.', 'error');
+     });
+ }
+
+ function submitPayLoan() {
+     const form = document.getElementById('payLoanForm');
+     const formData = new FormData(form);
+     const data = Object.fromEntries(formData);
+     
+     // Show loading state
+     showFeedback('payLoanFeedback', 'Processing payment...', 'info');
+     
+     fetch(`/chamas-bookeeping/update-loan/${data.loan_id}/`, {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+             'X-CSRFToken': getCsrfToken()
+         },
+         body: JSON.stringify(data)
+     })
+     .then(response => response.json())
+     .then(result => {
+         if (result.status === 'success') {
+             showFeedback('payLoanFeedback', result.message, 'success');
+             setTimeout(() => {
+                 location.reload();
+             }, 1500);
+         } else {
+             showFeedback('payLoanFeedback', result.message, 'error');
+         }
+     })
+     .catch(error => {
+         showFeedback('payLoanFeedback', 'Error processing payment. Please try again.', 'error');
+     });
+ }
+
+// Loan application approval/decline functions
+function approveLoanApplication(loanId) {
+    if (!confirm('Are you sure you want to approve this loan application?')) {
+        return;
+    }
+    
+         fetch(`/chamas-bookeeping/approve-loan/${localStorage.getItem('groupId')}/${loanId}/`, {
+         method: 'POST',
+         headers: {
+             'X-CSRFToken': getCsrfToken()
+         }
+     })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showToast('Loan application approved successfully', 'success');
+            // Update the row or reload page
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error approving loan application', 'error');
+    });
+}
+
+function declineLoanApplication(loanId) {
+    if (!confirm('Are you sure you want to decline this loan application?')) {
+        return;
+    }
+    
+         fetch(`/chamas-bookeeping/decline-loan/${localStorage.getItem('groupId')}/${loanId}/`, {
+         method: 'POST',
+         headers: {
+             'X-CSRFToken': getCsrfToken()
+         }
+     })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showToast('Loan application declined', 'success');
+            // Update the row or reload page
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error declining loan application', 'error');
+    });
+}
+
+// Utility functions
+function updateLoanCalculation() {
+    const loanTypeSelect = document.getElementById('loanApplicationType');
+    const amountInput = document.getElementById('loanApplicationAmount');
+    const durationInput = document.getElementById('loanApplicationDuration');
+    const calculationDiv = document.getElementById('loanCalculation');
+    
+    const selectedOption = loanTypeSelect.options[loanTypeSelect.selectedIndex];
+    const amount = parseFloat(amountInput.value) || 0;
+    const duration = parseInt(durationInput.value) || 0;
+    
+    if (selectedOption.value && amount > 0 && duration > 0) {
+        const maxAmount = parseFloat(selectedOption.dataset.max);
+        const interestRate = parseFloat(selectedOption.dataset.rate) / 100;
+        const maxDue = parseInt(selectedOption.dataset.maxDue);
+        
+        // Update hints
+        document.getElementById('maxAmountHint').textContent = `Maximum: KSH ${maxAmount.toLocaleString()}`;
+        document.getElementById('maxDurationHint').textContent = `Maximum: ${maxDue} months/weeks`;
+        
+        // Validate amount
+        if (amount > maxAmount) {
+            amountInput.setCustomValidity(`Amount cannot exceed KSH ${maxAmount.toLocaleString()}`);
+        } else {
+            amountInput.setCustomValidity('');
+        }
+        
+        // Validate duration
+        if (duration > maxDue) {
+            durationInput.setCustomValidity(`Duration cannot exceed ${maxDue} months/weeks`);
+        } else {
+            durationInput.setCustomValidity('');
+        }
+        
+        // Calculate total amount (simple interest for display)
+        const monthlyRate = interestRate / 12;
+        const totalInterest = amount * monthlyRate * duration;
+        const totalAmount = amount + totalInterest;
+        
+        // Update calculation display
+        document.getElementById('principalAmount').textContent = `KSH ${amount.toLocaleString()}`;
+        document.getElementById('interestRate').textContent = `${(interestRate * 100).toFixed(1)}%`;
+        document.getElementById('totalAmount').textContent = `KSH ${totalAmount.toLocaleString()}`;
+        
+        calculationDiv.style.display = 'block';
+    } else {
+        calculationDiv.style.display = 'none';
+    }
+}
+
+function showFeedback(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.className = `alert alert-${type === 'error' ? 'danger' : type}`;
+    element.style.display = 'block';
+}
+
+function showToast(message, type) {
+    // Create toast container if it doesn't exist
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div class="toast-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="bx bx-${type === 'success' ? 'check-circle' : type === 'error' ? 'error-circle' : 'info-circle'} me-2"></i>
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Remove toast after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => container.removeChild(toast), 300);
+    }, 5000);
+}
+
+ function getCsrfToken() {
+     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+     if (csrfToken) {
+         return csrfToken.value;
+     }
+     // Fallback to cookie method
+     const value = "; " + document.cookie;
+     const parts = value.split("; csrftoken=");
+     if (parts.length === 2) return parts.pop().split(";").shift();
+     return '';
+ }
+
+// Additional utility functions for other actions
+function viewLoanDetails(loanId) {
+    // Implementation for viewing loan details
+    console.log('View loan details:', loanId);
+}
+
+function editLoan(loanId) {
+    // Implementation for editing loan
+    console.log('Edit loan:', loanId);
+}
+
+function editLoanType(loanTypeId) {
+    // Implementation for editing loan type
+    console.log('Edit loan type:', loanTypeId);
+}
+
+function deleteLoanType(loanTypeId) {
+    if (!confirm('Are you sure you want to delete this loan type?')) {
+        return;
+    }
+    // Implementation for deleting loan type
+    console.log('Delete loan type:', loanTypeId);
+}
+
+function makePayment(loanId) {
+    // Implementation for making loan payment
+    console.log('Make payment for loan:', loanId);
+}
+
+function viewMyLoanDetails(loanId) {
+    // Implementation for viewing personal loan details
+    console.log('View my loan details:', loanId);
+}
+
+function viewApplicationDetails(applicationId) {
+    // Implementation for viewing application details
+    console.log('View application details:', applicationId);
+}
+
+function contactMember(memberId) {
+    // Implementation for contacting member
+    console.log('Contact member:', memberId);
+}
+
+ function contactAdmin() {
+     // Implementation for contacting admin
+     console.log('Contact admin');
+ }
+
+      // Update status display for cleared loans to show as Completed
+     document.addEventListener('DOMContentLoaded', function() {
+         const statusBadges = document.querySelectorAll('.status-badge.cleared');
+         statusBadges.forEach(badge => {
+             if (badge.textContent.trim() === 'Cleared') {
+                 badge.textContent = 'Completed';
+                 // Also add completed class for consistent styling
+                 badge.classList.add('completed');
+             }
+         });
+     });
+ </script>
+
+{%endblock%}

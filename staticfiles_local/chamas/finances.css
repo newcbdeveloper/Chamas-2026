@@ -1,0 +1,1610 @@
+:root {
+    --color-default: #2191a5;
+    --color-second: #0067ac;
+    --color-white: #fff;
+    --color-body: #e4e9f7;
+    --color-light: #e0e0e0;
+}
+
+/* ================================
+   DESKTOP FLOATING ACTION BUTTONS
+   ================================ */
+.floating-actions.desktop-floating {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    z-index: 100;
+}
+
+.reports-container {
+    position: relative;
+}
+
+.btn-floating {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 20px rgba(33, 145, 165, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.btn-floating:hover {
+    background: var(--brand-primary-hover);
+    transform: translateX(-8px);
+    box-shadow: 0 8px 30px rgba(33, 145, 165, 0.4);
+}
+
+.btn-floating i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.btn-floating span {
+    font-weight: 600;
+}
+
+/* ================================
+   FINANCE TABS
+   ================================ */
+.finance-tabs {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.finance-tabs .nav-item {
+    flex-shrink: 0;
+}
+
+.finance-tabs .nav-link {
+    display: block;
+    padding: 16px 20px;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border-radius: 0;
+}
+
+.finance-tabs .nav-link:hover {
+    color: var(--color-default);
+    background: #f1f5f9;
+}
+
+.finance-tabs .nav-link.active {
+    color: var(--color-default);
+    background: #f0f9ff;
+    border-bottom: 3px solid var(--color-default);
+    font-weight: 600;
+}
+
+/* ================================
+   TAB CONTENT
+   ================================ */
+.finance-tab-content {
+    padding: 0;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ================================
+   FINANCE CARDS
+   ================================ */
+.finance-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.finance-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.finance-card-header .header-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-default);
+    color: white;
+    border-radius: 8px;
+    font-size: 20px;
+}
+
+.finance-card-header .header-text p {
+    color: var(--color-default);
+    font-family: sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ================================
+   FILTER SECTION
+   ================================ */
+.filter-section {
+    padding: 20px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.filter-inputs {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-inputs .mb-3 {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* ================================
+   RESPONSIVE TABLES
+   ================================ */
+.desktop-view {
+    display: block;
+}
+
+.mobile-cards {
+    display: none;
+}
+
+.table-responsive {
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.finance-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.finance-table thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-weight: 600;
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 2px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.finance-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.finance-table tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+.finance-table tbody tr:hover {
+    background: #f0f9ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.finance-table tbody td {
+    padding: 14px 12px;
+    color: #64748b;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* ================================
+   MODAL STYLES
+   ================================ */
+.finance-modal .modal-header {
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    padding: 20px 24px;
+}
+
+.finance-modal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.finance-modal .modal-header .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+.finance-modal .modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.finance-modal .modal-body {
+    padding: 24px;
+}
+
+.finance-modal .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ================================
+   ORIGINAL STYLES (PRESERVED)
+   ================================ */
+.body-div {
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: #FFF;
+    box-shadow: 0px 3px 6px 0px rgba(148, 163, 184, 0.15);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+    align-self: stretch;
+    text-transform: capitalize;
+}
+
+.header-sect {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+}
+
+.header-icon {
+    width: 30;
+    height: 30px;
+    color: #2291A5;
+}
+
+.header-text p {
+    color: var(--Primary-500, #2291A5);
+    text-align: center;
+
+    /* Public Sans/Text sm/Medium */
+    font-family: sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.input-sect {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+    width: 100%;
+    height: auto;
+}
+
+.mb-3 {
+    border-radius: 8px;
+    /* border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20)); */
+    background: var(--White, #FFF);
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+}
+
+.mb-3 label {
+    color: var(--Primary-500, #2291A5);
+    text-align: center;
+
+    /* Public Sans/Text xs/Medium */
+    font-family: sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 18px;
+
+    /* 150% */
+}
+
+.mb-3 input {
+    opacity: 0.6;
+    color: #000;
+    text-align: flex-start;
+
+    /* Public Sans/Text xs/Regular */
+    font-family: sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 18px;
+}
+
+select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+select {
+    color: #2291A5;
+}
+
+/* Remove number increment and decrement */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
+
+select {
+    width: 100%;
+}
+
+.btn-primary {
+    border-radius: 8px;
+    background: var(--brand-primary);
+    background-color: var(--brand-primary);
+    display: flex;
+    padding: 12px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    color: #ffffff;
+    text-align: center;
+    border-color: var(--brand-primary);
+
+    /* Public Sans/Text sm/Semibold */
+    font-family: sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.btn-primary:hover {
+    background: var(--brand-primary-hover);
+    background-color: var(--brand-primary-hover);
+    border-color: var(--brand-primary-hover);
+}
+
+.saving-single {
+    display: flex;
+    padding: 5px;
+    flex-direction: column;
+    align-items: stretch;
+    /* Align children across the width */
+    gap: 12px;
+    align-self: stretch;
+    border-radius: 8px;
+    border: 0.25px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: var(--light-surface-tertiary, #F1F5F9);
+    margin: 5px 0;
+
+}
+
+.saving-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+}
+
+.saving-details-row {
+    display: flex;
+    flex-wrap: no-wrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    /* Change this line to align-items: stretch */
+    align-self: stretch;
+}
+
+
+.saving-cube {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    width: calc(33.33% - 12px);
+    margin: 5px;
+}
+
+.saving-cube h6 {
+    color: var(--Primary-900, #030F11);
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    /* 180% */
+}
+
+.amount-section {
+    border-radius: 4px;
+    border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: var(--light-surface-secondary, #F8FAFC);
+    display: flex;
+    padding: 2px 4px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+}
+
+.amount {
+    color: #000;
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    /* 180% */
+    opacity: 0.4;
+    padding: 0;
+    margin: 0;
+}
+
+.summary-section {
+    border-radius: 8px;
+    border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: var(--brand-primary);
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+    margin-top: 16px;
+}
+
+.summary-section-inner {
+    display: flex;
+    height: 36px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.summary-section-inner h6 {
+    color: var(--White, #FFF);
+    text-align: center;
+
+    /* Public Sans/Text sm/Semibold */
+    font-family: sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.summary-section-inner h5 {
+    color: var(--White, #FFF);
+
+    /* Public Sans/Text xs/Medium */
+    font-family: sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    /* 150% */
+
+}
+
+/* ================================
+   GLOBAL CONTAINER OVERRIDES
+   ================================ */
+html, body,
+.chamas-container, 
+.chamas-wrapper,
+.container,
+.container-fluid {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ================================
+   FAB - HIDDEN BY DEFAULT (SHOWN ON MOBILE)
+   ================================ */
+.fab-container,
+.fab-backdrop {
+    display: none;
+}
+
+/* ================================
+   FLOATING ACTION BUTTON (FAB) STYLES
+   ================================ */
+.fab-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.fab-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.fab-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+}
+
+.fab-create {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--brand-primary);
+    color: white;
+    box-shadow: 0 4px 16px rgba(33, 145, 165, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1001;
+}
+
+.fab-create:hover {
+    background: var(--brand-primary-hover);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(33, 145, 165, 0.6);
+}
+
+.fab-create.active {
+    transform: rotate(45deg);
+    background: var(--brand-primary-hover);
+}
+
+/* Mini FABs */
+.mini-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--brand-primary);
+    color: white;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 3px 12px rgba(33, 145, 165, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.3) translateY(0);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.mini-fab.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.mini-fab-savings.show {
+    transform: scale(1) translateY(-80px);
+    transition-delay: 0.1s;
+}
+
+.mini-fab-investment.show {
+    transform: scale(1) translateY(-140px);
+    transition-delay: 0.15s;
+}
+
+.mini-fab-income.show {
+    transform: scale(1) translateY(-200px);
+    transition-delay: 0.2s;
+}
+
+.mini-fab:hover {
+    background: #1a7560;
+    transform: scale(1.1) translateY(var(--translate-y));
+}
+
+.mini-fab-savings:hover {
+    --translate-y: -80px;
+}
+
+.mini-fab-investment:hover {
+    --translate-y: -140px;
+}
+
+.mini-fab-income:hover {
+    --translate-y: -200px;
+}
+
+/* FAB Labels */
+
+
+.mini-fab:hover .fab-label {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(-8px);
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+/* ================================
+   DESKTOP STYLES (min-width: 768px)
+   ================================ */
+@media (min-width: 768px) {
+    /* Show desktop floating actions */
+    .floating-actions.desktop-floating {
+        display: flex !important;
+    }
+    
+    /* Hide FAB completely on desktop */
+    .fab-create,
+    .mini-fab,
+    .mini-fab-savings,
+    .mini-fab-investment,
+    .mini-fab-income,
+    .fab-container,
+    .fab-backdrop {
+        display: none !important;
+    }
+
+    /* Brand color for all desktop modal elements */
+    .modal-header,
+    .modal-footer .btn,
+    .modal-footer .btn-primary {
+        background-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+        border-color: var(--brand-primary) !important;
+    }
+
+    /* Brand color for desktop action buttons */
+    .finance-action-row button,
+    .finance-create-savings,
+    .finance-create-investment,
+    .finance-create-income {
+        background-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+        border-color: var(--brand-primary) !important;
+    }
+
+    /* Brand color for desktop action buttons hover states */
+    .finance-action-row button:hover,
+    .finance-create-savings:hover,
+    .finance-create-investment:hover,
+    .finance-create-income:hover {
+        background-color: var(--brand-primary-hover) !important;
+        border-color: var(--brand-primary-hover) !important;
+    }
+
+    /* Brand color for tab navigation active states */
+    .finance-tabs .nav-link.active {
+        color: var(--brand-primary) !important;
+        border-bottom-color: var(--brand-primary) !important;
+    }
+
+    .finance-tabs .nav-link:hover {
+        color: var(--brand-primary) !important;
+    }
+
+    /* Brand color for primary buttons in modals */
+    .modal-body .btn-primary,
+    .finance-modal .btn-primary {
+        background-color: var(--brand-primary) !important;
+        border-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+    }
+
+    .modal-body .btn-primary:hover,
+    .finance-modal .btn-primary:hover {
+        background-color: var(--brand-primary-hover) !important;
+        border-color: var(--brand-primary-hover) !important;
+    }
+
+    /* Ensure modal close button is properly styled */
+    .modal-header .btn-close {
+        filter: invert(1);
+        opacity: 0.8;
+    }
+
+    .modal-header .btn-close:hover {
+        opacity: 1;
+    }
+
+    /* Comprehensive modal button styling */
+    .modal .btn,
+    .modal button[type="submit"],
+    .modal input[type="submit"] {
+        background-color: #1F8A70 !important;
+        border-color: #1F8A70 !important;
+        color: #ffffff !important;
+    }
+
+    .modal .btn:hover,
+    .modal button[type="submit"]:hover,
+    .modal input[type="submit"]:hover {
+        background-color: #1a7560 !important;
+        border-color: #1a7560 !important;
+    }
+}
+
+@media (max-width: 767px) {
+    /* Hide Desktop Floating Actions on Mobile */
+    .floating-actions.desktop-floating {
+        display: none !important;
+    }
+
+    /* Show FAB on Mobile - Only when visible (not hidden by jQuery) */
+    .fab-container.admin:not([style*="display: none"]):not(.hidden) {
+        display: block !important;
+        position: fixed !important;
+        bottom: 100px !important;
+        right: 24px !important;
+        z-index: 1050 !important;
+    }
+    
+    /* Ensure FAB is hidden when jQuery sets display: none */
+    .fab-container.admin[style*="display: none"],
+    .fab-container.admin.hidden {
+        display: none !important;
+    }
+    
+    .fab-backdrop.admin:not([style*="display: none"]):not(.hidden) {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        z-index: 999 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Hide backdrop when not in admin view */
+    .fab-backdrop.admin[style*="display: none"],
+    .fab-backdrop.admin.hidden {
+        display: none !important;
+    }
+
+    .fab-backdrop.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .fab-create {
+        display: flex !important;
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 50% !important;
+        border: none !important;
+        background: var(--brand-primary) !important;
+        color: white !important;
+        box-shadow: 0 8px 24px rgba(33, 145, 165, 0.6) !important;
+        cursor: pointer !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 28px !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        z-index: 1051 !important;
+    }
+
+    .fab-create:hover {
+        background: var(--brand-primary-hover) !important;
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 20px rgba(33, 145, 165, 0.6) !important;
+    }
+
+    .fab-create.active {
+        transform: rotate(45deg) !important;
+        background: var(--brand-primary-hover) !important;
+    }
+
+    /* Touch and Active States */
+    .fab-create:active,
+    .mini-fab:active {
+        transform: scale(0.95);
+    }
+
+    .fab-create.active:active {
+        transform: rotate(45deg) scale(0.95);
+    }
+
+    /* Prevent text selection on FAB */
+    .fab-create,
+    .mini-fab,
+    .fab-label {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Ensure FAB stays above other content */
+    .fab-container {
+        pointer-events: none;
+    }
+
+    .fab-create,
+    .mini-fab {
+        pointer-events: all;
+    }
+
+    /* Mini FABs for Mobile */
+    .mini-fab {
+        display: flex !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        border: none !important;
+        background: var(--brand-primary) !important;
+        color: white !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        cursor: pointer !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 18px !important;
+        box-shadow: 0 3px 12px rgba(33, 145, 165, 0.4) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: scale(0.3) translateY(0) !important;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+    }
+
+    .mini-fab.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: scale(1) !important;
+    }
+
+    .mini-fab-savings.show {
+        transform: scale(1) translateY(-80px) !important;
+        transition-delay: 0.1s !important;
+    }
+
+    .mini-fab-investment.show {
+        transform: scale(1) translateY(-140px) !important;
+        transition-delay: 0.15s !important;
+    }
+
+    .mini-fab-income.show {
+        transform: scale(1) translateY(-200px) !important;
+        transition-delay: 0.2s !important;
+    }
+
+    /* FAB Labels */
+    .fab-label {
+        position: absolute !important;
+        right: 60px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        background: rgba(0, 0, 0, 0.8) !important;
+        color: white !important;
+        padding: 6px 12px !important;
+        border-radius: 4px !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: all 0.3s ease !important;
+        pointer-events: none !important;
+    }
+
+    .mini-fab:hover .fab-label {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(-50%) translateX(-8px) !important;
+    }
+
+    /* ================================
+       FLOATING ACTION BUTTON (FAB)
+       ================================ */
+    .fab-container {
+        display: block;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+    }
+
+    .fab-backdrop {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .fab-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .fab-create {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background: #1F8A70;
+        color: white;
+        box-shadow: 0 4px 16px rgba(31, 138, 112, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1001;
+    }
+
+    .fab-create:hover {
+        background: #1a7560;
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(31, 138, 112, 0.6);
+    }
+
+    .fab-create.active {
+        transform: rotate(45deg);
+        background: #1a7560;
+    }
+
+    /* Mini FABs */
+    .mini-fab {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: #1F8A70;
+        color: white;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 3px 12px rgba(31, 138, 112, 0.4);
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.3) translateY(0);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .mini-fab.show {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+    }
+
+    .mini-fab-savings.show {
+        transform: scale(1) translateY(-80px);
+        transition-delay: 0.1s;
+    }
+
+    .mini-fab-investment.show {
+        transform: scale(1) translateY(-140px);
+        transition-delay: 0.15s;
+    }
+
+    .mini-fab-income.show {
+        transform: scale(1) translateY(-200px);
+        transition-delay: 0.2s;
+    }
+
+    .mini-fab:hover {
+        background: #1a7560;
+        transform: scale(1.1) translateY(var(--translate-y));
+    }
+
+    .mini-fab-savings:hover {
+        --translate-y: -80px;
+    }
+
+    .mini-fab-investment:hover {
+        --translate-y: -140px;
+    }
+
+    .mini-fab-income:hover {
+        --translate-y: -200px;
+    }
+
+    /* FAB Labels */
+    .fab-label {
+        position: absolute;
+        right: 60px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .mini-fab:hover .fab-label {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(-8px);
+    }
+
+    /* Brand Color Overrides for Mobile */
+    .fab-create.admin,
+    .mini-fab.admin,
+    .mini-fab.member {
+        background: #1F8A70 !important;
+        color: white !important;
+    }
+
+    .fab-create.admin:hover,
+    .mini-fab.admin:hover,
+    .mini-fab.member:hover {
+        background: #1a7560 !important;
+    }
+
+    /* Touch and Active States */
+    .fab-create:active,
+    .mini-fab:active {
+        transform: scale(0.95);
+    }
+
+    .fab-create.active:active {
+        transform: rotate(45deg) scale(0.95);
+    }
+
+    /* Prevent text selection on FAB */
+    .fab-create,
+    .mini-fab,
+    .fab-label {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Ensure FAB stays above other content */
+    .fab-container {
+        pointer-events: none;
+    }
+
+    .fab-create,
+    .mini-fab {
+        pointer-events: all;
+    }
+
+    /* Improved label positioning for longer text */
+    .fab-label {
+        min-width: max-content;
+        max-width: 120px;
+    }
+
+    /* Mobile Tabs - Horizontal Scroll */
+    .finance-tabs {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 4px;
+    }
+
+    .finance-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .finance-tabs .nav-link {
+        padding: 12px 16px;
+        font-size: 13px;
+        min-width: 140px;
+        text-align: center;
+    }
+
+    /* Show Tables on Mobile - Hide Card View */
+    .desktop-view {
+        display: block !important;
+    }
+
+    .mobile-cards {
+        display: none !important;
+    }
+
+    /* ================================
+       ENFORCE TABLE SEMANTICS ON MOBILE
+       ================================ */
+    .finance-table, 
+    .finance-table table,
+    .table-responsive table,
+    .finance-table-wrapper table {
+        display: table !important;
+        width: 100% !important;
+    }
+
+    .finance-table table thead,
+    .finance-table table tbody,
+    .table-responsive table thead,
+    .table-responsive table tbody,
+    .finance-table-wrapper table thead,
+    .finance-table-wrapper table tbody {
+        display: table-header-group !important;
+    }
+
+    .finance-table table tbody,
+    .table-responsive table tbody,
+    .finance-table-wrapper table tbody {
+        display: table-row-group !important;
+    }
+
+    .finance-table table tr,
+    .table-responsive table tr,
+    .finance-table-wrapper table tr {
+        display: table-row !important;
+    }
+
+    .finance-table table th,
+    .finance-table table td,
+    .table-responsive table th,
+    .table-responsive table td,
+    .finance-table-wrapper table th,
+    .finance-table-wrapper table td {
+        display: table-cell !important;
+        white-space: nowrap !important;
+        padding: 0.5rem !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid #e5e7eb !important;
+    }
+
+    .finance-table table th,
+    .table-responsive table th,
+    .finance-table-wrapper table th {
+        background: #f8fafc !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        text-align: left !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+    }
+
+    /* Mobile Table Enhancement */
+    .finance-table table,
+    .table-responsive table,
+    .finance-table-wrapper table {
+        font-size: 14px !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
+    .finance-table table tbody tr:nth-child(even),
+    .table-responsive table tbody tr:nth-child(even),
+    .finance-table-wrapper table tbody tr:nth-child(even) {
+        background: #f9fafb !important;
+    }
+
+    .finance-table table tbody tr:hover,
+    .table-responsive table tbody tr:hover,
+    .finance-table-wrapper table tbody tr:hover {
+        background: #f0f9ff !important;
+    }
+
+    /* Mobile card styles disabled - using table layout instead */
+
+    /* Filter Section Mobile */
+    .filter-inputs {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .filter-inputs .mb-3:not(.member-filter) {
+        flex: 1;
+        min-width: calc(50% - 6px);
+    }
+
+    .filter-inputs .mb-3.member-filter {
+        flex: 1;
+        min-width: 100%;
+        width: 100%;
+    }
+
+    /* Finance Modal Mobile Adjustments */
+    .finance-modal .modal-dialog {
+        margin: 15px auto !important;
+        max-width: 95vw !important;
+        width: auto !important;
+    }
+
+    .finance-modal .modal-content {
+        border-radius: 12px !important;
+        border: none !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .finance-modal .modal-header {
+        background: var(--brand-primary) !important;
+        color: white !important;
+        border: none !important;
+        padding: 20px 24px !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .finance-modal .modal-body {
+        padding: 24px !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+    }
+
+    .finance-modal .input-sect {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .finance-modal .btn-primary {
+        background-color: var(--brand-primary) !important;
+        border-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+        width: 100% !important;
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+
+    .finance-modal .btn-primary:hover {
+        background-color: var(--brand-primary-hover) !important;
+        border-color: var(--brand-primary-hover) !important;
+    }
+
+    /* ================================
+       MOBILE MODAL ADJUSTMENTS ONLY
+       ================================ */
+    
+    .finance-modal .modal-dialog {
+        max-width: 95vw !important;
+        margin: 15px auto !important;
+    }
+
+    .finance-modal .modal-content {
+        border-radius: 12px !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .modal-header {
+        background: var(--brand-primary) !important;
+        color: white !important;
+        border: none !important;
+        padding: 20px 24px !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .modal-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        font-weight: 600 !important;
+        font-size: 18px !important;
+    }
+
+    .modal-header .btn-close {
+        filter: invert(1) !important;
+        opacity: 0.8 !important;
+    }
+
+    .modal-header .btn-close:hover {
+        opacity: 1 !important;
+    }
+
+    .modal-body {
+        padding: 24px !important;
+        overflow-y: auto !important;
+        max-height: 70vh !important;
+    }
+
+    .modal-body .input-sect {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .modal-body .mb-3 {
+        display: flex !important;
+        flex-direction: column !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .modal-body button[type="submit"] {
+        width: 100% !important;
+        background-color: var(--brand-primary) !important;
+        border-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+
+    .modal-body button[type="submit"]:hover {
+        background-color: var(--brand-primary-hover) !important;
+        border-color: var(--brand-primary-hover) !important;
+    }
+
+    /* Form inputs in modals */
+    .modal-body .form-control,
+    .modal-body select,
+    .modal-body input {
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+        background: #ffffff !important;
+        color: #374151 !important;
+    }
+
+    .modal-body .form-control:focus,
+    .modal-body select:focus,
+    .modal-body input:focus {
+        border-color: var(--brand-primary) !important;
+        box-shadow: 0 0 0 0.2rem rgba(33, 145, 165, 0.25) !important;
+        outline: none !important;
+    }
+
+    .modal-body .form-label {
+        color: var(--brand-primary) !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .modal-body .input-group {
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+    }
+
+    .modal-body .input-group select {
+        border: none !important;
+        background: transparent !important;
+        width: 100% !important;
+        padding: 10px 12px !important;
+    }
+
+    /* ================================
+       SCROLLABLE HORIZONTAL TABLES
+       ================================ */
+    .finance-table-wrapper,
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        background: white !important;
+    }
+
+    .finance-table-wrapper table,
+    .table-responsive table {
+        width: max-content !important;
+        min-width: 100% !important;
+        table-layout: auto !important;
+        margin: 0 !important;
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
+
+    .finance-table-wrapper td,
+    .finance-table-wrapper th,
+    .table-responsive td,
+    .table-responsive th {
+        white-space: nowrap !important;
+        min-width: 80px !important;
+        font-size: 14px !important;
+    }
+}
+
+/* ================================
+   SWIPE GESTURES (FOR MOBILE TABS)
+   ================================ */
+@media (max-width: 767px) {
+    .finance-tab-content {
+        touch-action: pan-x;
+    }
+
+    .tab-pane {
+        transform: translateX(0);
+        transition: transform 0.3s ease;
+    }
+
+    /* Tab swipe indicators */
+    .finance-tabs::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, var(--color-default) 50%, transparent 100%);
+        opacity: 0.3;
+    }
+}
+
+/* ================================
+   ROLE-BASED VISIBILITY (PRESERVED)
+   ================================ */
+.admin {
+    /* Admin styles preserved as-is */
+}
+
+.member {
+    /* Member styles preserved as-is */
+}
+
+/* Ensure admin elements can be hidden by JavaScript */
+.admin.hidden,
+.fab-container.hidden,
+.fab-create.hidden,
+.mini-fab.hidden {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Admin specific button styling */
+.admin .finance-create-savings,
+.admin .finance-create-investment,
+.admin .finance-create-income {
+    /* Enhanced admin button styles already defined above */
+}
+
+/* Member specific adjustments */
+.member .finance-card-header .header-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* ================================
+   ACCESSIBILITY & FOCUS STATES
+   ================================ */
+.finance-tabs .nav-link:focus,
+.finance-action-row button:focus {
+    outline: 2px solid var(--color-default);
+    outline-offset: 2px;
+}
+
+.finance-table tbody tr:focus-within {
+    background: #f0f9ff;
+    outline: 2px solid var(--color-default);
+    outline-offset: -2px;
+}
+
+/* ================================
+   SMOOTH ANIMATIONS
+   ================================ */
+* {
+    scroll-behavior: smooth;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.finance-action-row button {
+    transform: translateY(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.finance-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+/* ================================
+   LOADING STATES & EMPTY STATES
+   ================================ */
+.finance-card .text-center {
+    padding: 40px 20px;
+    color: #64748b;
+    font-style: italic;
+}
+
+.finance-table .text-center {
+    padding: 40px;
+    color: #64748b;
+    font-style: italic;
+}

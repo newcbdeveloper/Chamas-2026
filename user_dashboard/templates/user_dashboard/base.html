@@ -1,0 +1,394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>ChamaSpace Dashboard</title>{% endblock %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}">
+
+    <style>
+        /* Verified Badge Styles */
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            border-radius: 50%;
+            color: white;
+            font-size: 11px;
+            margin-left: 6px;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+        }
+
+        .verified-badge-lg {
+            width: 24px;
+            height: 24px;
+            font-size: 13px;
+        }
+
+        .verified-badge i {
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+        }
+
+        /* Avatar with badge wrapper */
+        .avatar-with-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .avatar-badge-overlay {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .avatar-badge-overlay i {
+            font-size: 9px;
+            color: white;
+        }
+
+        /* Dropdown verified status */
+        .user-verified-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background: #D1FAE5;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #059669;
+            margin-top: 4px;
+        }
+
+        .user-verified-status i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+
+        .welcome-header .verified-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #059669;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+        }
+
+        .welcome-header .verified-indicator i {
+            font-size: 14px;
+        }
+
+        .welcome-title-with-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Global Mobile Footer Override - Emerald Theme */
+        @media (max-width: 991.98px) {
+            .mbl_footer {
+                display: block !important;
+                background: #2191a5 !important;
+                /* Emerald-600 */
+                z-index: 1040 !important;
+            }
+
+            /* Ensure main content doesn't hide behind footer */
+            .main-content {
+                padding-bottom: 80px !important;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    {% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 2000; margin-top: 80px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <a href="{% url 'user_dashboard:home' %}" class="sidebar-brand-link">
+                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="ChamaSpace">
+                <span class="sidebar-brand-text">ChamaSpace</span>
+            </a>
+            <button class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-nav">
+            <nav class="nav flex-column">
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                    href="{% url 'user_dashboard:home' %}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'all_notifications' %}active{% endif %}"
+                    href="{% url 'user_dashboard:all_notifications' %}">
+                    <i class="far fa-bell"></i> Notifications
+                </a>
+
+                <a class="nav-link {% if 'support' in request.resolver_match.namespace %}active{% endif %}"
+                        href="{% url 'support:my_tickets' %}">
+                        <i class="fas fa-life-ring"></i> Support
+                    </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+                    href="{% url 'user_dashboard:settings' %}">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+
+            <div class="sidebar-logout">
+                <a class="nav-link text-danger" href="{% url 'Logout' %}">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="page_header">
+        <div class="container-fluid">
+            <nav class="page_nav">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="header-brand">
+                        <a href="{% url 'user_dashboard:home' %}"
+                            class="d-flex align-items-center text-decoration-none">
+                            <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="ChamaSpace">
+                            <span class="header-brand-text d-none d-sm-inline">ChamaSpace</span>
+                        </a>
+                    </div>
+                </div>
+
+                <ul class="nav-list">
+                    <li>
+                        <button class="nav-btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                            <i class="far fa-bell"></i>
+                            {% if notifications|length > 0 %}
+                            <span class="badge-dot"></span>
+                            {% endif %}
+                        </button>
+                    </li>
+
+                    <li class="dropdown">
+                        <button class="nav-btn p-0 border-0" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <div class="avatar-with-badge">
+                                {% if profile.picture %}
+                                <img src="{{ profile.picture.url }}" alt="User" class="nav-avatar">
+                                {% else %}
+                                <img src="{% static 'assets/avatars/face-1.png' %}" alt="User" class="nav-avatar">
+                                {% endif %}
+
+                                {% if profile.owner.kyc_profile.is_verified %}
+                                <span class="avatar-badge-overlay" title="Verified Account">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li class="px-3 py-2 border-bottom mb-1">
+                                <div class="d-flex align-items-start justify-content-between">
+                                    <div>
+                                        <p class="mb-0 fw-bold text-dark d-flex align-items-center">
+                                            {{ profile.owner.get_full_name }}
+                                            {% if profile.owner.kyc_profile.is_verified %}
+                                            <span class="verified-badge" title="Verified Account">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            {% endif %}
+                                        </p>
+                                        <small class="text-muted">{{ profile.owner.email }}</small>
+                                    </div>
+                                </div>
+                                {% if profile.owner.kyc_profile.is_verified %}
+                                <div class="user-verified-status mt-2">
+                                    <i class="fas fa-shield-check"></i>
+                                    Verified Account
+                                </div>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user_dashboard:settings' %}">
+                                    <i class="fas fa-user-cog me-2 text-muted"></i> Settings
+                                </a>
+                            </li>
+                            {% if not profile.owner.kyc_profile.is_verified %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user_dashboard:kyc:dashboard' %}">
+                                    <i class="fas fa-shield-alt me-2 text-warning"></i> Verify Account
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider my-1">
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'Logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Log Out
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="container-fluid px-4 py-4">
+            {% block content %}{% endblock %}
+            {% block settings_content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="mbl_footer">
+        <div class="container">
+            <div class="footer_row">
+                <a href="{% url 'user_dashboard:home' %}"
+                    class="footer_button {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <img src="{% static 'images/home_white.png' %}" alt="Home">
+                    <p>Home</p>
+                </a>
+                <a href="#" class="footer_button" data-bs-toggle="modal" data-bs-target="#comingSoonModal">
+                    <img src="{% static 'images/filter_active.png' %}" alt="Features">
+                    <p>Features</p>
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="Wallet">
+                    <p>Wallet</p>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}"
+                    class="footer_button {% if request.resolver_match.url_name == 'settings' or request.resolver_match.url_name == 'settings_security' %}active{% endif %}">
+                    <img src="{% static 'images/setting.png' %}" alt="Settings">
+                    <p>Settings</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="comingSoonModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4" style="color: #2191a5;">
+                        <i class="fas fa-rocket fa-3x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2">Coming Soon!</h3>
+                    <p class="text-muted mb-4">We're busy building this feature to help you manage your finances better.
+                        Stay tuned!</p>
+                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Got
+                        it</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const body = document.body;
+
+            function openSidebar() {
+                sidebar.classList.add('show');
+                sidebarOverlay.classList.add('show');
+                body.classList.add('sidebar-open');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+                body.classList.remove('sidebar-open');
+            }
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', openSidebar);
+            }
+
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', closeSidebar);
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeSidebar);
+            }
+
+            const sidebarLinks = sidebar.querySelectorAll('.nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            const comingSoonModal = document.getElementById('comingSoonModal');
+            if (comingSoonModal) {
+                const modal = new bootstrap.Modal(comingSoonModal);
+
+                document.querySelectorAll('.coming_soon').forEach(tile => {
+                    tile.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        modal.show();
+                    });
+                });
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

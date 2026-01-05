@@ -1,0 +1,325 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+
+{% block title %}Preferences{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-cog me-2"></i>Preferences</h2>
+            <p class="text-muted">Customize your expense tracker experience</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3 mb-4">
+            <div class="list-group sticky-top" style="top: 20px;">
+                <a href="#display" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="fas fa-palette me-2"></i>Display Preferences
+                </a>
+                <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-bell me-2"></i>Notification Preferences
+                </a>
+                <a href="#data" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-database me-2"></i>Data Management
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-md-9">
+            <form method="post" id="preferences-form">
+                {% csrf_token %}
+                
+                <div class="tab-content">
+                    <!-- Display Preferences -->
+                    <div class="tab-pane fade show active" id="display">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-palette me-2"></i>Display Preferences
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Currency -->
+                                <div class="mb-4">
+                                    <label for="{{ form.currency.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Currency
+                                    </label>
+                                    {{ form.currency }}
+                                    {% if form.currency.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.currency.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Select your preferred currency for displaying amounts
+                                    </small>
+                                </div>
+
+                                <!-- Date Format -->
+                                <div class="mb-4">
+                                    <label for="{{ form.date_format.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-calendar me-2"></i>Date Format
+                                    </label>
+                                    {{ form.date_format }}
+                                    {% if form.date_format.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.date_format.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Choose how dates are displayed throughout the app
+                                    </small>
+                                </div>
+
+                                <!-- Theme -->
+                                <div class="mb-4">
+                                    <label for="{{ form.theme.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-moon me-2"></i>Theme
+                                    </label>
+                                    {{ form.theme }}
+                                    {% if form.theme.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.theme.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Select your preferred color theme
+                                    </small>
+                                </div>
+
+                                <!-- Show Insights -->
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        {{ form.show_insights }}
+                                        <label class="form-check-label" for="{{ form.show_insights.id_for_label }}">
+                                            <strong>Show Insights</strong>
+                                            <br>
+                                            <small class="text-muted">Display AI-generated spending insights on dashboard</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Preferences -->
+                    <div class="tab-pane fade" id="notifications">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-bell me-2"></i>Notification Preferences
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-4">
+                                    Choose which notifications you want to receive
+                                </p>
+
+                                <!-- Email Notifications -->
+                                <div class="mb-4">
+                                    <div class="form-check form-switch">
+                                        {{ form.email_notifications }}
+                                        <label class="form-check-label" for="{{ form.email_notifications.id_for_label }}">
+                                            <strong>Email Notifications</strong>
+                                            <br>
+                                            <small class="text-muted">Receive email notifications for important updates</small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Budget Alerts -->
+                                <div class="mb-4">
+                                    <div class="form-check form-switch">
+                                        {{ form.budget_alerts }}
+                                        <label class="form-check-label" for="{{ form.budget_alerts.id_for_label }}">
+                                            <strong>Budget Alerts</strong>
+                                            <br>
+                                            <small class="text-muted">Get notified when approaching or exceeding budget limits</small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Weekly Summary -->
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        {{ form.weekly_summary }}
+                                        <label class="form-check-label" for="{{ form.weekly_summary.id_for_label }}">
+                                            <strong>Weekly Summary Email</strong>
+                                            <br>
+                                            <small class="text-muted">Receive a weekly summary of your spending and income</small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info mt-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Notifications will be sent to: <strong>{{ user.email }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="tab-pane fade" id="data">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-database me-2"></i>Data Management
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Data Overview -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3">Your Data Overview</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h3 class="text-primary">{{ transaction_count }}</h3>
+                                                    <small class="text-muted">Transactions</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h3 class="text-success">{{ budget_count }}</h3>
+                                                    <small class="text-muted">Budgets</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h3 class="text-info">{{ category_count }}</h3>
+                                                    <small class="text-muted">Custom Categories</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <!-- Export Data -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3">
+                                        <i class="fas fa-download me-2"></i>Export Your Data
+                                    </h6>
+                                    <p class="text-muted">
+                                        Download all your expense tracker data in CSV format
+                                    </p>
+                                    <a href="{% url 'expense_tracker:export_all_data' %}" class="btn btn-primary">
+                                        <i class="fas fa-file-export me-2"></i>Export All Data (ZIP)
+                                    </a>
+                                    <small class="form-text text-muted d-block mt-2">
+                                        This will download a ZIP file containing all your transactions, budgets, categories, and recurring transactions
+                                    </small>
+                                </div>
+
+                                <hr>
+
+                                <!-- Clear All Data -->
+                                <div class="mb-3">
+                                    <h6 class="fw-bold mb-3 text-danger">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                                    </h6>
+                                    <div class="alert alert-danger">
+                                        <h6 class="alert-heading">Clear All Data</h6>
+                                        <p class="mb-0">
+                                            This will permanently delete all your transactions, budgets, categories, and recurring transactions. This action cannot be undone!
+                                        </p>
+                                    </div>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#clearDataModal">
+                                        <i class="fas fa-trash-alt me-2"></i>Clear All Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button (only for display and notification preferences) -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">
+                                    Changes to display and notification preferences are saved automatically
+                                </small>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Preferences
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Clear Data Confirmation Modal -->
+<div class="modal fade" id="clearDataModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Data Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'expense_tracker:clear_all_data' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <strong>Warning!</strong> This action cannot be undone.
+                    </div>
+                    <p>You are about to delete:</p>
+                    <ul>
+                        <li><strong>{{ transaction_count }}</strong> transactions</li>
+                        <li><strong>{{ budget_count }}</strong> budgets</li>
+                        <li><strong>{{ category_count }}</strong> custom categories</li>
+                        <li>All recurring transactions</li>
+                        <li>All insights</li>
+                    </ul>
+                    <p class="fw-bold">To confirm, type <code>DELETE</code> in the box below:</p>
+                    <input type="text" name="confirm" class="form-control" placeholder="Type DELETE to confirm" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Delete All Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle tab navigation
+    document.querySelectorAll('[data-bs-toggle="list"]').forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = this.getAttribute('href');
+            
+            // Update active states
+            document.querySelectorAll('[data-bs-toggle="list"]').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show corresponding content
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            document.querySelector(target).classList.add('show', 'active');
+        });
+    });
+</script>
+{% endblock %}

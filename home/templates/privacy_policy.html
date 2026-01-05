@@ -1,0 +1,136 @@
+{% extends 'pages_base.html' %}
+{% load static %}
+
+{% block title %}Privacy Policy - ChamaSpace{% endblock %}
+
+{% block content %}
+<div class="privacy-container">
+    <div class="privacy-header">
+        <a href="{% url 'homepage' %}" class="privacy-logo">ChamaSpace</a>
+        <div class="auth-buttons">
+            <a href="{% url 'Login' %}" class="btn-outline-sm">LOG IN</a>
+            <a href="{% url 'Sign_up' %}" class="btn-outline-sm">CREATE ACCOUNT</a>
+        </div>
+    </div>
+
+    <div class="privacy-content">
+        <h1>Privacy Policy</h1>
+
+        <h2>1. Information We Collect</h2>
+        <p>At ChamaSpace, we collect and process various types of information to deliver, enhance, and personalize our services. This section outlines the categories of information we collect, including but not limited to:</p>
+
+        <p><strong>a) Personal Identifiable Information (PII):</strong><br>
+        <strong>Full Names:</strong> We collect your full legal names to personalize your experience and ensure accurate identification.<br>
+        <strong>ID Number:</strong> Your identification number is collected to comply with regulatory requirements and verify your identity.<br>
+        <strong>Address:</strong> We collect your postal and physical address to facilitate account-related communication and transactions.<br>
+        <strong>Phone Number:</strong> Your contact number is essential for communication, security, and account verification purposes.<br>
+        <strong>Email Address:</strong> We may request your email address for account-related notifications and support communication.<br>
+        <strong>Mpesa Registered Number:</strong> If applicable, we collect your Mpesa registered number for payment and transaction purposes.</p>
+
+        <p><strong>b) Additional Information:</strong><br>
+        <strong>Source of Referral:</strong> We may ask how you heard about ChamaSpace to understand the effectiveness of our marketing efforts and improve our services.<br>
+        <strong>Cookies:</strong> We utilize cookies for website functionality, analytics, and personalized content delivery. Please refer to our Cookies and Tracking Technologies section for more details.</p>
+
+        <p><strong>c) Children's Privacy:</strong><br>
+        ChamaSpace services are intended for individuals who are at least 18 years old. We do not knowingly collect or process information from individuals under the age of 18.</p>
+
+        <h2>2. How We Use Collected Information</h2>
+        <p>ChamaSpace utilizes the information we collect for various purposes, ensuring the delivery of efficient and personalized services. Here's an overview of how we use the collected information:</p>
+
+        <p><strong>a) Mpesa Information for Transactions:</strong><br>
+        <strong>Processing Withdrawals and Deposits:</strong> Your Mpesa registered number is essential for processing financial transactions, including withdrawals and deposits, ensuring a seamless and secure payment experience.</p>
+
+        <p><strong>b) Account Opening and Verification:</strong><br>
+        <strong>Account Creation:</strong> Full names, ID number, address, phone number, and email address are collected during the account creation process to establish and personalize your ChamaSpace account.<br>
+        <strong>Verification:</strong> We use collected information, including your ID number, for identity verification purposes to comply with regulatory requirements and ensure the security of your account.</p>
+
+        <p><strong>c) KYC (Know Your Customer):</strong><br>
+        <strong>Compliance:</strong> We collect certain personal information, such as your ID number, to adhere to Know Your Customer (KYC) regulations and foster a secure and compliant financial environment.</p>
+
+        <h2>3. Data Sharing and Disclosure</h2>
+        <p>At ChamaSpace, we prioritize the privacy and security of your data. Our approach to data sharing and disclosure is guided by transparency and the necessity to deliver our services effectively. Below, we outline how and when we may share your data:</p>
+
+        <p><strong>a) Service Providers:</strong><br>
+        ChamaSpace may engage trusted third-party service providers to facilitate various aspects of our services. These service providers may have access to your data only to perform tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p>
+
+        <p><strong>b) Legal Compliance:</strong><br>
+        We may disclose your information when required by law, regulatory authorities, or other legal processes. This includes situations where we believe disclosure is necessary to comply with a judicial proceeding, court order, legal request, or government investigation.</p>
+
+        <p><strong>c) Consent:</strong><br>
+        Your data privacy matters to us. ChamaSpace will not share your personal information with third parties for marketing purposes without your explicit consent. You have the right to control and manage your preferences regarding data sharing.</p>
+
+        <h2>4. Security Measures</h2>
+        <p>At ChamaSpace, the security of your data is of paramount importance. We employ a comprehensive set of measures to safeguard your information from unauthorized access, disclosure, alteration, and destruction. Our commitment to ensuring the confidentiality and integrity of your data includes the following security measures:</p>
+
+        <p><strong>a) Encryption:</strong><br>
+        All data transmitted between your device and ChamaSpace is encrypted using industry-standard protocols. This encryption ensures that your information remains confidential during transit.</p>
+
+        <p><strong>b) Access Controls:</strong><br>
+        Access to your data within ChamaSpace is strictly controlled and limited to individuals with a legitimate need to access such information. Our access controls ensure that only authorized personnel can view or manage specific data.</p>
+
+        <p><strong>c) Regular Security Audits:</strong><br>
+        We conduct regular security audits and assessments to identify and address potential vulnerabilities in our systems. These audits are designed to uphold the highest security standards and ensure ongoing protection against emerging threats.</p>
+
+        <h2>5. User Rights</h2>
+        <p>At ChamaSpace, we recognize and respect your rights regarding the data you share with us. Your control over your personal information is fundamental to our commitment to transparency and user-centric data management. Here are your rights and how we ensure you can exercise them:</p>
+
+        <p><strong>a) Access:</strong><br>
+        You have the right to access the personal information we hold about you. If you wish to obtain a copy of this information, please contact us at <a href="mailto:info@chamaspace.com">info@chamaspace.com</a>. We will respond to your request in a timely manner.</p>
+
+        <p><strong>b) Correction:</strong><br>
+        If you believe that any information we hold about you is inaccurate or incomplete, you have the right to request corrections. You can update certain details directly through your ChamaSpace account settings. For other corrections, please reach out to us at <a href="mailto:info@chamaspace.com">info@chamaspace.com</a>.</p>
+
+        <p><strong>c) Deletion:</strong><br>
+        You have the right to request the deletion of your personal information under certain circumstances. If you would like to exercise this right, please contact us at <a href="mailto:info@chamaspace.com">info@chamaspace.com</a>. We will review your request and take appropriate action in accordance with applicable data protection laws.</p>
+
+        <h2>6. Data Retention</h2>
+        <p>At ChamaSpace, we are transparent about how long we retain your personal information and the criteria we use for determining retention periods. Our data retention practices are designed to balance the need for information with privacy considerations. Here's an overview of our data retention policies:</p>
+
+        <p><strong>a) Retention Periods:</strong><br>
+        The retention periods for different categories of personal information may vary based on legal requirements, the purpose for which the data was collected, and operational needs. Specific retention periods are outlined in our internal data retention policy, which aligns with applicable data protection laws.</p>
+
+        <p><strong>b) Account Deactivation:</strong><br>
+        If you choose to deactivate your ChamaSpace account, we will retain your personal information for a limited period following account deactivation. This retention is for purposes such as facilitating account reactivation if you decide to return to ChamaSpace.</p>
+
+        <p><strong>c) Deletion and Anonymization:</strong><br>
+        At the end of the applicable retention periods, your personal information will be securely deleted or anonymized to prevent identification. Anonymized data may be retained for statistical and analytical purposes, ensuring that insights can be derived without compromising individual privacy.</p>
+
+        <h2>7. Cookies and Tracking Technologies</h2>
+        <p>ChamaSpace utilizes cookies and tracking technologies to enhance your user experience, provide personalized content, and improve the functionality of our services. This section outlines how we use these technologies, the information they collect, and your control over their usage:</p>
+
+        <p><strong>a) Types of Cookies:</strong><br>
+        We use various types of cookies, including essential cookies that are necessary for the basic functioning of our website or application. These may include session cookies, which are temporary and deleted when you close your browser, and persistent cookies, which remain on your device for a set period.</p>
+
+        <h2>8. Changes to the Privacy Policy</h2>
+        <p>At ChamaSpace, we are committed to transparency and will keep you informed about updates to our Privacy Policy. This section outlines how we communicate changes and updates:</p>
+
+        <p><strong>a) Notification of Changes:</strong><br>
+        When there are material changes to our Privacy Policy, we will notify you through prominent notices on our website or through other communication channels. Material changes may include modifications that affect your rights or the way we handle your personal information.</p>
+
+        <h2>9. Governing Law</h2>
+        <p>ChamaSpace operates within the legal framework of the Republic of Kenya, and as such, our services and this Privacy Policy are governed by the laws of Kenya. Here are key points regarding the governing law:</p>
+
+        <p><strong>a) Jurisdiction:</strong><br>
+        Any disputes, claims, or legal actions arising from or related to our Privacy Policy and the use of ChamaSpace services shall be subject to the exclusive jurisdiction of the courts of the Republic of Kenya.</p>
+
+        <p><strong>b) Applicable Law:</strong><br>
+        This Privacy Policy and the use of ChamaSpace services are subject to and governed by the laws of the Republic of Kenya. Any legal matters, interpretation, or disputes will be resolved in accordance with Kenyan law.</p>
+
+        <p><strong>c) Compliance with Regulations:</strong><br>
+        ChamaSpace is committed to adhering to all applicable laws and regulations in Kenya concerning data protection, privacy, and any other relevant legislation. Our practices are designed to comply with the legal requirements of the jurisdiction in which we operate.</p>
+
+        <p><strong>d) User Consent:</strong><br>
+        By using ChamaSpace services, you consent to the application and interpretation of this Privacy Policy in accordance with the laws of Kenya. Users are expected to comply with the applicable laws and regulations governing their use of our services.</p>
+
+        <p><strong>e) Updates in Accordance with Law:</strong><br>
+        Any updates or modifications to this Privacy Policy will be made in compliance with the laws of Kenya. We will ensure that our practices align with the legal requirements of the jurisdiction and that users are appropriately informed of any changes.</p>
+    </div>
+
+    <div class="privacy-footer">
+        <a href="{% url 'homepage' %}" class="btn-home">Home</a>
+    </div>
+</div>
+
+<!-- Load custom CSS -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/privacy.css' %}">
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'subscriptions/base_pricing.html' %}
+
+{% block title %}Upgrade to {{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg- rounded- shadow- overflow-hidden">
+    <div class="px-6 py-8">
+        <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">
+            {% if not current_chama_subscription %}
+                Try
+            {% else %}
+                Upgrade to
+            {% endif %}
+
+            {{ plan.name }}
+
+            {% if not current_chama_subscription %}
+                for 14 days
+            {% endif %}
+        </h2>
+        <div class="flex flex-col items-center justify-center">
+            <div class="bg-green-600 text-white rounded-lg p-8 w-full">
+                <h3 class="text-3xl font-semibold mb-2">{{ plan.name }}</h3>
+                <hr class="my-5 border-green-100"/>
+                <p class="text-xl font-semibold mb-4">Price: KES {{ plan.get_total_amount }}/{{plan.period_name}}</p>
+                <ul class="text-md text-gray-100">
+                    <li class="mb-2">- Access to exclusive features</li>
+                    <li class="mb-2">- Priority support</li>
+                    <li class="mb-2">- Better experience experience</li>
+                </ul>
+                <div 
+                class="flex flex-col gap-y-2
+                mt-6">
+                    {% if not current_chama_subscription %}
+                        <a href="{% url 'start_trial' %}" class="block bg-white text-green-600 hover:bg-green-100 hover:text-green-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out text-center">Start 14 day trial</a>
+                    {% elif is_active and is_trial and expiration_date %}
+                        <a href="{% url 'subscribe' %}" class="block bg-white text-green-600 hover:bg-green-100 hover:text-green-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out text-center">Upgrade Now</a>
+                    {% elif is_active and not is_trial and expiration_date %}
+                        <a href="{% url 'chamas:chama-dashboard' chama_id %}" class="block bg-white text-green-600 hover:bg-green-100 hover:text-green-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out text-center">View Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'subscribe' %}" class="block bg-white text-red-600 hover:bg-red-100 hover:text-red-800 font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out text-center">Renew Subscription</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div 
+            class="flex flex-col gap-y-2
+            mt-6">
+                {% if is_active and is_trial and expiration_date %}
+                    <p class="text-center text-red-600">Your trial expires on {{ expiration_date|date:"F j, Y" }}</p>
+                    <a href="{% url 'chamas:chama-dashboard' chama_id %}" class="block text-green-600  hover:text-green-800 font-semibold py-2 px-4 
+                    transition duration-300 ease-in-out text-center"><< Back to Dashboard </a>
+                {% elif is_active and not is_trial and expiration_date %}
+                    <p class="text-center text-red-600">Your subscription expires on {{ expiration_date|date:"F j, Y" }}</p>
+                {% else %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

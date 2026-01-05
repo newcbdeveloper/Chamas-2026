@@ -1,0 +1,219 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Charts & Analytics{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'expense_tracker/css/charts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-chart-line me-2"></i>Charts & Visualizations</h2>
+        </div>
+    </div>
+
+    <!-- Period Filter -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Period</label>
+                            <select name="period" class="form-select" id="period-select">
+                                <option value="today" {% if selected_period == 'today' %}selected{% endif %}>Today</option>
+                                <option value="this_week" {% if selected_period == 'this_week' %}selected{% endif %}>This Week</option>
+                                <option value="this_month" {% if selected_period == 'this_month' %}selected{% endif %}>This Month</option>
+                                <option value="last_month" {% if selected_period == 'last_month' %}selected{% endif %}>Last Month</option>
+                                <option value="this_year" {% if selected_period == 'this_year' %}selected{% endif %}>This Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-2"></i>Apply
+                            </button>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="period-info">
+                                <small class="text-muted">
+                                    Showing data from {{ start_date }} to {{ end_date }}
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compact Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="metric-card bg-success text-white">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h6 class="metric-label">Total Income</h6>
+                        <h3 class="metric-value">{{ summary.income|currency }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card bg-danger text-white">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h6 class="metric-label">Total Expenses</h6>
+                        <h3 class="metric-value">{{ summary.expenses|currency }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card {% if summary.balance >= 0 %}bg-primary{% else %}bg-warning{% endif %} text-white">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h6 class="metric-label">Net Balance</h6>
+                        <h3 class="metric-value">{{ summary.balance|currency }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row g-3 mb-4">
+        <!-- Income vs Expenses -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-balance-scale me-2"></i>Income vs Expenses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Breakdown -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Expense Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container pie-chart">
+                        <canvas id="expensePieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row g-3 mb-4">
+        <!-- Spending Trend -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Spending Trends (Last 30 Days)
+                    </h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-primary" data-days="7">7 Days</button>
+                        <button type="button" class="btn btn-outline-primary active" data-days="30">30 Days</button>
+                        <button type="button" class="btn btn-outline-primary" data-days="90">90 Days</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container spending-trend">
+                        <canvas id="spendingTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 3 -->
+    <div class="row g-3">
+        <!-- Income Breakdown -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Income Sources
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container pie-chart">
+                        <canvas id="incomePieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Comparison -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Top Expense Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="categoryBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'expense_tracker/js/charts.js' %}"></script>
+<script>
+    // Initialize charts with data
+    const chartData = {
+        period: '{{ selected_period }}',
+        startDate: '{{ start_date|date:"Y-m-d" }}',
+        endDate: '{{ end_date|date:"Y-m-d" }}',
+    };
+    
+    // Initialize all charts when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts(chartData);
+    });
+    
+    // Update trend chart when time period buttons are clicked
+    document.querySelectorAll('[data-days]').forEach(button => {
+        button.addEventListener('click', function() {
+            const days = this.dataset.days;
+            updateTrendChart(days);
+            
+            // Update active button
+            document.querySelectorAll('[data-days]').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

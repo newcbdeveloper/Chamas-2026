@@ -1,0 +1,70 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - ChamaSpace Blog{% endblock %}
+{% block page_title %}{{ category.name }}{% endblock %}
+{% block page_subtitle %}{{ category.description|default:"Explore articles in this category" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/category_articles.css' %}">
+{% endblock %}
+
+{# Optional: remove breadcrumb if you want minimal design #}
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+{# Optional: remove back link #}
+{# <a href="{% url 'blog:article_list' %}" class="back-link">... </a> #}
+
+<div class="articles-grid">
+    {% for article in page_obj %}
+    <article class="article-card">
+        {% if article.featured_image %}
+            <div class="article-image">
+                <img src="{{ article.featured_image.url }}" alt="{{ article.title }}">
+            </div>
+        {% else %}
+            <div class="article-image"></div>
+        {% endif %}
+        
+        <div class="article-content">
+            <div class="article-meta">
+                <span><i class="far fa-calendar"></i> {{ article.published_at|date:"M d, Y" }}</span>
+                <span><i class="far fa-eye"></i> {{ article.views }} views</span>
+            </div>
+            
+            <h2 class="article-title">
+                <a href="{% url 'blog:article_detail' article.slug %}">{{ article.title }}</a>
+            </h2>
+            
+            <p class="article-excerpt">{{ article.excerpt|striptags|truncatewords:25 }}</p>
+            
+            <a href="{% url 'blog:article_detail' article.slug %}" class="read-more">
+                Read More <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </article>
+    {% empty %}
+    <div class="empty-state">
+        <i class="far fa-newspaper"></i>
+        <h3>No articles in this category yet.</h3>
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination-wrapper">
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" title="First Page"><i class="fas fa-angle-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" title="Previous"><i class="fas fa-angle-left"></i></a>
+        {% endif %}
+        <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" title="Next"><i class="fas fa-angle-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" title="Last Page"><i class="fas fa-angle-double-right"></i></a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

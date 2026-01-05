@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+    <title>ChamaBORA| User Settings</title>
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="css/simplebar.css">
+    <!-- Fonts CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Icons CSS -->
+    <link rel="stylesheet" href="css/feather.css">
+    <link rel="stylesheet" href="css/select2.css">
+    <link rel="stylesheet" href="css/dropzone.css">
+    <link rel="stylesheet" href="css/uppy.min.css">
+    <link rel="stylesheet" href="css/jquery.steps.css">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
+    <link rel="stylesheet" href="css/quill.snow.css">
+    <!-- Date Range Picker CSS -->
+    <link rel="stylesheet" href="css/daterangepicker.css">
+    <!-- App CSS -->
+    <link rel="stylesheet" href="css/app-light.css" id="lightTheme">
+    <link rel="stylesheet" href="css/app-dark.css" id="darkTheme" disabled>
+  </head>
+
+  <body class="vertical  light  ">
+    <div class="wrapper">
+
+      <nav class="topnav navbar navbar-light">
+        <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+          <i class="fe fe-menu navbar-toggler-icon"></i>
+        </button>
+        
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+              <i class="fe fe-sun fe-16"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
+              <span class="fe fe-grid fe-16"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar avatar-sm mt-2">
+                <img src="./assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="settings.html">Settings</a>
+              <a class="dropdown-item" href="activities.html">Activities</a>
+              <a class="dropdown-item" href="../index.html">Logout</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
+        <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
+          <i class="fe fe-x"><span class="sr-only"></span></i>
+        </a>
+
+        <nav class="vertnav navbar navbar-light">
+          <!-- nav bar -->
+          <div class="w-100 mb-4 d-flex">
+            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="dashboard.html">
+              <h1>ChamaBORA</h1>
+            </a>
+          </div>
+
+          <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100">
+              <a class="nav-link" href="dashboard.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item w-100">
+              <a class="nav-link" href="./index.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">My Chamas</span>
+              </a>
+              <li class="nav-item w-100">
+              <a class="nav-link" href="./index.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">Join a Chamas</span>
+              </a>
+            </li>
+            <li class="nav-item w-100">
+              <a class="nav-link" href="manage.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">Manage</span>
+              </a>
+            </li>
+            <li class="nav-item w-100">
+              <a class="nav-link" href="./index.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">Withdraw</span>
+              </a>
+            </li>
+            <li class="nav-item w-100">
+              <a class="nav-link" href="./index.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">Notifications</span>
+              </a>
+            </li>
+            <li class="nav-item w-100">
+              <a class="nav-link" href="settings.html">
+                <i class="fe fe-home fe-16"></i>
+                <span class="ml-3 item-text">Settings</span>
+              </a>
+            </li>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main role="main" class="main-content">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+              <h2 class="h3 mb-4 page-title">Settings</h2>
+              <div class="my-4">
+                <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link " href="settings.html" >Profile</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" href="settings-security.html">Security</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="settings-notification.html">Notifications</a>
+                  </li>
+                </ul>
+                <h5 class="mb-0 mt-5">Security Settings</h5>
+                <p>These settings are helps you keep your account secure.</p>
+                <div class="list-group mb-5 shadow">
+                  <div class="list-group-item">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <strong class="mb-2">Enable Activity Logs</strong>
+                        <p class="text-muted mb-0">Donec id elit non mi porta gravida at eget metus.</p>
+                      </div> <!-- .col -->
+                      <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="activityLog" checked>
+                          <span class="custom-control-label"></span>
+                        </div>
+                      </div> <!-- .col -->
+                    </div> <!-- .row -->
+                  </div> <!-- .list-group-item -->
+                  <div class="list-group-item">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <strong class="mb-2">2FA Authentication</strong>
+                        <span class="badge badge-pill badge-success">Enabled</span>
+                        <p class="text-muted mb-0">Maecenas sed diam eget risus varius blandit.</p>
+                      </div> <!-- .col -->
+                      <div class="col-auto">
+                        <button class="btn btn-primary btn-sm">Disable</button>
+                      </div> <!-- .col -->
+                    </div> <!-- .row -->
+                  </div> <!-- .list-group-item -->
+                  <div class="list-group-item">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <strong class="mb-2">Activate Pin Code</strong>
+                        <p class="text-muted mb-0">Donec id elit non mi porta gravida at eget metus.</p>
+                      </div> <!-- .col -->
+                      <div class="col-auto">
+                        <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="pinCode">
+                          <span class="custom-control-label"></span>
+                        </div>
+                      </div> <!-- .col -->
+                    </div> <!-- .row -->
+                  </div> <!-- .list-group-item -->
+                </div> <!-- .list-group -->
+                <h5 class="mb-0">Recent Activity</h5>
+                <p>Last activities with your account.</p>
+
+                <form>
+                  <div class="row mb-4">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="inputPassword4">Old Password</label>
+                        <input type="password" class="form-control" id="inputPassword5">
+                      </div>
+                      <div class="form-group">
+                        <label for="inputPassword5">New Password</label>
+                        <input type="password" class="form-control" id="inputPassword5">
+                      </div>
+                      <div class="form-group">
+                        <label for="inputPassword6">Confirm Password</label>
+                        <input type="password" class="form-control" id="inputPassword6">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="mb-2">Password requirements</p>
+                      <p class="small text-muted mb-2"> To create a new password, you have to meet all of the following requirements: </p>
+                      <ul class="small text-muted pl-4 mb-0">
+                        <li> Minimum 8 character </li>
+                        <li>At least one special character</li>
+                        <li>At least one number</li>
+                        <li>Can’t be the same as a previous password </li>
+                      </ul>
+                    </div>
+                  </div>                  
+
+                  <button type="submit" class="btn btn-primary">Save Change</button>
+                </form>
+              </div>
+            </div> 
+          </div>
+        </div>
+
+        
+        <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="list-group list-group-flush my-n3">
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>Your next contribution for Chama AA09gg is on Nov 27th </strong></small>
+                        <div class="my-0 text-muted small">Please pay load money before the date.</div>
+                        <small class="badge badge-pill badge-light text-muted">1m ago</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>You qualify to join another chama</strong></small>
+                        <div class="my-0 text-muted small">You can be in more than two chamas at the same time</div>
+                        <small class="badge badge-pill badge-light text-muted">42m ago</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>Notifications have been sent</strong></small>
+                        <div class="my-0 text-muted small">Fusce dapibus, tellus ac cursus commodo</div>
+                        <small class="badge badge-pill badge-light text-muted">30m ago</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>Link was attached to menu</strong></small>
+                        <div class="my-0 text-muted small">New layout has been attached to the menu</div>
+                        <small class="badge badge-pill badge-light text-muted">1h ago</small>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main> <!-- main -->
+    </div> <!-- .wrapper -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/simplebar.min.js"></script>
+    <script src='js/daterangepicker.js'></script>
+    <script src='js/jquery.stickOnScroll.js'></script>
+    <script src="js/tinycolor-min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/apps.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag()
+      {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-56159088-1');
+    </script>
+  </body>
+</html>

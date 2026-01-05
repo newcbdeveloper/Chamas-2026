@@ -1,0 +1,341 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block title %}Create Goal{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/create_personal_goal.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <div class="header-inner">
+            <a href="{% url 'goals:wekeza_dashboard' %}">
+                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="Chama Bora" height="40">
+            </a>
+            <button class="back-btn" onclick="history.back()">
+                <img src="{% static 'images/left_arrow.png' %}" alt="Back" height="24">
+            </button>
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1>Create a New Personal Goal</h1>
+            <p class="subtitle">What are you saving for today? Let's make it happen.</p>
+
+            <form id="personal_goals_created">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Select goal type</label>
+                    <select name="saving_type_input" id="saving_type_input" required>
+                        <option value="">Choose a goal type</option>
+                        <option value="regular" selected>Regular Saving ({{ regular_rate }}% interest p.a)</option>
+                        <option value="fixed">Fixed Saving ({{ fixed_rate }}% interest p.a)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Name Your Goal</label>
+                    <input type="text" name="goal_title" id="goal_title" placeholder="e.g., New Car, Paris Trip, Emergency Fund" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Amount</label>
+                    <input type="number" name="target_amount" id="target-amount" placeholder="Ksh" min="1">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="is_saving_or_goal">
+                        <label for="is_saving_or_goal">No target amount. I just want to save regularly.</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" name="start_date" id="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" name="end_date" id="end_date">
+                        <div class="checkbox-group" id="no-end-date-container">
+                            <input type="checkbox" id="just_want_to_save">
+                            <label for="just_want_to_save">Just want to save (no end date)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Saving Frequency</label>
+                        <select name="select_payment_frequency" id="select_payment_frequency">
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount to Save</label>
+                        <input type="number" name="amount_to_save" id="calculated-amount" placeholder="Ksh 0" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Reminders Frequency</label>
+                    <select name="reminder_frequency" id="reminder_frequency">
+                        <option value="">No reminders</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Set Goal</button>
+            </form>
+        </div>
+
+        
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const today = new Date().toISOString().split('T')[0];
+        $('#start_date').val(today).attr('min', today);
+        $('#end_date').attr('min', today);
+
+        const $target = $('#target-amount');
+        const $calc = $('#calculated-amount');
+        const $noTarget = $('#is_saving_or_goal');
+        const $noEnd = $('#just_want_to_save');
+        const $endDate = $('#end_date');
+        const $savingType = $('#saving_type_input');
+        const $noEndContainer = $('#no-end-date-container');
+
+        function formatKsh(amount) {
+            return 'Ksh ' + parseFloat(amount || 0).toLocaleString('en-KE');
+        }
+
+        function updatePreview() {
+            const name = $('#goal_title').val() || 'New Goal';
+            const target = $target.val() ? parseFloat($target.val()) : 0;
+            const freqText = $('#select_payment_frequency option:selected').text();
+            const contrib = $calc.val() ? parseFloat($calc.val()) : 0;
+
+            $('#preview-goal-name').text(name);
+            $('#preview-total').text(formatKsh(target));
+            $('#preview-target').text(formatKsh(target));
+            $('#preview-frequency').text(freqText);
+
+            let suffix = '/mo';
+            if (freqText === 'Weekly') suffix = '/wk';
+            if (freqText === 'Daily') suffix = '/day';
+
+            $('#preview-contribution').text(formatKsh(contrib) + suffix);
+        }
+
+        function calculateAmount() {
+            if ($noTarget.is(':checked') || $noEnd.is(':checked') || !$target.val()) {
+                $calc.val('');
+                updatePreview();
+                return;
+            }
+
+            const start = new Date($('#start_date').val());
+            const end = new Date($('#end_date').val());
+            if (!start || !end || end <= start) {
+                $calc.val('');
+                updatePreview();
+                return;
+            }
+
+            const target = parseFloat($target.val());
+            const freq = $('#select_payment_frequency').val();
+            let periods = 0;
+
+            if (freq === 'monthly') {
+                periods = (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth();
+            } else if (freq === 'weekly') {
+                periods = Math.floor((end - start) / (7 * 24 * 60 * 60 * 1000));
+            } else if (freq === 'daily') {
+                periods = Math.ceil((end - start) / (24 * 60 * 60 * 1000));
+            }
+
+            if (periods > 0) {
+                const amount = Math.ceil(target / periods);
+                $calc.val(amount);
+            }
+            updatePreview();
+        }
+
+        // UI Logic - Saving Type Change
+        $savingType.on('change', function () {
+            if (this.value === 'fixed') {
+                // Fixed goals MUST have end date
+                $noEndContainer.hide();
+                $noEnd.prop({checked: false, disabled: true});
+                $endDate.prop({required: true, disabled: false});
+            } else {
+                // Regular goals can skip end date
+                $noEndContainer.show();
+                $noEnd.prop('disabled', false);
+                $endDate.prop('required', !$noEnd.is(':checked'));
+            }
+            calculateAmount();
+        });
+
+        // No Target Checkbox
+        $noTarget.on('change', function () {
+            if (this.checked) {
+                $target.val('').prop('readonly', true);
+                $calc.prop('readonly', false);
+            } else {
+                $target.prop('readonly', false);
+                $calc.prop('readonly', true);
+            }
+            calculateAmount();
+        });
+
+        // No End Date Checkbox
+        $noEnd.on('change', function () {
+            if (this.checked) {
+                $endDate.val('').prop({disabled: true, required: false});
+            } else {
+                $endDate.prop({disabled: false, required: true});
+            }
+            calculateAmount();
+        });
+
+        // Start Date Change
+        $('#start_date').on('change', function () {
+            $('#end_date').attr('min', this.value);
+            calculateAmount();
+        });
+
+        // Update preview on any input
+        $('input, select').on('input change', updatePreview);
+        
+        // Recalculate on relevant changes
+        $target.add($endDate).add('#start_date').add('#select_payment_frequency').on('input change', calculateAmount);
+
+        // ============================================
+        // FORM SUBMISSION
+        // ============================================
+        $('#personal_goals_created').on('submit', function (e) {
+            e.preventDefault();
+            
+            const startDate = $('#start_date').val();
+            const endDate = $('#end_date').val();
+            const savingType = $savingType.val();
+            const noTarget = $noTarget.is(':checked');
+            const noEndDate = $noEnd.is(':checked');
+            
+            // Validation
+            if (!startDate) {
+                alert('Please select a start date.');
+                return false;
+            }
+            
+            if (startDate < today) {
+                alert('Start date cannot be in the past. Please select today or a future date.');
+                return false;
+            }
+            
+            // CRITICAL: For fixed goals, end_date is ALWAYS required
+            if (savingType === 'fixed') {
+                if (!endDate) {
+                    alert('Fixed saving goals MUST have an end date. Please select an end date.');
+                    return false;
+                }
+                
+                if (endDate < today) {
+                    alert('End date cannot be in the past. Please select today or a future date.');
+                    return false;
+                }
+                
+                if (endDate <= startDate) {
+                    alert('End date must be after the start date.');
+                    return false;
+                }
+            }
+            
+            // For regular goals with end date (not "no end date" checked)
+            if (savingType === 'regular' && !noEndDate && endDate) {
+                if (endDate < today) {
+                    alert('End date cannot be in the past. Please select today or a future date.');
+                    return false;
+                }
+                
+                if (endDate <= startDate) {
+                    alert('End date must be after the start date.');
+                    return false;
+                }
+            }
+            
+            // Validate target amount if "no target" is not checked
+            if (!noTarget) {
+                const targetAmount = $target.val();
+                if (!targetAmount || parseFloat(targetAmount) <= 0) {
+                    alert('Please enter a target amount or check "No target amount" to save flexibly.');
+                    return false;
+                }
+            }
+            
+            // Show loading state
+            const $submitBtn = $(this).find('button[type="submit"]');
+            const originalText = $submitBtn.text();
+            $submitBtn.prop('disabled', true).text('Creating Goal...');
+            
+            // If validation passes, submit via AJAX
+            $.ajax({
+                type: "POST",
+                url: "{% url 'goals:create_personal_goals' %}",
+                data: {
+                    saving_type_input: savingType,
+                    goal_title: $('#goal_title').val(),
+                    target_amount: noTarget ? '' : $target.val(),
+                    amount_to_save: $calc.val(),
+                    start_date: startDate,
+                    end_date: noEndDate ? '' : (endDate || ''),
+                    just_want_to_save: noEndDate ? 'on' : 'off',
+                    reminder_frequency: $('#reminder_frequency').val(),
+                    select_payment_frequency: $('#select_payment_frequency').val(),
+                    is_saving_or_goal: noTarget ? 'on' : 'off',
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    if (response.success === '1') {
+                        // Redirect to the goal details page
+                        window.location.href = "{% url 'goals:goal_details' 0 %}".replace('0', response.goal_id);
+                    } else {
+                        // Display the error message from the server
+                        alert(response.error || "Error creating goal. Please try again.");
+                        $submitBtn.prop('disabled', false).text(originalText);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                    console.error("Response:", xhr.responseText);
+                    
+                    // Try to parse error response
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        alert(response.error || "An error occurred. Please try again.");
+                    } catch(e) {
+                        alert("An error occurred. Please try again.");
+                    }
+                    
+                    $submitBtn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+
+        // Initialize
+        updatePreview();
+        calculateAmount();
+    });
+</script>
+{% endblock %}

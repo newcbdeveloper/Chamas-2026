@@ -1,0 +1,492 @@
+/* === VARIABLES & RESET === */
+:root {
+    /* Updated Color Palette */
+    --primary-color: #2191a5;
+    --primary-light: #2ba6bd;
+    --primary-dark: #1a7585;
+    /* Slightly darker for gradient support */
+
+    --accent-color: #10b981;
+    --danger-color: #ef4444;
+    --bg-color: #f8fafc;
+    /* Slightly cooler grey */
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    /* Slate 800 */
+    --text-secondary: #64748b;
+    /* Slate 500 */
+    --border-color: #e2e8f0;
+
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    --radius-lg: 1.5rem;
+    /* 24px */
+    --radius-md: 1rem;
+    /* 16px */
+    --radius-sm: 0.75rem;
+    /* 12px */
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.container-fluid {
+    padding: 0 !important;
+}
+
+/* === WALLET HEADER === */
+.wallet-header {
+    /* Strong diagonal gradient using new branded colors */
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 40%, var(--primary-light) 100%);
+    color: white;
+    padding: 2rem 1.5rem 3.5rem;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    position: relative;
+    box-shadow: var(--shadow-md);
+    margin-bottom: -2.5rem;
+    /* Pull content up */
+    z-index: 10;
+}
+
+.wallet-header .container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.wallet-title {
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.balance-section {
+    position: relative;
+}
+
+.balance-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.85;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.balance-amount {
+    font-size: 2.25rem;
+    /* Slightly smaller for elegance */
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+/* === QUICK ACTIONS === */
+.quick-actions {
+    display: flex;
+    justify-content: flex-start;
+    /* Left align for scroll */
+    gap: 1.25rem;
+    margin-top: 2rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+}
+
+.quick-actions::-webkit-scrollbar {
+    display: none;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    min-width: 72px;
+    /* Smaller touch target base */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    color: white;
+}
+
+.action-icon {
+    width: 52px;
+    height: 52px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.action-btn:hover .action-icon {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.action-icon img,
+.action-icon i {
+    width: 24px;
+    height: 24px;
+    font-size: 1.25rem;
+    color: white;
+    filter: brightness(0) invert(1);
+    object-fit: contain;
+}
+
+.action-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0.95;
+    letter-spacing: 0.02em;
+}
+
+/* === MAIN WRAPPER === */
+.container.mb-4,
+.container.mb-5 {
+    position: relative;
+    z-index: 20;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* === COMPACT 2-COLUMN GRID === */
+.summary-grid {
+    display: grid;
+    /* Two columns by default on mobile */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    /* Tighter gap */
+    margin-top: 0;
+}
+
+/* Total Card spans full width on very small screens? No, let's keep it uniform or maybe span 2 if needed. 
+   For now, strictly 2 columns makes "Total" share row with "Available" or "Locked" which is odd.
+   Let's make "Total" span 2 cols (full width) to highlight it, then others share.
+*/
+.summary-card.total {
+    grid-column: span 2;
+}
+
+.summary-card.available,
+.summary-card.locked {
+    grid-column: span 1;
+}
+
+
+/* === COMPACT CARDS === */
+.summary-card,
+.stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    /* Compact padding */
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.summary-card:hover,
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.summary-card h6,
+.stat-card h6 {
+    font-size: 0.7rem;
+    /* Smaller labels */
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+}
+
+.summary-card h3 {
+    font-size: 1.35rem;
+    /* Smaller numbers */
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.5px;
+    word-break: break-word;
+    /* Prevent overflow on small screens */
+}
+
+/* Hide helper text on compact cards to save space, or make it very small */
+.summary-card small {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    line-height: 1.2;
+}
+
+.summary-card.total {
+    background: #fff;
+}
+
+.summary-card.available {
+    background: #f0fdf4;
+    border-color: #dcfce7;
+}
+
+.summary-card.available h3 {
+    color: var(--accent-color);
+}
+
+.summary-card.locked {
+    background: #fffbeb;
+    border-color: #fef3c7;
+}
+
+.summary-card.locked h3 {
+    color: #d97706;
+}
+
+/* Stats Row - Also 2 Columns */
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.stat-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    word-break: break-all;
+}
+
+.stat-card.deposited h4 {
+    color: var(--accent-color);
+}
+
+.stat-card.withdrawn h4 {
+    color: var(--danger-color);
+}
+
+
+/* === TRANSACTIONS === */
+.transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0 1rem;
+    padding: 0 0.5rem;
+}
+
+.transactions-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.transactions-header a {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+.transaction-item {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 0.75rem;
+    /* Reduced padding */
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    /* Align to top */
+    gap: 0.5rem;
+    /* Reduced gap */
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.transaction-details {
+    flex: 1;
+    overflow: hidden;
+    padding-top: 0.1rem;
+    /* Slight alignment fix */
+}
+
+.transaction-details strong {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.15rem;
+    /* Allow wrapping if title is long, or keep it clean */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transaction-details small {
+    display: block;
+    /* Show description on mobile */
+    font-size: 0.75rem;
+    /* Smaller font to fit more text */
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+    white-space: normal;
+    letter-spacing: -0.01em;
+    /* Tighter tracking */
+}
+
+.transaction-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    /* Lighter text for date */
+    display: flex;
+    gap: 0.5rem;
+}
+
+.transaction-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: right;
+    white-space: nowrap;
+    padding-top: 0.1rem;
+    /* align with title */
+}
+
+.transaction-amount.positive {
+    color: var(--accent-color);
+}
+
+.transaction-amount.negative {
+    color: var(--text-primary);
+}
+
+
+/* === MOBILE FOOTER === */
+.mbl_footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-color);
+    padding: 0.5rem 0 1.5rem;
+    z-index: 1000;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.footer_row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.footer_button {
+    color: #94a3b8;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.5rem;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+}
+
+.footer_button:hover,
+.footer_button.active {
+    color: var(--primary-color);
+}
+
+.footer_button img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.footer_button.active img {
+    opacity: 1;
+    /* CSS Filter to match roughly simple teal */
+    filter: brightness(0) saturate(100%) invert(48%) sepia(61%) saturate(579%) hue-rotate(143deg) brightness(89%) contrast(89%);
+}
+
+
+/* === DESKTOP OVERRIDES === */
+@media (min-width: 768px) {
+    .wallet-header {
+        border-radius: 0 0 32px 32px;
+        margin-bottom: -4rem;
+        padding-bottom: 5rem;
+    }
+
+    .container.mb-4.summary-section {
+        margin-top: 4rem;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 Cols on desktop */
+        gap: 1.5rem;
+    }
+
+    .summary-card.total {
+        grid-column: auto;
+    }
+
+    /* Reset span */
+    .summary-card.available {
+        grid-column: auto;
+    }
+
+    .summary-card.locked {
+        grid-column: auto;
+    }
+
+    .stats-row {
+        gap: 1.5rem;
+    }
+
+    .mbl_footer {
+        display: none;
+    }
+
+    .transaction-item {
+        padding: 1rem 1.5rem;
+    }
+
+    .transaction-details small {
+        display: block;
+    }
+
+    /* Show details on desktop */
+}

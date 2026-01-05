@@ -1,0 +1,322 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}Create New Round{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xxl-9">
+            <!-- Back link -->
+            <a href="{% url 'merry_go_round:dashboard' %}" class="text-muted small mb-3 d-inline-block">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+
+            <!-- Header -->
+            <h2 class="fw-bold mb-2">Create New Round</h2>
+            <p class="text-muted mb-4">Set up a new savings circle and invite members to join.</p>
+
+            <div class="row g-4">
+                <!-- Left Column: Form -->
+                <div class="col-lg-8">
+                    <!-- Wallet Balance Card -->
+                    <div class="bg-light rounded-4 p-4 mb-4 border">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-white rounded-circle p-3 me-3 shadow-sm">
+                                    <i class="fas fa-wallet text-primary fs-4"></i>
+                                </div>
+                                <div>
+                                    <strong>Your MGR Wallet Balance</strong><br>
+                                    <span class="text-success fw-bold fs-5">Available: KSh {{ profile.user.mgr_wallet.available_balance|floatformat:2 }}</span>
+                                    {% if profile.user.mgr_wallet.locked_balance > 0 %}
+                                    <span class="text-warning ms-3 fw-bold">| Locked: KSh {{ profile.user.mgr_wallet.locked_balance|floatformat:2 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="{% url 'merry_go_round:wallet_dashboard' %}" class="btn btn-outline-success rounded-pill px-4">
+                                View Wallet →
+                            </a>
+                        </div>
+                    </div>
+
+                    <form method="post" id="create-round-form">
+                        {% csrf_token %}
+
+                        <!-- Basic Information -->
+                        <div class="bg-white rounded-4 shadow-sm p-4 mb-4 border">
+                            <h5 class="fw-semibold mb-4">Basic Information</h5>
+                            <div class="mb-3">
+                                {{ form.name.label_tag }}
+                                {{ form.name }}
+                                <small class="text-muted">e.g., January 2025 Savings Circle</small>
+                            </div>
+                            <div class="mb-3">
+                                {{ form.description.label_tag }}
+                                {{ form.description }}
+                                <small class="text-muted">Describe the purpose of this round (e.g., Car Savings, Holiday Fund).</small>
+                            </div>
+                        </div>
+
+                        <!-- Round Configuration -->
+                        <div class="bg-white rounded-4 shadow-sm p-4 mb-4 border">
+                            <h5 class="fw-semibold mb-4">Round Configuration</h5>
+
+                            <!-- Privacy Setting -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold mb-3">Privacy Setting</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <input type="radio" class="btn-check" name="round_type" id="public" value="public" {% if form.round_type.value == 'public' %}checked{% endif %}>
+                                        <label class="selection-card text-center p-4 rounded-4" for="public">
+                                            <i class="fas fa-globe fs-3 text-muted mb-3"></i>
+                                            <div class="fw-semibold">Public Round</div>
+                                            <small class="text-muted d-block mt-2">Open to all verified users. Best for filling rounds quickly with trusted community members.</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="radio" class="btn-check" name="round_type" id="private" value="private" {% if form.round_type.value != 'public' %}checked{% endif %}>
+                                        <label class="selection-card text-center p-4 rounded-4" for="private">
+                                            <i class="fas fa-lock fs-3 text-muted mb-3"></i>
+                                            <div class="fw-semibold">Private Round</div>
+                                            <small class="text-muted d-block mt-2">Invitation only. Hidden from the public directory. Best for friends and family.</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payout Model (Only Marathon) -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold mb-3">Payout Model</label>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="selection-card selected text-center p-4 rounded-4">
+                                            <i class="fas fa-trophy fs-3 text-primary mb-3"></i>
+                                            <div class="fw-semibold">Marathon</div>
+                                            <small class="text-muted d-block mt-2">Everyone gets paid at the end. Maximizes interest earned for all participants.</small>
+                                        </div>
+                                        <!-- Hidden field to always submit marathon -->
+                                        <input type="hidden" name="payout_model" value="marathon">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contribution Amount & Frequency -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form.contribution_amount.label_tag }}
+                                    {{ form.contribution_amount }}
+                                    <small class="text-muted">Amount each member pays per cycle.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Contribution Frequency</label>
+                                    {{ form.frequency }}
+                                    <small class="text-muted">How often payments are made.</small>
+                                </div>
+                            </div>
+
+                            <!-- Max Members & Min Trust Score -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form.max_members.label_tag }}
+                                    {{ form.max_members }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.min_trust_score.label_tag }}
+                                    {{ form.min_trust_score }}
+                                    <small class="text-muted d-block mt-1">Your score: <strong class="text-primary">{{ profile.trust_score }}</strong></small>
+                                </div>
+                            </div>
+
+                            <!-- Interest Rate Slider -->
+                            <div class="mb-4">
+                                {{ form.interest_rate.label_tag }}
+                                <div class="d-flex align-items-center justify-content-between mt-3">
+                                    <span class="text-muted small">Low (1%)</span>
+                                    <div class="flex-grow-1 mx-4">
+                                        {{ form.interest_rate }}
+                                    </div>
+                                    <span class="text-muted small">High (100%)</span>
+                                </div>
+                                <small class="text-muted d-block mt-2">Set by admin — funds earn this rate while in escrow.</small>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'merry_go_round:dashboard' %}" class="btn btn-outline-secondary px-5 py-3 rounded-3">Cancel</a>
+                            <button type="submit" class="btn btn-success px-5 py-3 rounded-3 shadow" id="submit-btn">
+                                <i class="fas fa-check me-2"></i>Create Round
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column: Financial Summary -->
+                <div class="col-lg-4">
+                    <div class="bg-white rounded-4 shadow-sm p-4 border sticky-top" style="top: 2rem;">
+                        <h5 class="fw-semibold mb-4">Financial Summary</h5>
+
+                        <div class="pb-4 mb-4 border-bottom">
+                            <small class="text-muted text-uppercase fw-semibold">First Contribution</small>
+                            <h4 class="text-primary mb-1" id="first-contribution">KSh 0</h4>
+                            <small class="text-muted">Amount reserved in your wallet immediately</small>
+                            <span class="badge bg-primary rounded-pill mt-2">Required Now</span>
+                        </div>
+
+                        <div class="pb-4 mb-4 border-bottom">
+                            <small class="text-muted text-uppercase fw-semibold">Total Commitment</small>
+                            <h4 class="mb-1" id="total-commitment">KSh 0</h4>
+                            <small class="text-muted">Over <span id="round-duration">0 months</span> duration</small>
+                        </div>
+
+                        <div class="pb-4 mb-4 border-bottom">
+                            <small class="text-muted text-uppercase fw-semibold">Projected Net Interest</small>
+                            <h4 class="text-success mb-1" id="projected-interest">+ KSh 0</h4>
+                            <small class="text-muted">@{{ form.interest_rate.value|default:"12" }}% p.a. (after tax)</small>
+                        </div>
+
+                        <div class="pt-3">
+                            <small class="text-muted text-uppercase fw-semibold">Expected Total Return</small>
+                            <h2 class="text-success mb-2" id="total-expected">KSh 0</h2>
+                            <small class="text-muted">Contributions + Net Interest</small>
+                            <div class="fs-1 text-success opacity-25 text-end mt-3">$</div>
+                        </div>
+
+                        <div class="alert alert-info small mt-4 rounded-3">
+                            <strong>How interest is calculated:</strong><br>
+                            Each contribution earns interest from the day it’s paid until the round ends. Earlier contributions earn more because they’re held longer.
+                        </div>
+
+                        <div class="alert alert-danger small mt-3" id="insufficient-balance-alert" style="display: none;">
+                            <strong>Insufficient Balance!</strong> You need <strong id="required-amount">KSh 0</strong> available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    const availableBalance = {{ profile.user.mgr_wallet.available_balance }};
+    const taxRate = {{ MGR_TAX_RATE }} / 100;
+
+    function calculateFinancials() {
+        const contributionAmount = parseFloat($('#id_contribution_amount').val()) || 0;
+        const maxMembers = parseInt($('#id_max_members').val()) || 0;
+        const frequency = $('#id_frequency').val();
+        const interestRate = parseFloat($('#id_interest_rate').val()) / 100 || 0.12;
+
+        if (contributionAmount > 0 && maxMembers > 0) {
+            // First contribution
+            $('#first-contribution').text('KSh ' + contributionAmount.toLocaleString());
+
+            // Total commitment
+            const totalCommitment = contributionAmount * maxMembers;
+            $('#total-commitment').text('KSh ' + totalCommitment.toLocaleString());
+
+            // Duration
+            let daysPerCycle = 30;
+            if (frequency === 'weekly') daysPerCycle = 7;
+            if (frequency === 'biweekly') daysPerCycle = 14;
+            const totalMonths = (maxMembers * daysPerCycle / 30).toFixed(1);
+            $('#round-duration').text(totalMonths + ' months');
+
+            // Accurate interest calculation
+            const dailyRate = interestRate / 365;
+            let totalGrossInterest = 0;
+            const endDay = maxMembers * daysPerCycle;
+
+            for (let cycle = 1; cycle <= maxMembers; cycle++) {
+                const contributionDay = (cycle - 1) * daysPerCycle;
+                const daysHeld = endDay - contributionDay;
+                totalGrossInterest += contributionAmount * dailyRate * daysHeld;
+            }
+
+            const netInterest = totalGrossInterest * (1 - taxRate);
+            $('#projected-interest').text('+ KSh ' + Math.round(netInterest).toLocaleString());
+
+            const totalExpected = totalCommitment + netInterest;
+            $('#total-expected').text('KSh ' + Math.round(totalExpected).toLocaleString());
+
+            // Balance check
+            if (contributionAmount > availableBalance) {
+                $('#insufficient-balance-alert').show();
+                $('#required-amount').text('KSh ' + contributionAmount.toLocaleString());
+                $('#submit-btn').prop('disabled', true);
+            } else {
+                $('#insufficient-balance-alert').hide();
+                $('#submit-btn').prop('disabled', false);
+            }
+        }
+    }
+
+    // Recalculate on any change
+    $('#id_contribution_amount, #id_max_members, #id_frequency, #id_interest_rate').on('input change', calculateFinancials);
+
+    // Visual selection for privacy cards
+    $('.selection-card').on('click', function() {
+        $(this).closest('.row').find('.selection-card').removeClass('selected');
+        $(this).addClass('selected');
+    });
+
+    // Set initial selected state
+    $('.btn-check:checked').each(function() {
+        $(this).closest('.col-md-6').find('.selection-card').addClass('selected');
+    });
+
+    // Initial calculation
+    calculateFinancials();
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .selection-card {
+        border: 2px solid #e2e8f0;
+        background: #fff;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .selection-card:hover {
+        border-color: #94a3b8;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .selection-card.selected {
+        border-color: #2563eb;
+        background: #eff6ff;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+    .selection-card.selected i {
+        color: #2563eb;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-range {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+    }
+    .form-range::-webkit-slider-thumb {
+        background: #2563eb;
+        width: 24px;
+        height: 24px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

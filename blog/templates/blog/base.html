@@ -1,0 +1,92 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}ChamaSpace Blog - Tips, stories, and updates for your chama journey{% endblock %}">
+    <meta name="keywords" content="chama, savings, investment, financial tips, chama management">
+
+    <!-- OG Meta Tags -->
+    <meta property="og:site_name" content="ChamaSpace Blog" />
+    <meta property="og:title" content="{% block og_title %}ChamaSpace Blog{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}Tips, stories, and updates for your chama journey{% endblock %}" />
+    <meta property="og:image" content="{% block og_image %}{% static 'images/ChamaSpace_Logo.png' %}{% endblock %}" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Webpage Title -->
+    <title>{% block title %}Blog{% endblock %} | ChamaSpace</title>
+
+    <!-- Main Site Styles (critical!) -->
+    <link href="{% static 'css/pages.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/index2.css' %}">
+
+    <!-- Blog-specific extra CSS (optional) -->
+    {% block extra_css %}{% endblock %}
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'images/ChamaSpace_Logo.png' %}">
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <!-- Shared Navigation (from pages_base.html) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{% url 'homepage' %}"><img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="ChamaSpace"></a>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="{% url 'about' %}" class="nav-link">About</a>
+                <a href="{% url 'features' %}" class="nav-link">Features</a>
+                <a href="{% url 'contact_us' %}" class="nav-link">Contact Us</a>
+                <a href="{% url 'privacy_policies' %}" class="nav-link">Privacy Policies</a>
+                <a href="{% url 'blog:article_list' %}" class="nav-link">Blog</a>
+                <a href="{% url 'term_conditions' %}" class="nav-link">Terms and Conditions</a>
+            </div>
+            <div class="nav-actions">
+                <a href="{% url 'Sign_up' %}" class="btn-start-saving">Sign Up</a>
+                <a href="{% url 'Login' %}" class="btn-login">Login</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Content Area -->
+    <div class="blog-wrapper">
+        <!-- Blog Header (title + subtitle + breadcrumbs) -->
+        <div class="blog-header-section">
+            <div class="container">
+                <h1 class="blog-page-title">{% block page_title %}ChamaSpace Blog{% endblock %}</h1>
+                <p class="blog-page-subtitle">{% block page_subtitle %}Tips, stories, and updates for your chama journey{% endblock %}</p>
+                {% block breadcrumb %}{% endblock %}
+            </div>
+        </div>
+
+        <!-- Main Blog Content -->
+        <div class="blog-main-content">
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+
+    <!-- Scripts -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/swiper.min.js' %}"></script>
+    <script src="{% static 'js/purecounter.min.js' %}"></script>
+    <script src="{% static 'js/replaceme.min.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/pages.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

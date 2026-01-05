@@ -1,0 +1,63 @@
+{% extends 'pages_base.html' %}
+{% load static %}
+
+{% block title %}About - ChamaSpace{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <a href="{% url 'homepage' %}" class="back-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5m7-7l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Home
+    </a>
+    
+    <div class="page-header">
+        <h1>About ChamaSpace</h1>
+        <p>Empowering Financial Inclusion Through Digital Chama Solutions</p>
+    </div>
+    
+    <div class="content-section">
+        <h2>Our Vision & Mission</h2>
+        <p><strong>Vision:</strong> To create a future where financial well-being is within everyone’s reach, regardless of their background or location.</p>
+        <p><strong>Mission:</strong> To provide innovative and accessible financial solutions that empower individuals, groups, and communities to take control of their financial destinies.</p>
+
+        <h2>Who We Are</h2>
+        <p>ChamaSpace is the digital brand of <strong>Jeld Investment Ltd</strong>, founded in 2022 by Lawrence Mwangi Ndirangu and Solomon Njeru Ndirangu. We are passionate about redefining financial inclusion for millions of Kenyans who rely on chamas as their primary financial support system.</p>
+
+        <div class="founders-grid">
+            <div class="founder-card">
+                <h3>Lawrence Mwangi</h3>
+                <p>Financial expert, Data Scientist, and fintech innovator with firsthand experience running group finances. Passionate about informal financial inclusion.</p>
+            </div>
+            <div class="founder-card">
+                <h3>Solomon Njeru</h3>
+                <p>Tech and product development expert who led the build of ChamaSpace’s MVP. Focused on creating intuitive, accessible digital tools for everyday savers.</p>
+            </div>
+        </div>
+
+        <h2>The Problems We Solve</h2>
+        <ul>
+            <li><strong>Manual bookkeeping:</strong> Notebooks and Excel sheets lead to errors, fraud, and mistrust within chamas.</li>
+            <li><strong>Idle funds:</strong> Traditional merry-go-rounds circulate money without growth—leaving savings vulnerable to inflation.</li>
+            <li><strong>No access to credit:</strong> Most chama members are excluded from formal financial institutions due to lack of credit history.</li>
+            <li><strong>High entry barriers:</strong> Money market funds often require KSh1,000–5,000+ minimums, locking out low-income earners.</li>
+        </ul>
+
+        <h2>Our Integrated Solution</h2>
+        <p>Unlike other platforms that offer only one piece of the puzzle, ChamaSpace is the <strong>only platform providing a fully integrated digital ecosystem</strong> for Kenyan chamas:</p>
+        <ul>
+            <li><strong>Digital Bookkeeping:</strong> Transparent, real-time tracking of all contributions, loans, fines, and expenses—accessible to all members.</li>
+            <li><strong>Wekeza Goals:</strong> Save as little as KSh5 toward personal or group goals and earn interest through pooled investments in high-yield instruments.</li>
+            <li><strong>Kopeshana (P2P Lending):</strong> Secure, collateral-free lending between verified members with digital agreements and repayment tracking.</li>
+            <li><strong>Smart Rota Management:</strong> Automate merry-go-round cycles while temporarily investing idle funds to beat inflation.</li>
+        </ul>
+
+        <h2>Why ChamaSpace?</h2>
+        <p>We serve group-based finance where most fintechs don’t. With over <strong>300,000 chamas in Kenya</strong> managing an estimated <strong>KSh 300 billion</strong> in collective assets, we’re building the infrastructure to bring this vital informal sector into the digital age—safely, transparently, and profitably.</p>
+    </div>
+</div>
+
+<!-- Load custom CSS -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/about.css' %}">
+{% endblock %}

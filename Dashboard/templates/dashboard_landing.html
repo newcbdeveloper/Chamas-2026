@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChamaSpace Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
+        .sidebar { background: #fff; border-right: 1px solid #dee2e6; padding: 1rem; }
+        .wallet-circle { background: linear-gradient(135deg, #2291A5, #1a7a8c); color: white; border-radius: 50%; width: 200px; height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 2rem auto; }
+        .app-row { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; }
+        .app-icon { text-align: center; width: 100px; }
+        .app-icon img { width: 50px; height: 50px; background: #2291A5; border-radius: 50%; padding: 10px; }
+        .notifications { background: #f8d7da; padding: 1rem; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <img src="{% static 'images/chamaspace_logo.png' %}" alt="ChamaSpace" class="mb-4">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a href="{% url 'user_dashboard:home' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li class="nav-item"><a href="{% url 'all_notifications' %}" class="nav-link"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li class="nav-item"><a href="{% url 'user_dashboard:settings' %}" class="nav-link"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li class="nav-item"><a href="{% url 'Logout' %}" class="nav-link btn btn-primary text-white">Log Out</a></li>
+                </ul>
+            </div>
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <nav class="navbar navbar-light bg-light">
+                    <!-- Top nav icons: moon, grid, profile -->
+                </nav>
+                <h4>{{ greeting }}, {{ user_profile.owner.first_name }} {{ user_profile.owner.last_name }}</h4>
+                <!-- Wallet Balance -->
+                <div class="wallet-circle">
+                    <small>Main Wallet Balance</small>
+                    <h3>KES {{ wallet_summary.balance|floatformat:2 }}</h3>
+                    <button class="btn btn-light">Coming Soon</button>
+                </div>
+                <!-- App Links Row -->
+                <div class="app-row">
+                    <div class="app-icon">
+                        <a href="/chamaz/"><img src="{% static 'images/chamaz_icon.png' %}" alt="Chamaz"></a>
+                        <p>Chamaz<br><small>Invest in Chamas</small></p>
+                    </div>
+                    <div class="app-icon">
+                        <a href="{% url 'goals:goals_dashboard' %}"><img src="{% static 'images/wekeza_icon.png' %}" alt="Wekeza Goals"></a>
+                        <p>Wekeza Goals<br><small>Save towards a Goal</small></p>
+                    </div>
+                    <div class="app-icon">
+                        <a href="/kopesh/"><img src="{% static 'images/kopesh_icon.png' %}" alt="Kopesh"></a>
+                        <p>Kopesh<br><small>Peer to peer</small></p>
+                    </div>
+                    <div class="app-icon">
+                        <a href="/expense-tracker/"><img src="{% static 'images/expense_icon.png' %}" alt="Expense Tracker"></a>
+                        <p>Expense Tracker<br><small>Track your spending and income</small></p>
+                    </div>
+                </div>
+                <!-- Notifications -->
+                <div class="notifications mt-4">
+                    <h5>NOTIFICATIONS</h5>
+                    <small>Today</small>
+                    {% for item in user_notifications %}
+                        <div class="alert alert-light">{{ item.notification_text }} - {{ item.created_at }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

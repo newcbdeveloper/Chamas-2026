@@ -1,0 +1,1599 @@
+{%load static%}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Link Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="{%static 'chamas/style.css'%}" />
+  <link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+  <!-- Header styling CSS -->
+  <link rel="stylesheet" href="{% static 'css/feather.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app-light.css' %}" id="lightTheme">
+  <link rel="stylesheet" href="{% static 'css/style-test.css' %}">
+
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <style>
+    .profile {
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-toggle {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: #333;
+      /* Adjust color as needed */
+      cursor: pointer;
+    }
+
+    .dropdown-toggle img {
+      margin-right: 5px;
+      /* Adjust spacing as needed */
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #fff;
+      /* Adjust background color as needed */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      /* Adjust box-shadow as needed */
+      padding: 10px;
+      list-style: none;
+      margin: 0;
+    }
+
+    .dropdown-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .dropdown-menu li {
+      padding: 5px 0;
+    }
+
+    /* Show dropdown when .show class is present */
+    .dropdown-menu.show {
+      display: block;
+    }
+
+
+    .iframe-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .iframe-container iframe {
+      width: 80%;
+      height: 80%;
+      filter: blur(10px);
+      border: none;
+      background: white;
+    }
+
+    .iframe-container.show {
+      display: flex;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+<style rel="stylesheet">
+  
+    /* full‐screen overlay */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* when visible */
+.modal.show {
+  display: flex;
+}
+
+/* white box */
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* the close “×” */
+.close-btn {
+  position: absolute;
+  top: 0.5rem; right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* optional icon styling */
+.modal-icon img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+
+</style>
+
+  {%block head%}
+  <title>Chamaspace</title>
+  {%endblock%}
+</head>
+
+<body>
+  <!-- Main Layout Container -->
+  <div class="app-layout">
+
+    <!-- Mobile Sidebar (Hidden by default, shown on mobile when menu is clicked) -->
+    <div id="mySidenav" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <div class="logo_details">
+        <img src="{%static 'chamas/logo.png'%}" alt="Logo" />
+      </div>
+      <ul class="nav-list">
+
+        {% if chama and chama.id %}
+        <li>
+          <a href="{% url 'chamas:chama-dashboard' chama.id %}" class="dashboard-link">
+            <i class='bx bx-bolt-circle'></i>
+            <span class="link_name">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:finances' chama.id %}" class="finances-link">
+            <i class="bx bx-wallet"></i>
+            <span class="link_name">Finances Page</span>
+          </a>
+        </li>
+        <li>
+          <a class="contribution-link" href="{% url 'chamas:contributions' chama.id %}">
+            <i class='bx bx-sort bx-rotate-90'></i>
+            <span class="link_name">Contributions</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:chama-loans' chama.id %}" class="loans-link">
+            <i class='bx bxs-donate-heart'></i>
+            <span class="link_name">Loans</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:chama-expenses' chama.id %}" class="expenses-link">
+            <i class="bx bx-folder"></i>
+            <span class="link_name">Expenses</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:chama-fines' chama.id %}" class="fines-link">
+            <i class="bx bx-file"></i>
+            <span class="link_name">Fines</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:reports' chama.id %}" class="reports-link">
+            <i class='bx bxs-report'></i>
+            <span class="link_name">Reports</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:members' chama.id %}" class="members-link">
+            <i class="bx bx-user"></i>
+            <span class="link_name">Members</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'chamas:notifications' chama.id %}" class="notifications-link">
+            <i class="bx bx-bell"></i>
+            <span class="link_name">Notifications</span>
+          </a>
+        </li>
+        <li class="admin">
+          <a href="{% url 'bot:bot-records' chama.id %}" class="bot-link">
+            <i class="bx bx-cog"></i>
+            <span class="link_name">Bot Control</span>
+          </a>
+        </li>
+        {% else %}
+        <li>
+          <a href="{% url 'chamas:chamas' %}" class="dashboard-link">
+            <i class='bx bx-bolt-circle'></i>
+            <span class="link_name">Select Chama</span>
+          </a>
+        </li>
+        {% endif %}
+        <li>
+          <a href="{%url 'chamas:chamas'%}">
+            <i class="bx bx-arrow-back"></i>
+            <span class="link_name">Back</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Desktop Sidebar (Always visible on desktop) -->
+    <aside class="desktop-sidebar">
+      <div class="sidebar-header">
+        <div class="logo_details">
+          <img src="{%static 'chamas/logo.png'%}" alt="Logo" />
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+
+          {% if chama and chama.id %}
+          <li>
+            <a href="{% url 'chamas:chama-dashboard' chama.id %}" class="dashboard-link">
+              <i class='bx bx-bolt-circle'></i>
+              <span class="link_name">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:finances' chama.id %}" class="finances-link">
+              <i class="bx bx-wallet"></i>
+              <span class="link_name">Finances Page</span>
+            </a>
+          </li>
+          <li>
+            <a class="contribution-link" href="{% url 'chamas:contributions' chama.id %}">
+              <i class='bx bx-sort bx-rotate-90'></i>
+              <span class="link_name">Contributions</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:chama-loans' chama.id %}" class="loans-link">
+              <i class='bx bxs-donate-heart'></i>
+              <span class="link_name">Loans</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:chama-expenses' chama.id %}" class="expenses-link">
+              <i class="bx bx-folder"></i>
+              <span class="link_name">Expenses</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:chama-fines' chama.id %}" class="fines-link">
+              <i class="bx bx-file"></i>
+              <span class="link_name">Fines</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:reports' chama.id %}" class="reports-link">
+              <i class='bx bxs-report'></i>
+              <span class="link_name">Reports</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:members' chama.id %}" class="members-link">
+              <i class="bx bx-user"></i>
+              <span class="link_name">Members</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:notifications' chama.id %}" class="notifications-link">
+              <i class="bx bx-bell"></i>
+              <span class="link_name">Notifications</span>
+            </a>
+          </li>
+          <li class="admin">
+            <a href="{% url 'bot:bot-records' chama.id %}" class="bot-link">
+              <i class="bx bx-cog"></i>
+              <span class="link_name">Bot Control</span>
+            </a>
+          </li>
+          {% else %}
+          <li>
+            <a href="{% url 'chamas:chamas' %}" class="dashboard-link">
+              <i class='bx bx-bolt-circle'></i>
+              <span class="link_name">Select Chama</span>
+            </a>
+          </li>
+          {% endif %}
+          <li>
+            <a href="{%url 'chamas:chamas'%}">
+              <i class="bx bx-arrow-back"></i>
+              <span class="link_name">Back</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="page_header pt-3">
+        <div class="container">
+          <nav class="page_nav mob_nav show_on_mobile">
+            <div class="brand">
+              <a href="#">
+                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+              </a>
+            </div>
+            <ul class="nav-list">
+              <li class="" data-bs-toggle="modal" data-bs-target=".modal-notif">
+                <img src="{% static 'images/Notifications.png' %}" alt="">
+              </li>
+              &nbsp;&nbsp;
+              <li class="">
+                <button class="btn navbar-toggler text-muted" type="button" onclick="openNav()">
+                  <img src="{% static 'images/menu.png' %}" class="avatar-img rounded-circle" alt="">
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Mobile Chama Info & Toggle Row (Mobile Only) -->
+      <div class="mobile-chama-header show_on_mobile">
+        <div class="container">
+          <div class="mobile-chama-row">
+            <div class="mobile-chama-info">
+              {% if group and group.name %}
+              <h3 class="mobile-chama-name">{{ group.name }}</h3>
+              {% elif chama and chama.name %}
+              <h3 class="mobile-chama-name">{{ chama.name }}</h3>
+              {% else %}
+              <h3 class="mobile-chama-name">Chama Dashboard</h3>
+              {% endif %}
+            </div>
+            <div class="mobile-toggle-container">
+              <div class="form-check form-switch mobile-view-switch">
+                <input class="form-check-input" type="checkbox" id="viewToggle">
+                <label class="form-check-label" for="viewToggle">
+                  <span class="switch-label-member">Member</span>
+                  <span class="switch-label-admin" style="display: none;">Admin</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Header -->
+      <nav class="topnav navbar navbar-light page_header hide_on_mobile">
+        <div style="margin-left: auto;"></div> <!-- Spacer to push nav items to the right -->
+
+        <ul class="nav">
+          <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#" data-bs-toggle="modal" data-bs-target=".modal-notif">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button"
+              data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar avatar-sm">
+                {% if request.user.profile.picture %}
+                <img src="{{ request.user.profile.picture.url }}" alt="img" class="avatar-img rounded-circle">
+                {% else %}
+                <img src="{% static 'assets/avatars/face-1.png' %}" alt="img" class="avatar-img rounded-circle">
+                {% endif %}
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end" style="margin-right: 20px;" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="{% url 'user_dashboard:settings' %}">Settings</a>
+              <div class="dropdown-item">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="viewToggleDesktop">
+                  <label class="form-check-label" for="viewToggleDesktop">
+                    <span class="switch-label-member">Member</span>
+                    <span class="switch-label-admin" style="display: none;">Admin</span>
+                  </label>
+                </div>
+              </div>
+              <a class="dropdown-item" href="{% url 'Logout' %}">Logout</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Page Content -->
+      <div class="page-content">
+        {%block body%}
+        {%endblock%}
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" onclick="closeNav()"></div>
+
+<!-- Notification Modal -->
+  <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group list-group-flush my-n3">
+            <div class="list-group-item bg-transparent">
+              <div class="row align-items-center">
+                <div class="col">
+                  <small><strong>No notifications</strong></small>
+                  <div class="my-0 text-muted small">You have no new notifications.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-block" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shortcuts Modal -->
+  <!-- <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body px-5">
+          <div class="row align-items-center">
+            <div class="col-6 text-center">
+              <div class="squircle bg-success justify-content-center">
+                <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+              </div>
+              <p>Control area</p>
+            </div>
+            <div class="col-6 text-center">
+              <div class="squircle bg-primary justify-content-center">
+                <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+              </div>
+              <p>Activity</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- modals  -->
+
+  <!-- add member to group modal-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel" style="color: #2291A5;">Add Member to group</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="add-member-form">
+            <h6 class="text"></h6>
+            <div class="modal-alert-hub">
+
+            </div>
+            <form action="" id="add-member-form">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="Name" class="form-label" style="color: #2291A5;">Name</label>
+                <input type="text" name="name" class="form-control" id="member-name" placeholder="member name..."
+                  required>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label" style="color: #2291A5;">Email address</label>
+                <input type="email" name="email" class="form-control" id="member-email" placeholder="name@example.com"
+                  required>
+              </div>
+              <div class="mb-3">
+                <label for="id_number" class="form-label" style="color: #2291A5;">Id Number</label>
+                <input type="number" name="id_number" class="form-control" id="member-id_number" placeholder="12345678"
+                  required>
+              </div>
+              <div class="mb-3">
+                <label for="mobile" class="form-label" style="color: #2291A5;">Mobile</label>
+                <input type="number" name="mobile" class="form-control" id="member-mobile" placeholder="07 xxx xxx"
+                  required>
+              </div>
+              <div class="input-group mb-3">
+                <label class="input-group-text" for="inputGroupSelect01" style="color: #2291A5;">Role</label>
+                <select class="form-select text-capitalize" name="role" id="member-role">
+                  {%for role in roles%}
+                  <option value="{{role.name}}">{{role.name}}</option>
+                  {%endfor%}
+                </select>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button id="add-member-modal-button" type="button" class="btn btn-primary"
+            style="background-color: #2291A5;">Save changes</button>
+
+        </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!--end modal-->
+
+
+
+  <div class="iframe-container" id="iframeContainer">
+    <button class="close-button" id="closeIframe">X</button>
+    <iframe src="/subscriptions/plans/" id="iframe"></iframe>
+  </div>
+
+
+
+
+  <!-- Load jQuery FIRST, then Bootstrap, then our scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script src="{%static 'chamas/script.js'%}"></script>
+  <script src="https://kit.fontawesome.com/d90233e428.js" crossorigin="anonymous"></script>
+  <script>
+    /* Open mobile navigation */
+    function openNav() {
+      document.getElementById("mySidenav").style.width = "260px";
+      document.querySelector(".mobile-overlay").style.display = "block";
+      document.querySelector(".mobile-overlay").classList.add("show");
+    }
+
+    /* Close mobile navigation */
+    function closeNav() {
+      document.getElementById("mySidenav").style.width = "0";
+      document.querySelector(".mobile-overlay").style.display = "none";
+      document.querySelector(".mobile-overlay").classList.remove("show");
+    }
+
+    function getGroupId() {
+      return localStorage.getItem('groupId');
+    }
+
+
+    $(document).ready(function () {
+      function handleDashboardClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-dashboard/${chama_id}/`;
+        } else {
+          console.error('invalid chama_id');
+        }
+      }
+
+      function handleContributionsClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/contributions/${chama_id}/`;
+        } else {
+          console.error('Invalid chama_id');
+        }
+      }
+
+      function handleMembersClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/members/${chama_id}/`
+        } else {
+          console.log('invalid chama id');
+        }
+      }
+
+      function handleFinesClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-fines/${chama_id}/`
+        } else {
+          console.log('invalid chama id');
+        }
+      }
+
+      function handleLoansClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-loans/${chama_id}/`;
+
+        } else {
+          console.log('invalid chama id');
+        }
+      }
+
+      function handleExpensesClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-expenses/${chama_id}/`;
+        } else {
+          console.log('invalid chama id');
+        }
+      }
+
+      function handleFinancesClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-finances/${chama_id}/`;
+        } else {
+          console.log('invalid chama id');
+        }
+      }
+
+      function handleReportsClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-reports/${chama_id}/`;
+        } else {
+          console.log('invalid chama id');
+        }
+      }
+
+      function handleNotificationsClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/chamas-bookeeping/chama-notifications/${chama_id}/`;
+        } else {
+          console.log('Invalid chama id');
+        }
+      }
+
+      function handleBotClick() {
+        var chama_id = getGroupId();
+
+        if (chama_id) {
+          window.location.href = `/bot/reports/${chama_id}/`;
+        } else {
+          console.log('Invalid chama id');
+        }
+      }
+
+      // Attach the click event handlers to  links
+      $('.dashboard-link').on('click', function (event) {
+        event.preventDefault();
+        handleDashboardClick();
+      });
+
+      $('.contribution-link').on('click', function (event) {
+        event.preventDefault();
+        handleContributionsClick();
+      });
+
+      $('.members-link').on('click', function (event) {
+        event.preventDefault();
+        handleMembersClick();
+      });
+
+      $('.loans-link').on('click', function (event) {
+        event.preventDefault();
+        handleLoansClick();
+      });
+
+      $('.fines-link').on('click', function (event) {
+        event.preventDefault();
+        handleFinesClick();
+      });
+
+      $('.expenses-link').on('click', function (event) {
+        event.preventDefault();
+        handleExpensesClick();
+      });
+
+      $('.finances-link').on('click', function (event) {
+        event.preventDefault();
+        handleFinancesClick();
+      });
+
+      $('.reports-link').on('click', function (event) {
+        event.preventDefault();
+        handleReportsClick();
+      });
+
+      $('.notifications-link').on('click', function (event) {
+        event.preventDefault();
+        handleNotificationsClick();
+      })
+
+      $('.bot-link').on('click', function (event) {
+        event.preventDefault();
+        handleBotClick();
+      })
+
+
+
+
+    });
+
+
+    {% comment %} ('#diamond').on('click', function (event) {
+      event.preventDefault();
+      handleDiamondClick();
+    }) {% endcomment %}
+
+    function handleDiamondClick() {
+      var chama_id = getGroupId();
+
+      if (chama_id) {
+        window.location.href = `/subscriptions/plans/${chama_id}`;
+      } else {
+        console.error('invalid chama_id');
+      }
+    }
+
+  </script>
+  <!-- Populate the dropdown menu with profile options -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Function to toggle the dropdown
+      function toggleDropdown() {
+        var dropdown = document.querySelector('.profile .dropdown-menu');
+        dropdown?.classList.toggle('show');
+      }
+
+      // Attach click event to the profile dropdown
+      document.querySelector('.profile .dropdown-toggle')?.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleDropdown();
+      });
+
+      // Close the dropdown when clicking outside of it
+      //document.addEventListener('click', function (event) {
+      //  var dropdown = document.querySelector('.profile .dropdown-menu');
+      //  if (dropdown?.classList.contains('show') && !dropdown?.contains(event.target)) {
+      //    toggleDropdown();
+      //  }
+      //});
+    });
+  </script>
+
+
+  {% comment %}
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> {% endcomment %}
+  <script>
+    $(document).ready(function () {
+      // 1) Grab groupId and localStorage key
+      var groupId = localStorage.getItem('groupId');
+      if (!groupId) {
+        console.error("No groupId in localStorage!");
+        return;
+      }
+      var storageKey = "selectedView_" + groupId;
+      var savedView = localStorage.getItem(storageKey) || "member";
+
+      // 2) IMMEDIATELY hide all admin‐only elements on page load
+      //    (so that nothing flashes on the screen before AJAX finishes)
+      $(".admin, #remove-user, #add-member-button").hide();
+
+      // 2.1) IMMEDIATELY disable the view switch for all users until verified
+      $("#viewToggle, #viewToggleDesktop").prop('disabled', true);
+
+      // 3) Initialize the switch state based on savedView
+      if (savedView === "member") {
+        // If last‐saved was member, set switch to member position
+        $("#viewToggle, #viewToggleDesktop").prop('checked', false);
+        $(".switch-label-member").show();
+        $(".switch-label-admin").hide();
+      } else {
+        // savedView is "admin" (user clicked admin on a previous page).
+        // Set switch to admin position but keep disabled until verified
+        $("#viewToggle, #viewToggleDesktop").prop('checked', true);
+        $(".switch-label-member").hide();
+        $(".switch-label-admin").show();
+      }
+
+      // 4) Now call the server to see "am I admin in this group?"
+      $.ajax({
+        url: '/chamas-bookeeping/get_user_role/',
+        data: { group_id: groupId },
+        dataType: 'json',
+        success: function (data) {
+          // If the server says I'm not an admin here or there's an error:
+          if (data.role !== "admin" || data.error) {
+            // Force member mode, keep switch disabled
+            savedView = "member";
+            $("#viewToggle, #viewToggleDesktop").prop('checked', false).prop('disabled', true);
+            // Re‐apply member‐only UI
+            updateView("member");
+            // Overwrite localStorage in case it was "admin" before
+            localStorage.setItem(storageKey, "member");
+
+            // Log any errors for debugging
+            if (data.error) {
+              console.log("Role verification error:", data.error);
+            }
+          } else {
+            // I am admin. Enable the switch now
+            $("#viewToggle, #viewToggleDesktop").prop('disabled', false);
+
+            // If they had last‐saved "admin," now we can safely flip on admin features:
+            if (savedView === "admin") {
+              updateView("admin");
+              $("#viewToggle, #viewToggleDesktop").prop('checked', true);
+              $(".switch-label-member").hide();
+              $(".switch-label-admin").show();
+            } else {
+              // They last‐saved "member," so keep member view
+              updateView("member");
+              $("#viewToggle, #viewToggleDesktop").prop('checked', false);
+              $(".switch-label-member").show();
+              $(".switch-label-admin").hide();
+            }
+          }
+        },
+        error: function () {
+          // If the AJAX fails, disable switch and stay in member view.
+          $("#viewToggle, #viewToggleDesktop").prop('checked', false).prop('disabled', true);
+          updateView("member");
+          localStorage.setItem(storageKey, "member");
+        }
+      });
+
+      // 5) Switch handler: whenever they toggle the switch, re‐verify if necessary
+      $("#viewToggle, #viewToggleDesktop").on("change", function () {
+        var isAdminView = $(this).is(':checked');
+
+        if (isAdminView) {
+          // If they toggle to admin, do one more AJAX check:
+          $.ajax({
+            url: '/chamas-bookeeping/get_user_role/',
+            data: { group_id: groupId },
+            dataType: 'json',
+            success: function (data) {
+              if (data.role === "admin") {
+                // OK, they really are an admin: flip on admin mode
+                updateView("admin");
+                $("#viewToggle, #viewToggleDesktop").prop('checked', true);
+                $(".switch-label-member").hide();
+                $(".switch-label-admin").show();
+                localStorage.setItem(storageKey, "admin");
+              } else {
+                // Not an admin—show alert and revert to member
+                alert("You don't have admin permissions");
+                updateView("member");
+                $("#viewToggle, #viewToggleDesktop").prop('checked', false);
+                $(".switch-label-member").show();
+                $(".switch-label-admin").hide();
+                localStorage.setItem(storageKey, "member");
+              }
+            },
+            error: function () {
+              // If AJAX fails, revert to member mode
+              alert("Unable to verify permissions");
+              updateView("member");
+              $("#viewToggle, #viewToggleDesktop").prop('checked', false);
+              $(".switch-label-member").show();
+              $(".switch-label-admin").hide();
+              localStorage.setItem(storageKey, "member");
+            }
+          });
+
+        } else {
+          // They toggled to member—just switch immediately (no need to re‐verify)
+          updateView("member");
+          $("#viewToggle, #viewToggleDesktop").prop('checked', false);
+          $(".switch-label-member").show();
+          $(".switch-label-admin").hide();
+          localStorage.setItem(storageKey, "member");
+        }
+      });
+
+      // 7) show/hide logic for each view
+      function updateView(view) {
+        if (view === "member") {
+          // Remove admin class from body/html and hide admin elements
+          $("body, html").removeClass("user-is-admin");
+          $(".admin, #remove-user, #add-member-button").hide();
+          $(".member").show();
+        } else {
+          // Add admin class to body/html and show admin elements
+          $("body, html").addClass("user-is-admin");
+          $(".member").hide();
+          $(".admin, #remove-user, #add-member-button").show();
+        }
+      }
+
+      // 8) Global function for pages to sync their visibility with current view state
+      window.syncAdminVisibility = function () {
+        var groupId = localStorage.getItem('groupId');
+        if (!groupId) return;
+
+        var storageKey = "selectedView_" + groupId;
+        var currentView = localStorage.getItem(storageKey) || "member";
+
+        // Apply the same logic as updateView but just for admin/member elements
+        if (currentView === "member") {
+          $("body, html").removeClass("user-is-admin");
+          $(".admin, #remove-user, #add-member-button").hide();
+          $(".member").show();
+        } else {
+          $("body, html").addClass("user-is-admin");
+          $(".member").hide();
+          $(".admin, #remove-user, #add-member-button").show();
+        }
+      };
+    });
+  </script>
+
+
+
+
+  <script>
+    document.getElementById('add-member-modal-button').addEventListener('click', function () {
+      // Collect form data
+      const name = document.querySelector("input[name='name']").value;
+      const role = document.querySelector("select[name='role']").value;
+      const email = document.querySelector("input[name='email']").value;
+      const phone = document.querySelector("input[name='mobile']").value;
+      const id_number = document.querySelector("input[name='id_number']").value;
+      var group = localStorage.getItem('groupId'); // Get group ID from localStorage
+
+      // Create FormData object to send form data
+      var formData = {
+        name: name,
+        role: role,
+        email: email,
+        phone: phone,
+        id_number: id_number,
+        group: group
+      }
+      console.log(formData)
+
+      // Send fetch request
+      fetch('/chamas-bookeeping/add-member/', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': "{{ csrf_token }}"
+        },
+        body: JSON.stringify(formData)
+      })
+        .then(function (response) {
+          // Check if request was successful
+          if (response.ok) {
+            return response.json();
+          } else {
+            return response.json().then(function (data) {
+              throw new Error(data.message);
+            });
+          }
+        })
+        .then(function (responseData) {
+          // Success response
+          var status = responseData.status;
+          var message = responseData.message;
+
+          // Display message in the alerts hub
+          var alertsHub = document.querySelector('.modal-alert-hub');
+          alertsHub.innerHTML = '<div class="alert alert-success" role="alert">' + message + '</div>';
+
+          // Clear the form
+          document.querySelector("input[name='name']").value = '';
+          document.querySelector("select[name='role']").value = '';
+          document.querySelector("input[name='email']").value = '';
+          document.querySelector("input[name='mobile']").value = '';
+          document.querySelector("input[name='id_number']").value = '';
+
+          // Close the modal (assuming you're using Bootstrap)
+          $('#exampleModal').modal('hide');
+
+
+          window.location.href = `/chamas-bookeeping/members/${localStorage.getItem('groupId')}`;
+        })
+        .catch(function (error) {
+          // Error response, handle accordingly
+          var errorMessage = error.message;
+          var alertsHub = document.querySelector('.modal-alert-hub');
+          alertsHub.innerHTML = '<div class="alert alert-danger" role="alert">' + errorMessage + '</div>';
+        });
+    });
+
+
+  </script>
+
+
+
+  <script>
+    {% comment %} document.getElementById('openIframe').addEventListener('click', function (event) {
+      event.preventDefault();
+      window.location.href = '/subscriptions/plans/'
+    }); {% endcomment %}
+    {% comment %} document.getElementById('iframeContainer').classList.add('show'); {% endcomment %}
+
+    {% comment %} document.getElementById('closeIframe').addEventListener('click', function (event) {
+      document.getElementById('iframeContainer').classList.remove('show');
+    }); {% endcomment %}
+  </script>
+
+  <!-- Mobile Navigation JavaScript -->
+  <script>
+    // Mobile Navigation Functions
+    function openNav() {
+      const sidenav = document.getElementById("mySidenav");
+      const overlay = document.querySelector(".mobile-overlay");
+      const body = document.body;
+
+      console.log("Opening navigation sidebar"); // Debug log
+
+      if (sidenav) {
+        sidenav.style.width = "280px";
+        sidenav.style.display = "block";
+        sidenav.classList.add("open");
+        console.log("Sidebar width set to 280px and open class added"); // Debug log
+      }
+
+      if (overlay) {
+        overlay.style.display = "block";
+        overlay.style.opacity = "1";
+        console.log("Overlay displayed"); // Debug log
+      }
+
+      // Add class to body to prevent scrolling
+      body.classList.add("sidebar-open");
+
+      // Add touch/click event to close on outside click
+      setTimeout(() => {
+        document.addEventListener('click', outsideClickHandler);
+      }, 100);
+    }
+
+    function closeNav() {
+      const sidenav = document.getElementById("mySidenav");
+      const overlay = document.querySelector(".mobile-overlay");
+      const body = document.body;
+
+      console.log("Closing navigation sidebar"); // Debug log
+
+      if (sidenav) {
+        sidenav.classList.remove("open");
+        sidenav.style.width = "0";
+        setTimeout(() => {
+          sidenav.style.display = "none";
+        }, 300);
+        console.log("Sidebar width set to 0 and open class removed"); // Debug log
+      }
+
+      if (overlay) {
+        overlay.style.opacity = "0";
+        setTimeout(() => {
+          overlay.style.display = "none";
+        }, 300);
+        console.log("Overlay hidden"); // Debug log
+      }
+
+      // Remove class from body
+      body.classList.remove("sidebar-open");
+
+      // Remove event listener
+      document.removeEventListener('click', outsideClickHandler);
+    }
+
+    function outsideClickHandler(event) {
+      const sidenav = document.getElementById("mySidenav");
+      const menuBtn = document.querySelector('.menu-btn');
+
+      // Check if click is outside sidebar and not on menu button
+      if (!sidenav.contains(event.target) && !menuBtn.contains(event.target)) {
+        closeNav();
+      }
+    }
+
+    // Initialize mobile navigation on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      // Ensure mobile overlay exists
+      let overlay = document.querySelector('.mobile-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'mobile-overlay';
+        document.body.appendChild(overlay);
+        console.log("Mobile overlay created");
+      }
+
+      // Navigation links are already correctly set by Django template
+      // No need for JavaScript URL parsing as Django context provides correct URLs
+
+      // Close sidebar on window resize if moving to desktop
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 768) {
+          closeNav();
+        }
+      });
+
+      // Handle swipe gestures for mobile
+      let startX = 0;
+      let startY = 0;
+
+      document.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      });
+
+      document.addEventListener('touchmove', function (e) {
+        if (!startX || !startY) return;
+
+        let currentX = e.touches[0].clientX;
+        let currentY = e.touches[0].clientY;
+
+        let diffX = startX - currentX;
+        let diffY = startY - currentY;
+
+        // Swipe left to close sidebar
+        if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50) {
+          const sidenav = document.getElementById("mySidenav");
+          if (sidenav && sidenav.style.width !== "0px" && sidenav.style.width !== "") {
+            closeNav();
+          }
+        }
+
+        startX = 0;
+        startY = 0;
+      });
+    });
+
+    // Navigation links are handled by Django template rendering
+    // The chama context condition ensures correct URLs are generated
+  </script>
+
+  <!-- Mobile Footer -->
+  <style>
+    @media screen and (min-width: 992px) {
+      .mbl_footer {
+        display: none !important;
+      }
+    }
+
+    @media screen and (max-width: 991px) {
+      body {
+        padding-bottom: 80px !important;
+      }
+
+      .mbl_footer {
+        display: block !important;
+      }
+    }
+  </style>
+  <footer class="mbl_footer"
+    style="background: #2291A5 !important; background-color: #2291A5 !important; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 10px 0; display: block;">
+    <div class="container">
+      <div class="footer_row d-flex flex-row justify-content-between align-items-center" style="padding: 0 15px;">
+        <a href="{% url 'user_dashboard:home' %}" class="footer_button btn"
+          style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;">
+          <img class="homer_white" src="{% static 'images/home_white.png' %}" alt=""
+            style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+          <p style="margin: 0; color: #fff; font-size: 12px; text-align: center;">Home</p>
+        </a>
+        <a href="#" class="footer_button btn" id="featuresBtn"
+          style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px; border-radius: 8px;">
+          <img src="{% static 'images/filter_active.png' %}" alt=""
+            style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+          <p style="margin: 0; color: #fff; font-size: 12px; text-align: center; font-weight: 600;">Features</p>
+        </a>
+        <a href="#" class="footer_button btn coming_soon"
+          style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;">
+          <img src="{% static 'images/wallet_alt_fill.png' %}" alt=""
+            style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+          <p style="margin: 0; color: #fff; font-size: 12px; text-align: center;">Account</p>
+        </a>
+        <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn"
+          style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;">
+          <img src="{% static 'images/setting.png' %}" alt=""
+            style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+          <p style="margin: 0; color: #fff; font-size: 12px; text-align: center;">Settings</p>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+
+<!-- Bottom Drawer -->
+<div id="bottomDrawer" class="bottom-drawer">
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer-content">
+    <div class="drawer-header">
+      <h3>Features</h3>
+      <button class="drawer-close" id="drawerClose">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <div class="feature-grid">
+        <!-- Chamas Feature -->
+        <div class="feature-item" data-feature="chamas">
+          <div class="feature-icon">
+            <img src="{% static 'images/icon_people.png' %}" alt="Chamas" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Chamas</h4>
+            <p>Join and manage group savings</p>
+          </div>
+        </div>
+        
+        <!-- Wekeza Goals Feature -->
+        <div class="feature-item coming-soon-item" data-feature="wekeza">
+          <div class="feature-icon">
+            <img src="{% static 'images/service-icon-01.png' %}" alt="Wekeza Goals" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Wekeza Goals</h4>
+            <p>Personal savings & investment goals</p>
+          </div>
+          <div class="coming-soon-badge">Coming Soon</div>
+        </div>
+        
+        <!-- Kopesha Feature -->
+        <div class="feature-item coming-soon-item" data-feature="kopesha">
+          <div class="feature-icon">
+            <img src="{% static 'images/kopesha.png' %}" alt="Kopesha" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Kopesha</h4>
+            <p>Quick loans & financial assistance</p>
+          </div>
+          <div class="coming-soon-badge">Coming Soon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Bottom Drawer Styles */
+.bottom-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.3s, opacity 0.3s;
+}
+
+.bottom-drawer.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.drawer-content {
+  position: relative;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 2;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.bottom-drawer.show .drawer-content {
+  transform: translateY(0);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.drawer-header h3 {
+  margin: 0;
+  color: #2291A5;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.drawer-close:hover {
+  background-color: #f0f0f0;
+}
+
+.drawer-body {
+  padding: 20px 25px 30px;
+}
+
+.feature-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+}
+
+.feature-item:hover {
+  border-color: #2291A5;
+  box-shadow: 0 4px 12px rgba(34, 145, 165, 0.1);
+  transform: translateY(-2px);
+}
+
+.feature-item:active {
+  transform: translateY(0);
+}
+
+.feature-icon {
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-content h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.feature-content p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.coming-soon-item {
+  opacity: 0.7;
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff6b6b;
+  color: white;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .drawer-content {
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .bottom-drawer.show .drawer-content {
+    transform: translateY(-20px);
+  }
+}
+
+/* Hide drawer on larger screens where footer is hidden */
+@media screen and (min-width: 992px) {
+  .bottom-drawer { display: none !important; }
+}
+</style>
+
+<script>
+// Bottom Drawer Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const featuresBtn = document.getElementById('featuresBtn');
+  const bottomDrawer = document.getElementById('bottomDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const drawerClose = document.getElementById('drawerClose');
+  const comingSoonItems = document.querySelectorAll('.coming-soon-item');
+  const chamasItem = document.querySelector('[data-feature="chamas"]');
+  const comingSoonModal = document.getElementById('comingSoonModal');
+
+  // Open drawer when features button is clicked
+  if (featuresBtn) {
+    featuresBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openDrawer();
+    });
+  }
+
+  // Close drawer functions
+  function closeDrawer() {
+    if (bottomDrawer) {
+      bottomDrawer.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function openDrawer() {
+    if (bottomDrawer) {
+      bottomDrawer.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Close drawer on overlay click
+  if (drawerOverlay) {
+    drawerOverlay.addEventListener('click', closeDrawer);
+  }
+
+  // Close drawer on close button click
+  if (drawerClose) {
+    drawerClose.addEventListener('click', closeDrawer);
+  }
+
+  // Handle chamas item click
+  if (chamasItem) {
+    chamasItem.addEventListener('click', function() {
+      closeDrawer();
+      // Navigate to chamas page
+      window.location.href = "/chamas-bookeeping/chamas/";
+    });
+  }
+
+  // Handle coming soon items
+  comingSoonItems.forEach(item => {
+    item.addEventListener('click', function() {
+      closeDrawer();
+      // Show coming soon modal after a short delay
+      setTimeout(() => {
+        if (comingSoonModal) {
+          comingSoonModal.classList.add('show');
+        }
+      }, 300);
+    });
+  });
+
+  // Close drawer on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && bottomDrawer && bottomDrawer.classList.contains('show')) {
+      closeDrawer();
+    }
+  });
+
+  // Prevent body scroll when drawer is open
+  if (bottomDrawer) {
+    bottomDrawer.addEventListener('touchmove', function(e) {
+      if (bottomDrawer.classList.contains('show')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  }
+});
+</script>
+
+</body>
+
+</html>

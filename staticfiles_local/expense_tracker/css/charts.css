@@ -1,0 +1,615 @@
+/* ==================== CSS Variables & Color System ==================== */
+:root {
+  /* Updated color palette */
+  --color-primary: #2191a5;
+  --color-primary-light: #2ba6bd;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #06b6d4;
+
+  /* Neutral colors */
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Semantic */
+  --color-dark: var(--color-gray-800);
+  --color-light: var(--color-gray-100);
+
+  /* Effects */
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-sm: 6px;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================== General Styles ==================== */
+body {
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-gray-800);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* ==================== Utility Classes ==================== */
+.py-4 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.text-end { text-align: end !important; }
+.text-muted { color: var(--color-gray-500) !important; }
+.w-100 { width: 100% !important; }
+
+.d-flex { display: flex !important; }
+.justify-content-between { justify-content: space-between !important; }
+.align-items-center { align-items: center !important; }
+
+/* Spacing (Bootstrap-like gap) */
+.g-3 > * { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+.g-3 { --bs-gutter-x: 1rem; --bs-gutter-y: 1rem; }
+.g-4 > * { padding-left: 1rem !important; padding-right: 1rem !important; }
+.g-4 { --bs-gutter-x: 1.5rem; --bs-gutter-y: 1.5rem; }
+
+/* ==================== Grid System (Simplified) ==================== */
+.container-fluid {
+  width: 100%;
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -12px;
+  margin-left: -12px;
+}
+
+.col-md-12 { flex: 0 0 auto; width: 100%; }
+.col-md-6 { flex: 0 0 auto; width: 50%; }
+.col-md-4 { flex: 0 0 auto; width: 33.333333%; }
+@media (max-width: 768px) {
+  .col-md-12,
+  .col-md-6,
+  .col-md-4 {
+    width: 100%;
+  }
+}
+
+/* ==================== Card Component ==================== */
+.card {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-gray-100);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-gray-200);
+}
+
+.card-header {
+  padding: clamp(10px, 2.5vw, 14px) clamp(14px, 3vw, 18px);
+  border-bottom: 1px solid var(--color-gray-100);
+  background-color: var(--color-gray-50);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h5 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.card-body {
+  padding: clamp(12px, 3vw, 16px);
+}
+
+/* Full-height card support */
+.card.h-100 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.card.h-100 .card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== Metric Cards (Charts Page) ==================== */
+.metric-card {
+  background: var(--color-white);
+  border-radius: var(--border-radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-white);
+  min-height: auto;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  width: 100%;
+}
+
+.metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.metric-content {
+  flex: 1;
+  min-width: 0; /* Allow text to shrink */
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* Colored backgrounds */
+.metric-card.bg-success {
+  background: linear-gradient(135deg, var(--color-success), #0da26d);
+}
+
+.metric-card.bg-danger {
+  background: linear-gradient(135deg, var(--color-danger), #dc2626);
+}
+
+.metric-card.bg-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+}
+
+.metric-card.bg-warning {
+  background: linear-gradient(135deg, var(--color-warning), #d97706);
+}
+
+/* Improvement: Change negative balance to use red background consistently */
+.metric-card.bg-negative {
+  background: linear-gradient(135deg, var(--color-danger), #dc2626);
+}
+
+/* ==================== Chart Containers ==================== */
+.chart-container {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Bar and Line Charts - Optimal 16:9 aspect ratio */
+.chart-container:not(.pie-chart):not(.spending-trend) {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  min-height: 280px;
+  max-height: 400px;
+}
+
+/* Fallback for older browsers */
+@supports not (aspect-ratio: 16 / 9) {
+  .chart-container:not(.pie-chart):not(.spending-trend) {
+    height: 320px;
+  }
+}
+
+/* ====== Pie/Donut Charts - Compact square with max size ====== */
+.chart-container.pie-chart {
+  aspect-ratio: 1 / 1;
+  max-width: 350px; /* Industry standard: pie charts should be max 300-400px */
+  max-height: 350px;
+  margin: 0 auto;
+  padding: 12px;
+}
+
+@supports not (aspect-ratio: 1) {
+  .chart-container.pie-chart {
+    width: 100%;
+    max-width: 350px;
+    padding-bottom: 100%; /* Creates a square using padding trick */
+    position: relative;
+    height: 0;
+  }
+  .chart-container.pie-chart canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* ====== Spending Trend Chart - Optimal height for line charts ====== */
+.chart-container.spending-trend {
+  aspect-ratio: 16 / 7; /* Wider aspect ratio for trend charts */
+  max-height: 320px;
+  min-height: 280px;
+}
+
+@supports not (aspect-ratio: 16 / 7) {
+  .chart-container.spending-trend {
+    height: 300px;
+  }
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* ==================== Buttons & Forms ==================== */
+.btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+}
+
+.btn-outline-primary {
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+  color: white !important;
+}
+
+.btn-group {
+  display: inline-flex;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.btn-group .btn {
+  border-radius: 0 !important;
+  margin: 0;
+}
+.btn-group .btn:first-child {
+  border-top-left-radius: var(--border-radius) !important;
+  border-bottom-left-radius: var(--border-radius) !important;
+}
+.btn-group .btn:last-child {
+  border-top-right-radius: var(--border-radius) !important;
+  border-bottom-right-radius: var(--border-radius) !important;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-gray-300);
+  background-color: var(--color-white);
+  color: var(--color-gray-800);
+}
+
+/* Improvement: Align Apply button inline with dropdown */
+.form-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.form-row .col-md-4 {
+  flex: 1;
+}
+
+.form-row .col-md-2 {
+  flex: 0 0 auto;
+}
+
+/* Improvement: Make date range more prominent */
+.period-info {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.period-info::before {
+  content: '📅';
+}
+
+/* Improvement: Add spacing between metric cards */
+.row.g-3.mb-4 .col-md-4 {
+  margin-bottom: 1rem; /* Extra vertical spacing */
+}
+
+/* Reduce spacing on mobile */
+@media (max-width: 768px) {
+  .row.g-3.mb-4 {
+    --bs-gutter-y: 0.5rem;
+  }
+  
+  .row.g-3.mb-4 .col-md-4 {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Improvement: Bold metric values more - Desktop only */
+@media (min-width: 769px) {
+  .metric-value {
+    font-weight: 800; /* Bolder */
+    font-size: 1.5rem; /* Slightly larger */
+  }
+}
+
+/* Improvement: Consistent icons - replace wallet with arrow for balance */
+.metric-card .metric-icon i.fa-wallet {
+  display: none; /* Hide wallet */
+}
+
+.metric-card .metric-icon::before {
+  content: '\f175'; /* Down arrow for negative, but conditional in HTML */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+/* For positive balance, up arrow */
+.metric-card.bg-primary .metric-icon::before {
+  content: '\f176';
+}
+
+/* ==================== Responsive Tweakss ==================== */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  
+  /* Card Reduction for Mobile */
+  .card-header {
+    padding: 10px 12px;
+  }
+  
+  .card-header h5 {
+    font-size: 0.9rem;
+  }
+  
+  .card-body {
+    padding: 12px;
+  }
+  
+  /* Compact metric cards for mobile */
+  .metric-card {
+    padding: 8px 12px;
+    gap: 8px;
+    min-height: auto;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .metric-header {
+    gap: 8px;
+  }
+  
+  .metric-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+  
+  .metric-label {
+    font-size: 0.625rem;
+    margin: 0 0 2px 0;
+    letter-spacing: 0.3px;
+  }
+  
+  .metric-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  /* Responsive chart containers for mobile */
+  .chart-container:not(.pie-chart):not(.spending-trend) {
+    aspect-ratio: 16 / 9;
+    padding: 12px;
+    min-height: 220px;
+    max-height: 280px;
+  }
+  
+  @supports not (aspect-ratio: 16 / 9) {
+    .chart-container:not(.pie-chart):not(.spending-trend) {
+      height: 240px;
+    }
+  }
+  
+  /* Pie charts on mobile - smaller but still square */
+  .chart-container.pie-chart {
+    max-width: 280px;
+    max-height: 280px;
+    padding: 10px;
+  }
+  
+  @supports not (aspect-ratio: 1) {
+    .chart-container.pie-chart {
+      max-width: 280px;
+    }
+  }
+  
+  /* Spending trend on mobile */
+  .chart-container.spending-trend {
+    aspect-ratio: 16 / 8;
+    max-height: 240px;
+    min-height: 200px;
+    padding: 12px;
+  }
+  
+  @supports not (aspect-ratio: 16 / 8) {
+    .chart-container.spending-trend {
+      height: 220px;
+    }
+  }
+  
+  .card.h-100 {
+    min-height: auto;
+  }
+  
+  .btn { 
+    padding: 0.375rem 0.5rem !important; 
+    font-size: 0.875rem !important; 
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small mobile - ultra compact charts */
+  .chart-container:not(.pie-chart):not(.spending-trend) {
+    aspect-ratio: 16 / 9;
+    padding: 10px;
+    min-height: 180px;
+    max-height: 220px;
+  }
+  
+  @supports not (aspect-ratio: 16 / 9) {
+    .chart-container:not(.pie-chart):not(.spending-trend) {
+      height: 200px;
+    }
+  }
+  
+  .chart-container.pie-chart {
+    max-width: 240px;
+    max-height: 240px;
+    padding: 8px;
+  }
+  
+  @supports not (aspect-ratio: 1) {
+    .chart-container.pie-chart {
+      max-width: 240px;
+    }
+  }
+  
+  .chart-container.spending-trend {
+    aspect-ratio: 16 / 9;
+    max-height: 200px;
+    min-height: 180px;
+    padding: 10px;
+  }
+  
+  @supports not (aspect-ratio: 16 / 9) {
+    .chart-container.spending-trend {
+      height: 190px;
+    }
+  }
+  
+  body { font-size: 13px; }
+  
+  /* Extra compact for small mobile */
+  .metric-card {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  
+  .metric-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  
+  .metric-label {
+    font-size: 0.6rem;
+    margin: 0 0 1px 0;
+  }
+  
+  .metric-value {
+    font-size: 0.8rem;
+  }
+  
+  .metric-header {
+    gap: 6px;
+  }
+}
+
+/* Improvement: Accessibility - Ensure color contrast */
+.metric-card {
+  --contrast-threshold: 4.5; /* WCAG AA */
+}
+
+/* Add dividers between sections if needed */
+.row.mb-4::after {
+  content: '';
+  display: block;
+  border-bottom: 1px solid var(--color-gray-200);
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}

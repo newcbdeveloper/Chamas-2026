@@ -1,0 +1,1782 @@
+{%extends 'chamas/base.html'%}{% load static %}{% load humanize %}
+
+{%block head%}
+<title>Contributions</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/contribution.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/dashboard.css'%}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    .action-buttons {
+        min-width: 80px;
+    }
+    
+    .action-buttons .btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-width: 1.5px;
+        transition: all 0.2s ease;
+    }
+    
+    .action-buttons .btn i {
+        font-size: 16px;
+        line-height: 1;
+    }
+    
+    .action-buttons .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .table-fine-button:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    
+    .table-pay-button:hover {
+        background-color: #198754;
+        border-color: #198754;
+        color: white;
+    }
+</style>
+{%endblock%}
+
+{%block body%}
+<div class="modern-contributions">
+    <!-- Mobile View -->
+    <div class="mobile-contributions d-block d-lg-none">
+        <!-- Tabs -->
+        <div class="mobile-tabs">
+            <button class="tab-btn active" data-tab="all-contributions">All Contributions</button>
+            <button class="tab-btn admin" data-tab="create-contributions">Create Contributions</button>
+        </div>
+
+        <!-- All Contributions Tab Content -->
+        <div class="tab-content active" id="all-contributions">
+            <!-- Contributions Accordion -->
+            <div class="mobile-contributions-accordion" id="mobile-contributions-container">
+                <!-- Contributions will be populated by JavaScript -->
+            </div>
+            
+            <!-- Mobile Pagination -->
+            <div class="mobile-pagination" id="mobile-pagination" role="navigation" aria-label="Contribution pages">
+                <!-- Pagination will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Create Contributions Tab Content -->
+        <div class="tab-content" id="create-contributions">
+            <!-- Create Contribution Form -->
+            <div class="mobile-create-form admin">
+                <form id="mobile-create-contribution-form">
+                    <div class="form-group">
+                        <label for="mobile-contribution-name">Name</label>
+                        <input type="text" id="mobile-contribution-name" name="name" class="form-input" placeholder="Enter Contribution name">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile-target-amount">Amount</label>
+                        <input type="number" id="mobile-target-amount" name="amount" class="form-input" placeholder="Enter contribution amount" min="1" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile-start-date">Start</label>
+                        <input type="date" id="mobile-start-date" name="start-date" class="form-input">
+                    </div>
+                    <!-- End date and grace period fields removed as they are no longer used in the contribution logic -->
+                    <div class="form-group" style="display: none;">
+                        <label for="mobile-due-date">End date</label>
+                        <input type="date" id="mobile-due-date" name="end-date" class="form-input">
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label for="mobile-grace-period">Grace period</label>
+                        <input type="number" id="mobile-grace-period" name="grace-period" class="form-input" placeholder="Enter grace period">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile-description">Description</label>
+                        <textarea id="mobile-description" name="description" class="form-input" rows="3" placeholder="Enter description for contribution"></textarea>
+                    </div>
+                    <div id="mobile-alert-div" class="alert" style="display: none; margin-top: 10px;"></div>
+                    <button type="button" class="create-contribution-btn" id="mobile-create-contribution-button">
+                        Create contribution Scheme
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="desktop-contributions d-none d-lg-block">
+        <div class="desktop-content">
+            <!-- Desktop Header -->
+            <div class="desktop-header-section">
+                <h1 class="page-title">Contributions</h1>
+                <div class="desktop-actions">
+                    <button class="btn-secondary">
+                        <i class='bx bx-filter'></i>
+                        Filter
+                    </button>
+                    <button class="btn-primary admin" id="desktop-create-toggle">
+                        <i class='bx bx-plus'></i>
+                        Create Contribution
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top Row - Create Form & Contributions List -->
+            <div class="desktop-top-row">
+                <!-- Create Contribution Form -->
+                <div class="create-contribution-section admin">
+                    <div class="create-contribution-card" id="desktop-create-form">
+                        <h3 class="card-title">Create Contribution</h3>
+                        <div class="create-contribution-alert-hub"></div>
+                        <form action="" id="create-contribution-form">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" id="name" class="form-input-wide" />
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <input type="number" name="amount" id="amount" class="form-input-wide" placeholder="Enter contribution amount" min="1" step="0.01" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="start-date">date</label>
+                                <input type="date" name="start-date" id="start-date" class="form-input-wide" />
+                            </div>
+                            <!-- End date and grace period fields removed as they are no longer used in the contribution logic -->
+                            <div class="form-group" style="display: none;">
+                                <label for="end-date">End date</label>
+                                <input type="date" name="end-date" id="end-date" class="form-input-wide" />
+                            </div>
+                            <div class="form-group" style="display: none;">
+                                <label for="grace-period">Grace period</label>
+                                <input type="number" name="grace-period" id="grace-period" class="form-input-wide" />
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea name="description" id="description" rows="3" class="form-input-wide" placeholder="Enter contribution description"></textarea>
+                            </div>
+                            <button class="btn-primary-wide" id="create-contribution-button" type="button">
+                                Create Contribution
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Contributions List -->
+                <div class="contribution-list-section">
+                    <div class="contribution-list-card">
+                        <h3 class="card-title">Contribution List</h3>
+                        <div class="contributions-grid" id="desktop-contributions-container">
+                            <!-- Contributions will be populated by JavaScript -->
+                        </div>
+                        
+                        <!-- Desktop Pagination -->
+                        <div class="desktop-pagination" id="desktop-pagination">
+                            <!-- Pagination will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row - Contribution Details Full Width -->
+            <div class="desktop-bottom-row">
+                <div class="contribution-details-section">
+                    <h3 class="details-title">
+                        Contribution Details - 
+                        <span id="contribution-details-name">Select a contribution</span>
+                    </h3>
+                    <p style="display: none" id="contribution-id"></p>
+                    <div class="contribution-details-alert-hub"></div>
+
+                    <div class="details-grid">
+                        <!-- Member Update Table -->
+                        <div class="member-update-card admin contribution-form-card">
+                            <div class="table-responsive">
+                                <table class="table" id="member-list">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Required Amount</th>
+                                            <th>Enter Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for member in members%}
+                                        {%if member.active == True%}
+                                        <tr>
+                                            <td>{{member.name}}</td>
+                                            <td>Ksh <span class="contribution-details-amount">0</span></td>
+                                            <td style="display: none" id="member-id">{{member.id}}</td>
+                                            <td>
+                                                <input type="number" id="amount" name="amount" class="amount-input-wide" placeholder="0" value="0" />
+                                            </td>
+                                        </tr>
+                                        {%endif%}
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                                <button class="btn-primary-wide" id="update-contributions">
+                                    Update Contributions
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Contribution Records -->
+                        <div class="contribution-records-card">
+                            <h4 class="card-subtitle">Contribution Records</h4>
+                            <div class="table-responsive" id="contribution-records">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Member</th>
+                                            <th>Contribution</th>
+                                            <th>Amount</th>
+                                            <th>Balance</th>
+                                            <th>Fines</th>
+                                            <th class="admin">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals (keeping existing functionality) -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Pay Contribution</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="pay-contribution-alerts"></div>
+                <div class="mb-3">
+                    <label for="repayment-amount" class="form-label">Amount</label>
+                    <input type="number" class="form-control" id="repayment-amount">
+                </div>
+                <input type="hidden" value="" id="contribution-record-id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" style="background-color: #2291a5;" id="pay-modal-button">Pay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="fineContribution" tabindex="-1" aria-labelledby="fineContributionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="fineContributionLabel">Fine Contribution</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="fine-contribution-alerts"></div>
+                <select class="form-select" aria-label="Default select example" id="fine-type">
+                    <label for="fine-type">Fine Type</label>
+                    {%for type in fine_types%}
+                    <option value="{{type.id}}">{{type.name}}</option>
+                    {%endfor%}
+                </select>
+                <input type="hidden" value="" id="fine-contribution-record-id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" style="background-color: #2291a5;" id="fine-modal-button">Fine</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Contribution Modal -->
+<div class="modal fade" id="editContributionModal" tabindex="-1" aria-labelledby="editContributionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editContributionModalLabel">Edit Contribution Scheme</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-contribution-alerts"></div>
+                <form id="edit-contribution-form">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit-contribution-id" name="contribution_id">
+                    
+                    <div class="mb-3">
+                        <label for="edit-contribution-name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="edit-contribution-name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit-contribution-amount" class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="edit-contribution-amount" name="amount" min="1" step="0.01" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit-contribution-start-date" class="form-label">Start</label>
+                        <input type="date" class="form-control" id="edit-contribution-start-date" name="start_date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit-contribution-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit-contribution-description" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" style="background-color: #2191a5;" id="save-contribution-changes">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+// Pagination and contribution list management
+const contributionPagination = {
+    itemsPerPage: 5,
+    currentPage: 1,
+    contributions: [],
+    
+    init: function(contributions) {
+        this.contributions = contributions;
+        this.currentPage = 1;
+        this.renderContributions();
+        this.renderPagination();
+    },
+    
+    renderContributions: function() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        const pageContributions = this.contributions.slice(start, end);
+        
+        this.renderDesktopContributions(pageContributions);
+        this.renderMobileContributions(pageContributions);
+    },
+    
+    renderDesktopContributions: function(contributions) {
+        const container = $('#desktop-contributions-container');
+        let html = '';
+        
+        if (contributions.length === 0) {
+            html = '<div class="no-contributions"><p>No contributions found</p></div>';
+        } else {
+            contributions.forEach(contribution => {
+                const truncatedDescription = this.truncateText(contribution.description, 80);
+                const hasRecords = contribution.has_records || false;
+                const editButtonClass = hasRecords ? 'disabled' : '';
+                const editButtonTitle = hasRecords ? 'Cannot edit - scheme has records' : 'Edit contribution scheme';
+                
+                html += `
+                    <div class="contribution-item" data-contribution-name="${contribution.name}">
+                        <div class="contribution-content">
+                            <div class="contribution-name">
+                                <h4>${contribution.name}</h4>
+                                <p class="contribution-description">${truncatedDescription}</p>
+                            </div>
+                            <div class="contribution-amount">Ksh ${this.formatNumber(contribution.amount)}</div>
+                        </div>
+                        <div class="contribution-actions">
+                            <button class="edit-contribution-btn admin ${editButtonClass}" 
+                                    data-contribution-id="${contribution.id}"
+                                    title="${editButtonTitle}"
+                                    ${hasRecords ? 'disabled' : ''}>
+                                <i class='bx bx-edit'></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        container.html(html);
+    },
+    
+    renderMobileContributions: function(contributions) {
+        const container = $('#mobile-contributions-container');
+        let html = '';
+        
+        if (contributions.length === 0) {
+            html = '<div class="no-contributions"><i class="bx bx-inbox"></i><p>No contributions found</p></div>';
+        } else {
+            contributions.forEach(contribution => {
+                const truncatedDescription = this.truncateText(contribution.description, 60);
+                const hasRecords = contribution.has_records || false;
+                const editButtonClass = hasRecords ? 'disabled' : '';
+                const editButtonTitle = hasRecords ? 'Cannot edit - scheme has records' : 'Edit contribution scheme';
+                
+                html += `
+                    <div class="mobile-accordion-item" data-contribution-name="${contribution.name}">
+                        <div class="accordion-header" data-contribution-id="${contribution.id}">
+                            <div class="contribution-summary">
+                                <div class="contribution-info">
+                                    <div class="contribution-type">
+                                        <span class="type-label">Type</span>
+                                        <span class="type-value">${contribution.name}</span>
+                                        <div class="mobile-contribution-description">${truncatedDescription}</div>
+                                    </div>
+                                    <div class="contribution-due">
+                                        <span class="due-label">Start Date</span>
+                                        <span class="due-value">${this.formatDate(contribution.start_date)}</span>
+                                    </div>
+                                </div>
+                                <div class="contribution-amount">
+                                    <span class="amount-label">Target Amount</span>
+                                    <span class="amount-value">Ksh${this.formatNumber(contribution.amount)}</span>
+                                </div>
+                            </div>
+                            <div class="mobile-contribution-actions">
+                                <button class="mobile-edit-contribution-btn admin ${editButtonClass}" 
+                                        data-contribution-id="${contribution.id}"
+                                        title="${editButtonTitle}"
+                                        ${hasRecords ? 'disabled' : ''}>
+                                    <i class='bx bx-edit'></i>
+                                </button>
+                                <i class='bx bx-chevron-down accordion-toggle'></i>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-content">
+                            <div class="members-table-header" id="mobile-header-${contribution.id}">
+                                <span>Members Name</span>
+                                <span>Balance</span>
+                                <span>Enter amount</span>
+                            </div>
+                            <div class="members-list" id="members-list-${contribution.id}">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            <div id="mobile-contribution-feedback-${contribution.id}" class="alert" style="display: none; margin-top: 10px;"></div>
+                            ${!hasRecords ? `
+                            <button class="update-contribution-btn admin" data-contribution-id="${contribution.id}" id="mobile-update-btn-${contribution.id}">
+                                Update contribution
+                            </button>
+                            ` : ''}
+                            <!-- Mobile Contribution Records Section -->
+                            <div class="mobile-contribution-records" style="margin-top: 20px;">
+                                <h4 class="mobile-records-title">Contribution Records</h4>
+                                <div class="mobile-records-container" id="mobile-records-${contribution.id}">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        container.html(html);
+    },
+    
+    renderPagination: function() {
+        const totalPages = Math.ceil(this.contributions.length / this.itemsPerPage);
+        
+        if (totalPages <= 1) {
+            $('#desktop-pagination, #mobile-pagination').hide();
+            return;
+        }
+        
+        $('#desktop-pagination, #mobile-pagination').show();
+        
+        const paginationHtml = this.generatePaginationHtml(totalPages);
+        $('#desktop-pagination').html(paginationHtml);
+        $('#mobile-pagination').html(paginationHtml);
+    },
+    
+    generatePaginationHtml: function(totalPages) {
+        let html = '';
+        
+        // Previous button
+        html += `<button type="button" class="pagination-btn ${this.currentPage === 1 ? 'disabled' : ''}" data-page="${this.currentPage - 1}" aria-label="Previous page">
+                    <i class='bx bx-chevron-left'></i>
+                 </button>`;
+        
+        // Page numbers
+        const startPage = Math.max(1, this.currentPage - 2);
+        const endPage = Math.min(totalPages, this.currentPage + 2);
+        
+        if (startPage > 1) {
+            html += `<button type="button" class="pagination-btn" data-page="1" aria-label="Go to page 1">1</button>`;
+            if (startPage > 2) {
+                html += '<span class="pagination-info">...</span>';
+            }
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button type="button" class="pagination-btn ${i === this.currentPage ? 'active' : ''}" data-page="${i}" aria-label="Go to page ${i}">${i}</button>`;
+        }
+        
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += '<span class="pagination-info">...</span>';
+            }
+            html += `<button type="button" class="pagination-btn" data-page="${totalPages}" aria-label="Go to page ${totalPages}">${totalPages}</button>`;
+        }
+        
+        // Next button
+        html += `<button type="button" class="pagination-btn ${this.currentPage === totalPages ? 'disabled' : ''}" data-page="${this.currentPage + 1}" aria-label="Next page">
+                    <i class='bx bx-chevron-right'></i>
+                 </button>`;
+        
+        // Info
+        const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min(this.currentPage * this.itemsPerPage, this.contributions.length);
+        html += `<span class="pagination-info">${start}-${end} of ${this.contributions.length}</span>`;
+        
+        return html;
+    },
+    
+    goToPage: function(page) {
+        const totalPages = Math.ceil(this.contributions.length / this.itemsPerPage);
+        if (page < 1 || page > totalPages) return;
+        
+        this.currentPage = page;
+        this.renderContributions();
+        this.renderPagination();
+    },
+    
+    truncateText: function(text, maxLength) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength).trim() + '...';
+    },
+    
+    formatNumber: function(number) {
+        return new Intl.NumberFormat().format(number);
+    },
+    
+    formatDate: function(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+    }
+};
+
+// Pagination click handler
+$(document).on('click', '.pagination-btn:not(.disabled)', function() {
+    const page = parseInt($(this).data('page'));
+    if (!isNaN(page)) {
+        contributionPagination.goToPage(page);
+    }
+});
+
+// Edit contribution functionality
+// Function to get the value of a cookie by name
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const editContribution = {
+    openEditModal: function(contributionId) {
+        // Validate contribution ID
+        if (!contributionId || contributionId === 'undefined') {
+            alert('Invalid contribution selected. Please try again.');
+            return;
+        }
+        
+        // Get chama ID
+        const chamaId = localStorage.getItem("groupId");
+        if (!chamaId) {
+            alert('Error: No chama selected. Please refresh the page.');
+            return;
+        }
+        
+        // Show loading state
+        const loadingHtml = '<div class="text-center"><i class="bx bx-loader-alt bx-spin"></i> Loading...</div>';
+        
+        // Get contribution details
+        $.ajax({
+            url: `/chamas-bookeeping/get-contribution/${chamaId}/${contributionId}/`,
+            type: 'GET',
+            timeout: 10000, // 10 second timeout
+            success: function(response) {
+                if (response && response.status === 'success' && response.contribution) {
+                    const contribution = response.contribution;
+                    
+                    // Populate the form
+                    $('#edit-contribution-id').val(contribution.id || '');
+                    $('#edit-contribution-name').val(contribution.name || '');
+                    $('#edit-contribution-amount').val(contribution.amount || '');
+                    $('#edit-contribution-start-date').val(contribution.start_date || '');
+                    $('#edit-contribution-description').val(contribution.description || '');
+                    
+                    // Clear any previous alerts
+                    $('.edit-contribution-alerts').empty();
+                    
+                    // Show the modal
+                    $('#editContributionModal').modal('show');
+                } else {
+                    const errorMessage = response && response.message ? response.message : 'Unknown error occurred';
+                    alert('Failed to load contribution details: ' + errorMessage);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Edit modal error:', {xhr, status, error});
+                
+                let errorMessage = 'Failed to load contribution details. ';
+                
+                if (status === 'timeout') {
+                    errorMessage += 'The request timed out. Please check your connection and try again.';
+                } else if (xhr.status === 403) {
+                    errorMessage += 'You do not have permission to edit this contribution.';
+                } else if (xhr.status === 404) {
+                    errorMessage += 'Contribution not found.';
+                } else if (xhr.status === 500) {
+                    errorMessage += 'Server error occurred. Please try again later.';
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage += xhr.responseJSON.message;
+                } else {
+                    errorMessage += 'Please check your connection and try again.';
+                }
+                
+                alert(errorMessage);
+            }
+        });
+    },
+    
+    saveChanges: function() {
+        const contributionId = $('#edit-contribution-id').val();
+        const chamaId = localStorage.getItem("groupId");
+        
+        // Validate contribution ID
+        if (!contributionId || contributionId === 'undefined') {
+            $('.edit-contribution-alerts').html(`
+                <div class="alert alert-danger" role="alert">
+                    Invalid contribution ID. Please refresh and try again.
+                </div>
+            `);
+            return;
+        }
+        
+        // Validate chama ID
+        if (!chamaId) {
+            $('.edit-contribution-alerts').html(`
+                <div class="alert alert-danger" role="alert">
+                    Error: No chama selected. Please refresh the page.
+                </div>
+            `);
+            return;
+        }
+        
+        // Validate required fields
+        const name = $('#edit-contribution-name').val().trim();
+        const amount = $('#edit-contribution-amount').val().trim();
+        const startDate = $('#edit-contribution-start-date').val().trim();
+        
+        if (!name) {
+            $('.edit-contribution-alerts').html(`
+                <div class="alert alert-danger" role="alert">
+                    Contribution name is required.
+                </div>
+            `);
+            $('#edit-contribution-name').focus();
+            return;
+        }
+        
+        if (!amount) {
+            $('.edit-contribution-alerts').html(`
+                <div class="alert alert-danger" role="alert">
+                    Amount is required.
+                </div>
+            `);
+            $('#edit-contribution-amount').focus();
+            return;
+        }
+        
+        if (!startDate) {
+            $('.edit-contribution-alerts').html(`
+                <div class="alert alert-danger" role="alert">
+                    Start date is required.
+                </div>
+            `);
+            $('#edit-contribution-start-date').focus();
+            return;
+        }
+        
+        // Validate amount
+        const amountFloat = parseFloat(amount);
+        if (isNaN(amountFloat) || amountFloat <= 0) {
+            $('.edit-contribution-alerts').html(`
+                <div class="alert alert-danger" role="alert">
+                    Please enter a valid amount greater than zero.
+                </div>
+            `);
+            $('#edit-contribution-amount').focus();
+            return;
+        }
+        
+        // Show saving state
+        const saveButton = $('#save-contribution-changes');
+        const originalText = saveButton.text();
+        saveButton.prop('disabled', true).html('<i class="bx bx-loader-alt bx-spin"></i> Saving...');
+        
+        const formData = $('#edit-contribution-form').serialize();
+        
+        // Send update request
+        $.ajax({
+            url: `/chamas-bookeeping/update-contribution/${chamaId}/${contributionId}/`,
+            type: 'POST',
+            data: formData,
+            timeout: 15000, // 15 second timeout
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function(response) {
+                if (response && response.status === 'success') {
+                    $('.edit-contribution-alerts').html(`
+                        <div class="alert alert-success" role="alert">
+                            <i class="bx bx-check-circle"></i> ${response.message || 'Contribution updated successfully!'}
+                        </div>
+                    `);
+                    
+                    // Close modal after a short delay and refresh the page
+                    setTimeout(function() {
+                        $('#editContributionModal').modal('hide');
+                        location.reload();
+                    }, 1500);
+                } else {
+                    const errorMessage = response && response.message ? response.message : 'Update failed';
+                    $('.edit-contribution-alerts').html(`
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bx bx-error-circle"></i> ${errorMessage}
+                        </div>
+                    `);
+                    // Re-enable button
+                    saveButton.prop('disabled', false).text(originalText);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Save changes error:', {xhr, status, error});
+                
+                let errorMessage = 'Failed to update contribution. ';
+                
+                if (status === 'timeout') {
+                    errorMessage += 'The request timed out. Please try again.';
+                } else if (xhr.status === 400) {
+                    errorMessage = xhr.responseJSON && xhr.responseJSON.message ? 
+                        xhr.responseJSON.message : 'Invalid data provided.';
+                } else if (xhr.status === 403) {
+                    errorMessage += 'You do not have permission to edit this contribution.';
+                } else if (xhr.status === 404) {
+                    errorMessage += 'Contribution not found.';
+                } else if (xhr.status === 409) {
+                    errorMessage = xhr.responseJSON && xhr.responseJSON.message ? 
+                        xhr.responseJSON.message : 'Contribution name already exists.';
+                } else if (xhr.status === 500) {
+                    errorMessage += 'Server error occurred. Please try again later.';
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else {
+                    errorMessage += 'Please check your connection and try again.';
+                }
+                
+                $('.edit-contribution-alerts').html(`
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bx bx-error-circle"></i> ${errorMessage}
+                    </div>
+                `);
+                
+                // Re-enable button
+                saveButton.prop('disabled', false).text(originalText);
+            }
+        });
+    }
+};
+
+// Edit button click handlers
+$(document).on('click', '.edit-contribution-btn:not(.disabled)', function(e) {
+    e.stopPropagation();
+    const contributionId = $(this).data('contribution-id');
+    editContribution.openEditModal(contributionId);
+});
+
+$(document).on('click', '.mobile-edit-contribution-btn:not(.disabled)', function(e) {
+    e.stopPropagation();
+    const contributionId = $(this).data('contribution-id');
+    editContribution.openEditModal(contributionId);
+});
+
+// Save changes button
+$(document).on('click', '#save-contribution-changes', function() {
+    editContribution.saveChanges();
+});
+
+// Function to apply admin visibility rules to newly generated content
+function applyAdminVisibility() {
+    // Use the global function from base template for consistency
+    if (window.syncAdminVisibility) {
+        window.syncAdminVisibility();
+    } else {
+        // Fallback if base template function isn't available yet
+        var groupId = localStorage.getItem('groupId');
+        if (!groupId) return;
+        
+        var storageKey = "selectedView_" + groupId;
+        var savedView = localStorage.getItem(storageKey) || "member";
+        
+        // Apply the view based on the stored preference
+        if (savedView === "admin") {
+            $(".admin").show();
+            $(".member").hide();
+        } else {
+            $(".admin").hide();
+            $(".member").show();
+        }
+    }
+    
+    // Ensure proper layout after applying visibility - 
+    // force-hidden should still work even in admin mode
+    setTimeout(function() {
+        const contributionFormCard = $(".contribution-form-card");
+        const detailsGrid = $(".details-grid");
+        
+        if (contributionFormCard.hasClass('force-hidden')) {
+            detailsGrid.addClass('full-width');
+        } else if (contributionFormCard.hasClass('admin') && $("body").hasClass("user-is-admin")) {
+            // Only show form if in admin mode and form doesn't have records
+            detailsGrid.removeClass('full-width');
+        }
+    }, 100);
+}
+
+// Function to re-bind mobile accordion functionality
+function rebindMobileAccordion() {
+    // This function is no longer needed since we're using event delegation
+    // The accordion functionality will work automatically with the existing handlers
+}
+
+$(document).ready(function () {
+    // Initialize contributions pagination
+    const contributions = [
+        {% for contribution_data in contributions_with_status %}
+        {
+            id: {{ contribution_data.contribution.id }},
+            name: "{{ contribution_data.contribution.name|escapejs }}",
+            description: "{{ contribution_data.contribution.description|escapejs }}",
+            amount: {{ contribution_data.contribution.amount }},
+            start_date: "{{ contribution_data.contribution.start_date|date:'Y-m-d' }}",
+            has_records: {{ contribution_data.has_any_records|yesno:"true,false" }}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    contributionPagination.init(contributions);
+
+    // Mobile tab functionality
+    $('.tab-btn').click(function() {
+        const tabId = $(this).data('tab');
+        
+        // Update active tab
+        $('.tab-btn').removeClass('active');
+        $(this).addClass('active');
+        
+        // Update active content
+        $('.tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
+    // Restore the original accordion click handler using event delegation
+    $(document).on('click', '.mobile-accordion-item .accordion-header', function() {
+        const contributionId = $(this).data('contribution-id');
+        const contributionName = $(this).closest('.mobile-accordion-item').data('contribution-name');
+        const accordionContent = $(this).closest('.mobile-accordion-item').find('.accordion-content');
+        const toggleIcon = $(this).find('.accordion-toggle');
+        
+        // Load contribution details for desktop view
+        fetchAndRenderContributionDetails(contributionName);
+        
+        if (accordionContent.is(':visible')) {
+            accordionContent.slideUp();
+            toggleIcon.removeClass('bx-chevron-up').addClass('bx-chevron-down');
+        } else {
+            accordionContent.slideDown();
+            toggleIcon.removeClass('bx-chevron-down').addClass('bx-chevron-up');
+            loadMembersForMobile(contributionId);
+            loadMobileContributionRecords(contributionName);
+        }
+    });
+
+    // Desktop create form toggle
+    $('#desktop-create-toggle').click(function() {
+        $('#desktop-create-form').slideToggle();
+    });
+
+    // Ensure DOM is loaded before accessing elements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fixed mobile navigation functions with null checks
+        window.openNav = function() {
+            const sidenav = document.getElementById("mySidenav");
+            const overlay = document.querySelector(".mobile-overlay");
+            const body = document.body;
+            
+            if (sidenav) {
+                // Force display and visibility first
+                sidenav.style.display = "block";
+                sidenav.style.visibility = "visible";
+                sidenav.style.zIndex = "2000";
+                
+                // Add open class for additional styling
+                sidenav.classList.add("open");
+                
+                // Set width to trigger animation
+                sidenav.style.width = "280px";
+            } else {
+                console.error("Sidebar element #mySidenav not found");
+                return;
+            }
+            
+            if (overlay) {
+                overlay.style.display = "block";
+                overlay.style.visibility = "visible";
+                overlay.style.opacity = "1";
+                overlay.classList.add("active");
+            }
+            
+            // Add class to body to prevent scrolling
+            if (body) {
+                body.classList.add("sidebar-open");
+            }
+            
+            // Add touch/click event to close on outside click
+            setTimeout(() => {
+                document.addEventListener('click', outsideClickHandler);
+            }, 100);
+        };
+
+        window.closeNav = function() {
+            const sidenav = document.getElementById("mySidenav");
+            const overlay = document.querySelector(".mobile-overlay");
+            const body = document.body;
+            
+            if (sidenav) {
+                // Remove open class
+                sidenav.classList.remove("open");
+                
+                // Set width to 0 to trigger close animation
+                sidenav.style.width = "0";
+                
+                // Hide after animation completes
+                setTimeout(() => {
+                    sidenav.style.display = "none";
+                    sidenav.style.visibility = "hidden";
+                }, 300);
+            } else {
+                console.error("Sidebar element #mySidenav not found");
+                return;
+            }
+            
+            if (overlay) {
+                // Remove active class
+                overlay.classList.remove("active");
+                overlay.style.opacity = "0";
+                
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    overlay.style.visibility = "hidden";
+                }, 300);
+            }
+            
+            // Remove class from body
+            if (body) {
+                body.classList.remove("sidebar-open");
+            }
+            
+            // Remove event listener
+            document.removeEventListener('click', outsideClickHandler);
+        };
+
+        function outsideClickHandler(event) {
+            const sidenav = document.getElementById("mySidenav");
+            const menuBtn = document.querySelector('.menu-btn');
+            
+            // Check if click is outside sidebar and not on menu button
+            if (sidenav && menuBtn && !sidenav.contains(event.target) && !menuBtn.contains(event.target)) {
+                closeNav();
+            }
+        }
+    });
+
+         // Load members for mobile view
+     function loadMembersForMobile(contributionId) {
+         // Get members data that was already loaded in the page
+         const membersList = $('#members-list-' + contributionId);
+         let membersHtml = '';
+         
+         // Use the member data from the desktop table if available
+         $('#member-list tbody tr').each(function() {
+             const memberName = $(this).find('td:first').text();
+             const memberId = $(this).find('#member-id').text();
+             
+             if (memberName) {
+                 membersHtml += `
+                     <div class="member-row">
+                         <div class="member-info">
+                             <div class="member-avatar">
+                                 <img src="data:image/png;base64,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" alt="${memberName}">
+                             </div>
+                             <span class="member-name">${memberName}</span>
+                         </div>
+                         <div class="member-balance">Ksh${getContributionAmount(contributionId)}</div>
+                         <div class="member-input">
+                             <input type="number" placeholder="Enter amount" class="amount-input-mobile" data-member-id="${memberId}">
+                         </div>
+                     </div>
+                 `;
+             }
+         });
+         
+         if (!membersHtml) {
+             membersHtml = '<div class="no-members">No members found</div>';
+         }
+         
+         membersList.html(membersHtml);
+     }
+
+     // Helper function to get contribution amount by ID
+     function getContributionAmount(contributionId) {
+         let amount = '0';
+         
+         // Find the contribution amount from the accordion items
+         $('.mobile-accordion-item').each(function() {
+             const accordionHeader = $(this).find('.accordion-header');
+             const currentContributionId = accordionHeader.data('contribution-id');
+             
+             if (currentContributionId == contributionId) {
+                 const amountText = $(this).find('.amount-value').text();
+                 // Extract the numeric value from "Ksh1,000" format
+                 amount = amountText.replace('Ksh', '').replace(/,/g, '');
+                 return false; // Break the loop
+             }
+         });
+         
+         return amount || '0';
+     }
+
+     // Load contribution records for mobile view
+     function loadMobileContributionRecords(contributionName) {
+         const chamaId = localStorage.getItem("groupId");
+         const csrfToken = getCookie("csrftoken");
+
+         $.ajaxSetup({
+             headers: { "X-CSRFToken": csrfToken }
+         });
+
+         $.ajax({
+             url: `/chamas-bookeeping/retrieve-contribution/${chamaId}/`,
+             type: "POST",
+             data: JSON.stringify({ name: contributionName }),
+             contentType: "application/json",
+             success: function (response) {
+                 if (response.status !== "success") {
+                     return;
+                 }
+
+                 const contributionId = response.contribution.id;
+                 const recordsContainer = $(`#mobile-records-${contributionId}`);
+                 let recordsHtml = '';
+
+                 if (response.records.results && response.records.results.length > 0) {
+                     response.records.results.forEach(record => {
+                         const date = new Date(record.date_created).toLocaleDateString();
+                         const paid = parseFloat(record.amount_paid).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                         const balance = parseFloat(record.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                         const hasBalance = parseFloat(record.balance) > 0;
+
+                         const fineCount = record.fine_count || 0;
+                         
+                         recordsHtml += `
+                             <div class="mobile-record-card" data-record-id="${record.id}">
+                                 <div class="mobile-record-header">
+                                     <div class="mobile-record-member">${record.member}</div>
+                                     <div class="mobile-record-date">${date}</div>
+                                 </div>
+                                 <div class="mobile-record-details">
+                                     <div class="mobile-record-row">
+                                         <span class="mobile-record-label">Amount Paid:</span>
+                                         <span class="mobile-record-value">Ksh ${paid}</span>
+                                     </div>
+                                     <div class="mobile-record-row">
+                                         <span class="mobile-record-label">Balance:</span>
+                                         <span class="mobile-record-value">Ksh ${balance}</span>
+                                     </div>`;
+                         
+                         // Add fine count to mobile view
+                         if (fineCount > 0) {
+                             recordsHtml += `
+                                     <div class="mobile-record-row">
+                                         <span class="mobile-record-label">Fines:</span>
+                                         <span class="mobile-record-value">
+                                             <span class="badge bg-warning text-dark">
+                                                 <i class='bx bx-error-circle'></i> ${fineCount} fine${fineCount > 1 ? 's' : ''}
+                                             </span>
+                                         </span>
+                                     </div>`;
+                         }
+                         
+                         recordsHtml += `</div>`;
+                         
+                         if (hasBalance) {
+                             recordsHtml += `
+                                 <div class="mobile-record-actions admin">
+                                     <button class="mobile-fine-btn admin" data-bs-toggle="modal" data-bs-target="#fineContribution" data-record-id="${record.id}">
+                                         <i class='bx bx-error-circle'></i> Fine
+                                     </button>
+                                     <button class="mobile-pay-btn admin" data-bs-toggle="modal" data-bs-target="#exampleModal" data-record-id="${record.id}">
+                                         <i class='bx bx-money-withdraw'></i> Pay
+                                     </button>
+                                 </div>`;
+                         } else {
+                             recordsHtml += `
+                                 <div class="mobile-record-status">
+                                     <span class="mobile-paid-badge">
+                                         <i class='bx bx-check-circle'></i> Paid
+                                     </span>
+                                 </div>`;
+                         }
+                         
+                         recordsHtml += `</div>`;
+                     });
+                 } else {
+                     recordsHtml = '<div class="no-mobile-records">No contribution records found</div>';
+                 }
+
+                                 recordsContainer.html(recordsHtml);
+                
+                // Show/hide mobile update form based on first round records status
+                const hasFirstRound = response.has_first_round_records;
+                const membersList = $(`#members-list-${contributionId}`);
+                const mobileHeader = $(`#mobile-header-${contributionId}`);
+                
+                if (hasFirstRound) {
+                    membersList.hide();
+                    mobileHeader.hide();
+                } else {
+                    membersList.show();
+                    mobileHeader.show();
+                }
+                
+                // Apply admin visibility to newly generated mobile content
+                applyAdminVisibility();
+            },
+            error: function () {
+                console.error("Failed to load contribution records for mobile view");
+            }
+         });
+     }
+
+    // Existing JavaScript functionality (keeping all original functions)
+    function submitContributionForm() {
+        // Validate amount field
+        const amount = $("#amount").val();
+        
+        if (!amount || amount <= 0) {
+            $(".create-contribution-alert-hub").html(`
+                <div class="alert alert-danger" role="alert">
+                    Please enter a valid amount.
+                </div>
+            `);
+            return;
+        }
+        
+        var formData = $("#create-contribution-form").serialize();
+        var chama_id = localStorage.getItem("groupId");
+
+        if (!chama_id) {
+            console.error("Invalid chama_id");
+            return;
+        }
+
+        var csrfToken = getCookie("csrftoken");
+        if (!csrfToken) {
+            console.error("CSRF token not found");
+            return;
+        }
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": csrfToken }
+        });
+
+        $.ajax({
+            url: `/chamas-bookeeping/create-contribution/${chama_id}/`,
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                if (response.status == "success") {
+                    $(".create-contribution-alert-hub").html(`
+                        <div class="alert alert-success" role="alert">
+                            ${response.message}
+                        </div>
+                    `);
+                    $("#create-contribution-form")[0].reset();
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    $(".create-contribution-alert-hub").html(`
+                        <div class="alert alert-danger" role="alert">
+                            ${response.message}
+                        </div>
+                    `);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                $(".create-contribution-alert-hub").html(`
+                    <div class="alert alert-danger" role="alert">
+                        An error occurred. Please try again.
+                    </div>
+                `);
+            }
+        });
+    }
+
+    // Mobile create contribution
+    $("#mobile-create-contribution-button").click(function () {
+        // Validate amount field
+        const amount = $("#mobile-target-amount").val();
+        
+        if (!amount || amount <= 0) {
+            $("#mobile-alert-div").html(`
+                <div class="alert alert-danger" role="alert">
+                    Please enter a valid amount.
+                </div>
+            `).show();
+            return;
+        }
+        
+        var formData = $("#mobile-create-contribution-form").serialize();
+        var chama_id = localStorage.getItem("groupId");
+
+        if (!chama_id) {
+            console.error("Invalid chama_id");
+            return;
+        }
+
+        var csrfToken = getCookie("csrftoken");
+        if (!csrfToken) {
+            console.error("CSRF token not found");
+            return;
+        }
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": csrfToken }
+        });
+
+        $.ajax({
+            url: `/chamas-bookeeping/create-contribution/${chama_id}/`,
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                if (response.status == "success") {
+                    alert("Contribution created successfully!");
+                    $("#mobile-create-contribution-form")[0].reset();
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    });
+
+    $("#create-contribution-button").click(submitContributionForm);
+
+    // Function to handle click on a contribution item
+    function fetchAndRenderContributionDetails(contributionName) {
+        const chamaId = localStorage.getItem("groupId");
+        const csrfToken = getCookie("csrftoken");
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": csrfToken }
+        });
+
+        $.ajax({
+            url: `/chamas-bookeeping/retrieve-contribution/${chamaId}/`,
+            type: "POST",
+            data: JSON.stringify({ name: contributionName }),
+            contentType: "application/json",
+            success: function (response) {
+                if (response.status !== "success") {
+                    alert("Failed to retrieve contribution details. Please try again.");
+                    return;
+                }
+
+                $("#contribution-details-name").text(response.contribution.name);
+                $("#contribution-id").text(response.contribution.id);
+                $(".contribution-details-amount").text(response.contribution.amount);
+
+                // Show/hide the contribution form based on first round records status
+                const hasFirstRound = response.has_first_round_records;
+                const contributionFormCard = $(".contribution-form-card");
+                const detailsGrid = $(".details-grid");
+                
+                if (hasFirstRound) {
+                    contributionFormCard.addClass('force-hidden');
+                    detailsGrid.addClass('full-width');
+                } else {
+                    contributionFormCard.removeClass('force-hidden');
+                    // Keep grid two-column by default; no forced full-width here
+                    detailsGrid.removeClass('full-width');
+                }
+
+                const tbody = $("#contribution-records tbody");
+                tbody.empty();
+
+                const hasAnyRecords = response.records && response.records.results && response.records.results.length > 0;
+                const recordsCard = $(".contribution-records-card");
+                const detailsGridContainer = $(".details-grid");
+                if (!hasAnyRecords) {
+                    // No records: use single column to avoid whitespace
+                    detailsGridContainer.addClass('full-width');
+                } else {
+                    detailsGridContainer.removeClass('full-width');
+                }
+
+                response.records.results.forEach(record => {
+                    const date = new Date(record.date_created).toLocaleDateString();
+                    const member = record.member;
+                    const contrib = record.contribution;
+                    const paid = parseFloat(record.amount_paid).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const bal = parseFloat(record.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const fineCount = record.fine_count || 0;
+
+                    // Check if this record has a balance greater than 0
+                    const hasBalance = parseFloat(record.balance) > 0;
+                    
+                    let rowHtml = `
+                        <tr data-record-id="${record.id}" id="record-id">
+                            <td>${date}</td>
+                            <td>${member}</td>
+                            <td>${contrib}</td>
+                            <td>ksh ${paid}</td>
+                            <td>ksh ${bal}</td>
+                            <td>`;
+                    
+                    // Display fine count with appropriate styling
+                    if (fineCount > 0) {
+                        rowHtml += `<span class="badge bg-warning text-dark">
+                            <i class='bx bx-error-circle'></i> ${fineCount} fine${fineCount > 1 ? 's' : ''}
+                        </span>`;
+                    } else {
+                        rowHtml += `<span class="text-muted">-</span>`;
+                    }
+                    
+                    rowHtml += `</td>
+                            <td class="admin">`;
+                    
+                    // Only show buttons if there's a balance
+                    if (hasBalance) {
+                        rowHtml += `
+                            <div class="action-buttons d-flex justify-content-center align-items-center admin">
+                                <button type="button" class="btn btn-sm btn-outline-danger table-fine-button me-2 admin" 
+                                        data-bs-toggle="modal" data-bs-target="#fineContribution"
+                                        title="Apply fine for late payment">
+                                    <i class='bx bx-error-circle'></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-success table-pay-button admin" 
+                                        data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                        title="Record payment for this contribution">
+                                    <i class='bx bx-money-withdraw'></i>
+                                </button>
+                            </div>`;
+                    } else {
+                        rowHtml += `<span class="badge bg-success text-white">
+                            <i class='bx bx-check-circle'></i> Paid
+                        </span>`;
+                    }
+                    
+                    rowHtml += `
+                            </td>
+                        </tr>`;
+
+                    tbody.append(rowHtml);
+                });
+                
+                // Apply admin visibility to newly generated content
+                applyAdminVisibility();
+            },
+            error: function () {
+                alert("Failed to retrieve contribution details. Please try again.");
+            }
+        });
+    }
+
+         // Click handlers for contribution items
+     $(document).on('click', '.contribution-item', function(e) {
+         // Don't trigger if clicking on edit button
+         if ($(e.target).closest('.edit-contribution-btn, .contribution-actions').length > 0) {
+             return;
+         }
+         
+         const contributionName = $(this).data('contribution-name') || $(this).find('#contribution-name').text();
+         fetchAndRenderContributionDetails(contributionName);
+         
+         // Highlight selected item
+         $('.contribution-item').removeClass('selected');
+         $(this).addClass('selected');
+     });
+
+     // Mobile update contribution button
+     $(document).on('click', '.mobile-accordion-item .update-contribution-btn', function(e) {
+         if (!this) return; // Button may not exist if not rendered
+         e.stopPropagation();
+         const contributionId = $(this).data('contribution-id');
+         const chamaId = localStorage.getItem("groupId");
+         const csrfToken = getCookie("csrftoken");
+
+         if (!contributionId) {
+             alert("Please select a contribution first.");
+             return;
+         }
+
+         const contributionData = [];
+         $(this).closest('.accordion-content').find('.member-row').each(function () {
+             const memberIdInput = $(this).find('.amount-input-mobile');
+             const memberId = memberIdInput.data('member-id');
+             var amount = memberIdInput.val();
+
+             console.log("amount:", amount);
+
+             // Convert empty values or invalid values to 0
+             if (!amount || amount === '' || isNaN(amount) || parseFloat(amount) < 0) {
+                 amount = 0;
+             } else {
+                 amount = parseFloat(amount);
+             }
+
+             // Include all members in the contribution data (even with 0 amounts)
+             contributionData.push({
+                 member_id: memberId,
+                 amount: amount
+             });
+         });
+
+         if (contributionData.length === 0) {
+             alert("No members found to process contributions.");
+             return;
+         }
+
+         $.ajaxSetup({
+             headers: { "X-CSRFToken": csrfToken }
+         });
+
+         $.ajax({
+             url: `/chamas-bookeeping/create-contribution-record/${chamaId}/`,
+             type: "POST",
+             data: JSON.stringify({
+                 contribution_id: contributionId,
+                 contributions: contributionData
+             }),
+             contentType: "application/json",
+             success: function (response) {
+                 const feedbackDiv = $(`#mobile-contribution-feedback-${contributionId}`);
+                 if (response.status === "success") {
+                     // Show success message in mobile feedback div
+                     if (feedbackDiv.length) {
+                         feedbackDiv.removeClass('alert-danger').addClass('alert-success');
+                         feedbackDiv.html(response.message || "Contributions updated successfully!");
+                         feedbackDiv.show();
+                     } else {
+                         alert("Contributions updated successfully!");
+                     }
+                     // Clear input fields
+                     $(this).closest('.accordion-content').find('.amount-input-mobile').val("");
+                     
+                     // Refresh mobile records
+                     const contributionName = $(this).closest('.mobile-accordion-item').data('contribution-name');
+                     if (contributionName) {
+                         setTimeout(() => {
+                             loadMobileContributionRecords(contributionName);
+                         }, 1000);
+                     }
+                 } else {
+                     // Show error message in mobile feedback div
+                     if (feedbackDiv.length) {
+                         feedbackDiv.removeClass('alert-success').addClass('alert-danger');
+                         feedbackDiv.html(response.message || "Failed to update contributions");
+                         feedbackDiv.show();
+                     } else {
+                         alert(response.message);
+                     }
+                 }
+             },
+             error: function () {
+                 const feedbackDiv = $(`#mobile-contribution-feedback-${contributionId}`);
+                 if (feedbackDiv.length) {
+                     feedbackDiv.removeClass('alert-success').addClass('alert-danger');
+                     feedbackDiv.html("Failed to update contributions. Please try again.");
+                     feedbackDiv.show();
+                 } else {
+                     alert("Failed to update contributions. Please try again.");
+                 }
+             }
+         });
+     });
+
+
+
+    // Update contributions functionality
+    $("#update-contributions").click(function () {
+        const contributionId = $("#contribution-id").text();
+        const chamaId = localStorage.getItem("groupId");
+        const csrfToken = getCookie("csrftoken");
+
+        if (!contributionId) {
+            alert("Please select a contribution first.");
+            return;
+        }
+
+        const contributionData = [];
+        $("#member-list tbody tr").each(function () {
+            const memberId = $(this).find("#member-id").text();
+            var amount = $(this).find("input[name='amount']").val();
+
+            console.log("amount:", amount);
+
+            // Convert empty values or invalid values to 0
+            if (!amount || amount === '' || isNaN(amount) || parseFloat(amount) < 0) {
+                amount = 0;
+            } else {
+                amount = parseFloat(amount);
+            }
+            
+            // Include all members in the contribution data (even with 0 amounts)
+            contributionData.push({
+                member_id: memberId,
+                amount: amount
+            });
+        });
+
+        if (contributionData.length === 0) {
+            alert("No members found to process contributions.");
+            return;
+        }
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": csrfToken }
+        });
+
+        $.ajax({
+            url: `/chamas-bookeeping/create-contribution-record/${chamaId}/`,
+            type: "POST",
+            data: JSON.stringify({
+                contribution_id: contributionId,
+                contributions: contributionData
+            }),
+            contentType: "application/json",
+            success: function (response) {
+                if (response.status === "success") {
+                    $(".contribution-details-alert-hub").html(`
+                        <div class="alert alert-success" role="alert">
+                            ${response.message}
+                        </div>
+                    `);
+                    // Clear input fields
+                    $("#member-list tbody input").val("");
+                    // Show success message briefly
+                    setTimeout(() => {
+                        $(".contribution-details-alert-hub").empty();
+                    }, 5000);
+                    // Refresh contribution details
+                    fetchAndRenderContributionDetails($("#contribution-details-name").text());
+                } else {
+                    $(".contribution-details-alert-hub").html(`
+                        <div class="alert alert-danger" role="alert">
+                            ${response.message}
+                        </div>
+                    `);
+                }
+            },
+            error: function () {
+                $(".contribution-details-alert-hub").html(`
+                    <div class="alert alert-danger" role="alert">
+                        Failed to update contributions. Please try again.
+                    </div>
+                `);
+            }
+        });
+    });
+
+    // Modal functionality for payments and fines (desktop)
+    $(document).on('click', '.table-pay-button', function() {
+        const recordId = $(this).closest('tr').data('record-id');
+        $('#contribution-record-id').val(recordId);
+    });
+
+    $(document).on('click', '.table-fine-button', function() {
+        const recordId = $(this).closest('tr').data('record-id');
+        $('#fine-contribution-record-id').val(recordId);
+    });
+
+    // Modal functionality for payments and fines (mobile)
+    $(document).on('click', '.mobile-pay-btn', function() {
+        const recordId = $(this).data('record-id');
+        $('#contribution-record-id').val(recordId);
+    });
+
+    $(document).on('click', '.mobile-fine-btn', function() {
+        const recordId = $(this).data('record-id');
+        $('#fine-contribution-record-id').val(recordId);
+    });
+
+    $('#pay-modal-button').click(function() {
+        const amount = $('#repayment-amount').val();
+        const recordId = $('#contribution-record-id').val();
+        const csrfToken = getCookie("csrftoken");
+
+        if (!amount || amount <= 0) {
+            alert("Please enter a valid amount.");
+            return;
+        }
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": csrfToken }
+        });
+
+        $.ajax({
+            url: `/chamas-bookeeping/pay-contribution/${recordId}/`,
+            type: "POST",
+            data: JSON.stringify({ amount: amount }),
+            contentType: "application/json",
+            success: function(response) {
+                if (response.status === "success") {
+                    $('#exampleModal').modal('hide');
+                    $('.pay-contribution-alerts').empty(); // Clear alerts
+                    $('#repayment-amount').val(''); // Clear amount input
+                    alert("Payment recorded successfully!");
+                    fetchAndRenderContributionDetails($("#contribution-details-name").text());
+                    
+                    // Refresh mobile records if currently viewing mobile
+                    const currentContributionName = $("#contribution-details-name").text();
+                    if (currentContributionName && currentContributionName !== "Select a contribution") {
+                        loadMobileContributionRecords(currentContributionName);
+                    }
+                } else {
+                    $('.pay-contribution-alerts').html(`
+                        <div class="alert alert-danger" role="alert">
+                            ${response.message}
+                        </div>
+                    `);
+                }
+            },
+            error: function() {
+                $('.pay-contribution-alerts').html(`
+                    <div class="alert alert-danger" role="alert">
+                        Failed to process payment. Please try again.
+                    </div>
+                `);
+            }
+        });
+    });
+
+         $('#fine-modal-button').click(function() {
+         const fineType = $('#fine-type').val();
+         const recordId = $('#fine-contribution-record-id').val();
+         const csrfToken = getCookie("csrftoken");
+
+         if (!fineType) {
+             alert("Please select a fine type.");
+             return;
+         }
+
+         $.ajaxSetup({
+             headers: { "X-CSRFToken": csrfToken }
+         });
+
+         $.ajax({
+             url: `/chamas-bookeeping/fine-contribution/${recordId}/`,
+             type: "POST",
+             data: JSON.stringify({ fine_type_id: fineType }),
+             contentType: "application/json",
+             success: function(response) {
+                 if (response.status === "success") {
+                     $('#fineContribution').modal('hide');
+                     $('.fine-contribution-alerts').empty(); // Clear alerts
+                     alert("Fine applied successfully!");
+                     fetchAndRenderContributionDetails($("#contribution-details-name").text());
+                     
+                     // Refresh mobile records if currently viewing mobile
+                     const currentContributionName = $("#contribution-details-name").text();
+                     if (currentContributionName && currentContributionName !== "Select a contribution") {
+                         loadMobileContributionRecords(currentContributionName);
+                     }
+                 } else {
+                     $('.fine-contribution-alerts').html(`
+                         <div class="alert alert-danger" role="alert">
+                             ${response.message}
+                         </div>
+                     `);
+                 }
+             },
+             error: function() {
+                 $('.fine-contribution-alerts').html(`
+                     <div class="alert alert-danger" role="alert">
+                         Failed to apply fine. Please try again.
+                     </div>
+                 `);
+             }
+         });
+     });
+
+     // Apply admin visibility rules on initial page load with a delay
+    // to ensure the base template admin system has initialized
+    setTimeout(function() {
+        applyAdminVisibility();
+        
+        // Also ensure proper layout on initial load
+        const contributionFormCard = $(".contribution-form-card");
+        const detailsGrid = $(".details-grid");
+        if (contributionFormCard.hasClass('force-hidden')) {
+            detailsGrid.addClass('full-width');
+        } else {
+            detailsGrid.removeClass('full-width');
+        }
+        
+        // Auto-load first contribution details after admin visibility is set
+        setTimeout(function() {
+            var firstContributionItem = $(".contribution-item").first();
+            if (firstContributionItem.length > 0) {
+                var firstContributionName = firstContributionItem.data('contribution-name');
+                if (firstContributionName) {
+                    fetchAndRenderContributionDetails(firstContributionName);
+                    firstContributionItem.addClass('selected');
+                }
+            }
+        }, 100);
+    }, 1000);
+ });
+</script>
+{%endblock%}

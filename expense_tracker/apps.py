@@ -1,0 +1,13 @@
+from django.apps import AppConfig
+
+
+class ExpenseTrackerConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'expense_tracker'
+    verbose_name = 'Expense Tracker'
+    
+    def ready(self):
+        """
+        Import signals when the app is ready
+        """
+        import expense_tracker.signals

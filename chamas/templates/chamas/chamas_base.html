@@ -1,0 +1,924 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+    href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+    rel="stylesheet"
+  />
+    <link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+    <link rel="stylesheet" href="{%static 'chamas/style.css'%}" />
+    <link rel="stylesheet" href="{%static 'chamas/chamas-base.css'%}" />
+    <!-- Header styling CSS -->
+    <link rel="stylesheet" href="{% static 'css/feather.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app-light.css' %}" id="lightTheme">
+    <link rel="stylesheet" href="{% static 'css/style-test.css' %}">
+    
+<style rel="stylesheet">
+  
+    /* full‐screen overlay */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* when visible */
+.modal.show {
+  display: flex;
+}
+
+/* white box */
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* the close “×” */
+.close-btn {
+  position: absolute;
+  top: 0.5rem; right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* optional icon styling */
+.modal-icon img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+
+</style>
+    {%block head%} {%endblock%}
+    <title>Chamas</title>
+  </head>
+  <body>
+    <!-- Main Layout Container -->
+    <div class="app-layout">
+      
+      <!-- Mobile Sidebar (Hidden by default, shown on mobile when menu is clicked) -->
+      <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="logo_details">
+          <img src="{%static 'chamas/logo.png'%}" alt="Logo" />
+        </div>
+        <ul class="nav-list">
+          <li>
+            <a href="{% url 'user_dashboard:home' %}">
+              <i class='bx bx-arrow-back'></i>
+              <span class="link_name">Back to Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'chamas:my-chamas' %}">
+              <i class="fa-solid fa-gauge"></i>
+              <span class="link_name">My Chamas</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="fa-solid fa-group-arrows-rotate"></i>
+              <span class="link_name">Merry-go-round chama</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="bookeeping-window">
+              <i class="fa-solid fa-clipboard"></i>
+              <span class="link_name">Book keeping</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="fa-solid fa-building-columns"></i>
+              <span class="link_name">Table Banking</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Desktop Sidebar (Always visible on desktop) -->
+      <aside class="desktop-sidebar">
+        <div class="sidebar-header">
+          <div class="logo_details">
+            <img src="{%static 'chamas/logo.png'%}" alt="Logo" />
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <ul class="nav-list">
+            <li>
+              <a href="{% url 'user_dashboard:home' %}">
+                <i class='bx bx-arrow-back'></i>
+                <span class="link_name">Back to Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'expense_tracker:dashboard' %}" class="app-card text-decoration-none">
+                <div class="app-icon-box icon-expense">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="link_name">Expense Tracker</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'merry_go_round:dashboard' %}" class="app-card text-decoration-none">
+                  <div class="app-icon-box icon-merry">
+                    <i class="fas fa-users"></i>
+                      </div>
+                <span class="link_name">Merry-go-round chama</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'goals:wekeza_dashboard' %}" class="app-card text-decoration-none">
+                  <div class="app-icon-box icon-wekeza">
+                      <i class="fas fa-bullseye"></i>
+                  </div>
+                <span class="link_name">Wekeza Goals</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa-solid fa-building-columns"></i>
+                <span class="link_name">Table Banking</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        
+        <!-- Mobile Header -->
+        <div class="page_header pt-3">
+          <div class="container">
+            <nav class="page_nav mob_nav show_on_mobile">
+              <div class="brand">
+                <a href="#">
+                  <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                </a>
+              </div>
+              <ul class="nav-list">
+                <li class="" data-bs-toggle="modal" data-bs-target=".modal-notif">
+                  <img src="{% static 'images/Notifications.png' %}" alt="">
+                </li>
+                &nbsp;&nbsp;
+                <li class="">
+                  <button class="btn navbar-toggler text-muted" type="button" onclick="openNav()">
+                    <img src="{% static 'images/menu.png' %}" class="avatar-img rounded-circle" alt="">
+                  </button>
+                </li>
+              </ul>
+            </nav>
+                  </div>
+      </div>
+
+      <!-- Mobile Chama Info & Toggle Row (Mobile Only) -->
+      <div class="mobile-chama-header show_on_mobile">
+        <div class="container">
+          <div class="mobile-chama-row">
+            <div class="mobile-chama-info">
+              {% if group and group.name %}
+                <h3 class="mobile-chama-name">{{ group.name }}</h3>
+              {% elif chama and chama.name %}
+                <h3 class="mobile-chama-name">{{ chama.name }}</h3>
+              {% else %}
+                <h3 class="mobile-chama-name">Chama Dashboard</h3>
+              {% endif %}
+            </div>
+            <!-- <div class="mobile-toggle-container">
+              <div class="form-check form-switch mobile-view-switch">
+                <input class="form-check-input" type="checkbox" id="viewToggle">
+                <label class="form-check-label" for="viewToggle">
+                  <span class="switch-label-member">Member</span>
+                  <span class="switch-label-admin" style="display: none;">Admin</span>
+                </label>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+
+        <!-- Desktop Header -->
+         <nav class="topnav navbar navbar-light page_header hide_on_mobile">
+           <div style="margin-left: auto;"></div> <!-- Spacer to push nav items to the right -->
+
+          <ul class="nav">
+            <li class="nav-item">
+              <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+                <i class="fe fe-sun fe-16"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-muted my-2" href="./#" data-bs-toggle="modal" data-bs-target=".modal-shortcut">
+                <span class="fe fe-grid fe-16"></span>
+              </a>
+            </li>
+            <li class="nav-item nav-notif">
+              <a class="nav-link text-muted my-2" href="./#" data-bs-toggle="modal" data-bs-target=".modal-notif">
+                <span class="fe fe-bell fe-16"></span>
+                <span class="dot dot-md bg-success"></span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink"
+                 role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="avatar avatar-sm">
+                  {% if request.user.profile.picture %}
+                    <img src="{{ request.user.profile.picture.url }}" alt="img" class="avatar-img rounded-circle">
+                  {% else %}
+                    <img src="{% static 'assets/avatars/face-1.png' %}" alt="img"
+                         class="avatar-img rounded-circle">
+                  {% endif %}
+                </span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'user_dashboard:settings' %}">Settings</a>
+                <div class="dropdown-item">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="viewToggleDesktop">
+                    <label class="form-check-label" for="viewToggleDesktop">
+                      <span class="switch-label-member">Member</span>
+                      <span class="switch-label-admin" style="display: none;">Admin</span>
+                    </label>
+                  </div>
+                </div>
+                <a class="dropdown-item" href="{% url 'Logout' %}">Logout</a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="page-content">
+          {%block body%}
+          {%endblock%}
+        </div>
+      </main>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeNav()"></div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="list-group list-group-flush my-n3">
+              <div class="list-group-item bg-transparent">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <small><strong>No notifications</strong></small>
+                    <div class="my-0 text-muted small">You have no new notifications.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-block" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body px-5">
+            <div class="row align-items-center">
+              <div class="col-6 text-center">
+                <div class="squircle bg-success justify-content-center">
+                  <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Control area</p>
+              </div>
+              <div class="col-6 text-center">
+                <div class="squircle bg-primary justify-content-center">
+                  <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Activity</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--Modals-->
+    <!--Add members to group modal-->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1
+              class="modal-title fs-5"
+              id="exampleModalLabel"
+              style="color: #2291a5"
+            >
+              Add Member to group
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form action="">
+              <div class="mobile-input">
+                <label for="mobile">Name</label>
+                <input
+                  type="text"
+                  name="mobile"
+                  placeholder="Eg John Doe"
+                  class="form-control"
+                />
+              </div>
+              <div class="mobile-input">
+                <label for="mobile">Mobile</label>
+                <input
+                  type="text"
+                  name="mobile"
+                  placeholder="Eg +2547XXXXXXXX"
+                  class="form-control"
+                />
+              </div>
+              <div class="mobile-input">
+                <label for="mobile">email</label>
+                <input
+                  type="email"
+                  name="mobile"
+                  placeholder="Eg example@email.com"
+                  class="form-control"
+                />
+              </div>
+              <div class="mobile-input">
+                <label for="mobile">ID Number</label>
+                <input
+                  type="text"
+                  name="mobile"
+                  placeholder="Eg 12XXXXXXXX"
+                  class="form-control"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">
+              Save changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/d90233e428.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <script>
+      /* Enhanced Mobile Navigation Functions */
+      function openNav() {
+          const sidenav = document.getElementById("mySidenav");
+          const overlay = document.querySelector(".mobile-overlay");
+          const body = document.body;
+          
+          console.log("Opening navigation sidebar"); // Debug log
+          
+          if (sidenav) {
+              sidenav.style.width = "280px";
+              sidenav.style.display = "block";
+              console.log("Sidebar width set to 280px"); // Debug log
+          }
+          
+          if (overlay) {
+              overlay.style.display = "block";
+              overlay.style.opacity = "1";
+              console.log("Overlay displayed"); // Debug log
+          }
+          
+          // Add class to body to prevent scrolling
+          body.classList.add("sidebar-open");
+          
+          // Add touch/click event to close on outside click
+          setTimeout(() => {
+              document.addEventListener('click', outsideClickHandler);
+          }, 100);
+      }
+
+      function closeNav() {
+          const sidenav = document.getElementById("mySidenav");
+          const overlay = document.querySelector(".mobile-overlay");
+          const body = document.body;
+          
+          console.log("Closing navigation sidebar"); // Debug log
+          
+          if (sidenav) {
+              sidenav.style.width = "0";
+              setTimeout(() => {
+                  sidenav.style.display = "none";
+              }, 300);
+              console.log("Sidebar width set to 0"); // Debug log
+          }
+          
+          if (overlay) {
+              overlay.style.opacity = "0";
+              setTimeout(() => {
+                  overlay.style.display = "none";
+              }, 300);
+              console.log("Overlay hidden"); // Debug log
+          }
+          
+          // Remove class from body
+          body.classList.remove("sidebar-open");
+          
+          // Remove event listener
+          document.removeEventListener('click', outsideClickHandler);
+      }
+
+      function outsideClickHandler(event) {
+          const sidenav = document.getElementById("mySidenav");
+          const menuBtn = document.querySelector('.menu-btn');
+          
+          // Check if click is outside sidebar and not on menu button
+          if (!sidenav.contains(event.target) && !menuBtn.contains(event.target)) {
+              closeNav();
+          }
+      }
+
+      // Initialize mobile navigation on page load
+      document.addEventListener('DOMContentLoaded', function() {
+          // Ensure mobile overlay exists
+          let overlay = document.querySelector('.mobile-overlay');
+          if (!overlay) {
+              overlay = document.createElement('div');
+              overlay.className = 'mobile-overlay';
+              document.body.appendChild(overlay);
+          }
+          
+          // Close sidebar on window resize if moving to desktop
+          window.addEventListener('resize', function() {
+              if (window.innerWidth > 768) {
+                  closeNav();
+              }
+          });
+      });
+
+      $(document).ready(function () {
+        // Book keeping window functionality
+        $(".bookeeping-window").click(function(e) {
+          e.preventDefault();
+          // Add your book keeping functionality here
+          console.log("Book keeping clicked");
+        });
+      });
+    </script>
+
+<!-- Mobile Footer -->
+<style>
+@media screen and (min-width: 992px) {
+    .mbl_footer { display: none !important; }
+}
+@media screen and (max-width: 991px) {
+    body { padding-bottom: 80px !important; }
+    .mbl_footer { display: block !important; }
+}
+</style>
+<footer class="mbl_footer" style="background: #2291A5 !important; background-color: #2291A5 !important; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 10px 0; display: block;">
+    <div class="container">
+        <div class="footer_row d-flex flex-row justify-content-between align-items-center" style="padding: 0 15px;">
+            <a href="{% url 'user_dashboard:home' %}" class="footer_button btn" style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;">
+                <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="" style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+                <p style="margin: 0; color: #fff; font-size: 12px; text-align: center;">Home</p>
+            </a>
+            <a href="#" class="footer_button btn" id="featuresBtn" style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;  border-radius: 8px;">
+                <img src="{% static 'images/filter_active.png' %}" alt="" style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+                <p style="margin: 0; color: #fff; font-size: 12px; text-align: center; font-weight: 600;">Features</p>
+            </a>
+            <a href="#" class="footer_button btn coming_soon" style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;">
+                <img src="{% static 'images/wallet_alt_fill.png' %}" alt="" style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+                <p style="margin: 0; color: #fff; font-size: 12px; text-align: center;">Account</p>
+            </a>
+            <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn" style="color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 8px 12px;">
+                <img src="{% static 'images/setting.png' %}" alt="" style="width: 24px; height: 24px; margin-bottom: 4px; filter: brightness(0) invert(1);">
+                <p style="margin: 0; color: #fff; font-size: 12px; text-align: center;">Settings</p>
+            </a>
+        </div>
+    </div>
+</footer>
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+
+<!-- Bottom Drawer -->
+<div id="bottomDrawer" class="bottom-drawer">
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer-content">
+    <div class="drawer-header">
+      <h3>Features</h3>
+      <button class="drawer-close" id="drawerClose">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <div class="feature-grid">
+        <!-- Chamas Feature -->
+        <div class="feature-item" data-feature="chamas">
+          <div class="feature-icon">
+            <img src="{% static 'images/icon_people.png' %}" alt="Chamas" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Chamas</h4>
+            <p>Join and manage group savings</p>
+          </div>
+        </div>
+                <!-- Expense Tracker Feature -->
+        <div class="feature-item" data-feature="expense_tracker">
+          <div class="feature-icon">
+            <img src="{% static 'images/wallet_alt_fill.png' %}" alt="Expense Tracker"
+                 style="width: 40px; height: 40px; filter: brightness(0) invert(1);">
+          </div>
+          <div class="feature-content">
+            <h4>Expense Tracker</h4>
+            <p>Track your personal expenses & income</p>
+          </div>
+        </div>
+        
+        <!-- Wekeza Goals Feature -->
+        <div class="feature-item coming-soon-item" data-feature="wekeza">
+          <div class="feature-icon">
+            <img src="{% static 'images/service-icon-01.png' %}" alt="Wekeza Goals" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Wekeza Goals</h4>
+            <p>Personal savings & investment goals</p>
+          </div>
+          <div class="coming-soon-badge">Coming Soon</div>
+        </div>
+        
+        <!-- Kopesha Feature -->
+        <div class="feature-item coming-soon-item" data-feature="kopesha">
+          <div class="feature-icon">
+            <img src="{% static 'images/kopesha.png' %}" alt="Kopesha" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Kopesha</h4>
+            <p>Quick loans & financial assistance</p>
+          </div>
+          <div class="coming-soon-badge">Coming Soon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Bottom Drawer Styles */
+.bottom-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.3s, opacity 0.3s;
+}
+
+.bottom-drawer.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.drawer-content {
+  position: relative;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 2;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.bottom-drawer.show .drawer-content {
+  transform: translateY(0);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.drawer-header h3 {
+  margin: 0;
+  color: #2291A5;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.drawer-close:hover {
+  background-color: #f0f0f0;
+}
+
+.drawer-body {
+  padding: 20px 25px 30px;
+}
+
+.feature-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+}
+
+.feature-item:hover {
+  border-color: #2291A5;
+  box-shadow: 0 4px 12px rgba(34, 145, 165, 0.1);
+  transform: translateY(-2px);
+}
+
+.feature-item:active {
+  transform: translateY(0);
+}
+
+.feature-icon {
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-content h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.feature-content p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.coming-soon-item {
+  opacity: 0.7;
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff6b6b;
+  color: white;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .drawer-content {
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .bottom-drawer.show .drawer-content {
+    transform: translateY(-20px);
+  }
+}
+
+/* Hide drawer on larger screens where footer is hidden */
+@media screen and (min-width: 992px) {
+  .bottom-drawer { display: none !important; }
+}
+</style>
+
+<script>
+// Bottom Drawer Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const featuresBtn = document.getElementById('featuresBtn');
+  const bottomDrawer = document.getElementById('bottomDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const drawerClose = document.getElementById('drawerClose');
+  const comingSoonItems = document.querySelectorAll('.coming-soon-item');
+  const chamasItem = document.querySelector('[data-feature="chamas"]');
+  const expenseTrackerItem = document.querySelector('[data-feature="expense_tracker"]');
+  const comingSoonModal = document.getElementById('comingSoonModal');
+
+  // ——— Expense Tracker Click Handler ———
+  if (expenseTrackerItem) {
+    expenseTrackerItem.addEventListener('click', function() {
+      closeDrawer();
+      window.location.href = "{% url 'expense_tracker:dashboard' %}";
+    });
+  }
+
+  // ——— Chamas Click Handler ———
+  if (chamasItem) {
+    chamasItem.addEventListener('click', function() {
+      closeDrawer();
+      window.location.href = "{% url 'chamas:chamas' %}";
+    });
+  }
+
+  // ——— Coming Soon Items ———
+  comingSoonItems.forEach(item => {
+    item.addEventListener('click', function() {
+      closeDrawer();
+      setTimeout(() => {
+        if (comingSoonModal) {
+          comingSoonModal.classList.add('show');
+        }
+      }, 300);
+    });
+  });
+
+  // ——— Open Drawer ———
+  if (featuresBtn) {
+    featuresBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openDrawer();
+    });
+  }
+
+  // ——— Close Drawer Functions ———
+  function closeDrawer() {
+    bottomDrawer.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  function openDrawer() {
+    bottomDrawer.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close on overlay click
+  if (drawerOverlay) {
+    drawerOverlay.addEventListener('click', closeDrawer);
+  }
+
+  // Close on X button
+  if (drawerClose) {
+    drawerClose.addEventListener('click', closeDrawer);
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && bottomDrawer.classList.contains('show')) {
+      closeDrawer();
+    }
+  });
+});
+</script>
+
+  </body>
+</html>

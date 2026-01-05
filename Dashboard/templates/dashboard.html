@@ -1,0 +1,272 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Goad Details
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+        <main role="main" class="main-content p-0">
+            <header class=" weknz_header">
+                <div class="container">
+                    <nav class="page_nav mob_nav">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+
+                            <li class="">
+
+                                <button class="btn" type="button" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvasRight"
+                                        aria-controls="offcanvasRight">
+
+                                    <img src="{% static 'images/left_arrow.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
+
+
+            <div class="col-md-12">
+                <section class="banner car_banner house_banner">
+                    <div class="container">
+                        <div class="wekenza_content">
+                            <h2 class="wekenz_h mb-2">
+                                {{ goal_info.name }}
+                            </h2>
+                            <p class="sub_heading mb-2">
+                                99 Months Left
+                            </p>
+                            <h4 class="wekenza_price mb-2 text_shadows">
+                                Kshs.
+                                {{ goal_info.goal_balance|add:goal_info.goal_profit }}
+                            </h4>
+                            <p class="sub_heading mt-0">
+                                Remaining
+                            </p>
+                            <div>
+                                <div class="bar_content mt-4">
+                                    <p class="mb-0">
+                                        Saving
+                                    </p>
+                                    <p class="mb-0">1%</p>
+                                    <p class="mb-0">Goals</p>
+                                </div>
+                                <div class="goal_progress">
+                                    <div class="inner" style="width: 3%;">
+                                    </div>
+                                </div>
+
+                                <div class="bar_content mt-1">
+                                    <p>
+                                        Kshs. {{ goal_info.goal_balance|floatformat:2 }}
+                                    </p>
+                                    <p>Kshs. {{ goal_info.goal_amount|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                <section class="creat_goals">
+                    <div class="container">
+                        <div class="d-flex flex-row align-items-center justify-content-between mt-3">
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#exampleModal9">
+                                <a href="{% url 'add_funds_to_goal' goal_info.id %}">
+                                    <div class="person_round d-flex align-items-center justify-content-center">
+                                        <img src="{% static 'images/wallet-money_.png' %}" alt="">
+                                    </div>
+                                    <h4 class="pesno_plus_h">Add Funds</h4>
+                                </a>
+
+                            </div>
+
+                            {% if can_withdraw == 'Yes' %}
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#exampleModal8">
+                                <div class="person_round d-flex align-items-center justify-content-center">
+                                    <img src="{% static 'images/money-send_.png' %}" alt="">
+                                </div>
+                                <h4 class="pesno_plus_h">Withdraw</h4>
+                            </div>
+                            {% else %}
+
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#exampleModal8">
+                                <div class="person_round d-flex align-items-center justify-content-center">
+                                    <img src="{% static 'images/money-send_.png' %}" alt="">
+                                </div>
+                                <h4 class="pesno_plus_h">Can not withdraw before: {{ goal_info.end_date }}</h4>
+                            </div>
+                            {% endif %}
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 class="btn btn-primary"
+                                 data-bs-toggle="modal" data-bs-target="#exampleModal7">
+                                <div class="person_round d-flex align-items-center justify-content-center cursot-pointer">
+                                    <img src="{% static 'images/more_.png' %}" alt="">
+                                </div>
+                                <h4 class="pesno_plus_h">More</h4>
+                            </div>
+                        </div>
+                        <div class="pt-3 astimate border-top border-bottom d-flex align-items-center justify-content-between">
+                            <div class="astimate_content text-center">
+                                <h5>
+                                    Total Deposit
+                                </h5>
+                                <h4>
+                                    Kshs. {{ goal_info.goal_balance|floatformat:2 }}
+                                </h4>
+                            </div>
+                            <div class="astimate_content text-center">
+                                <h5>
+                                    Interest Rate
+                                </h5>
+                                <h4>
+
+                                    6.00%
+
+                                </h4>
+                            </div>
+                            <div class="astimate_content text-center">
+                                <h5>
+                                    Earned Interest
+                                </h5>
+                                <h4>
+                                    Kshs. {{ goal_info.goal_profit|floatformat:2 }}
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="records">
+                            <h4 class="recor_heading mb-0 mt-4">
+                                Records
+                            </h4>
+                            {% for item in all_deposits %}
+                                <div class="record_row d-flex align-items-center justify-content-between border-bottom pb-3 pt-3">
+
+                                    <p class="mb-0">
+                                        + Kshs. {{ item.amount|floatformat:2 }}
+                                    </p>
+
+
+                                    <p>
+                                        {{ item.deposit_date }}
+                                    </p>
+                                    <p>
+                                        + Kshs.{{ item.calculate_future_value|floatformat:2 }}
+                                    </p>
+
+                                </div>
+                            {% empty %}
+
+                                <p class="mb-0">
+                                    No Record found
+                                </p>
+                                <br>
+                                <br>
+
+                            {% endfor %}
+
+                            <a href="{% url 'user_dashboard:home' %}" class="btn saving_btn "
+                                   >
+                                All Goals
+                            </a>
+                            <a href="{% url 'create_personal_goals' %}" class="btn saving_btn">
+                                Add a New Goal
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <footer class="mbl_footer">
+                <div class="container">
+                    <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                        <button class="footer_button btn">
+                            <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                            <p>Home</p>
+                        </button>
+                        <button class="footer_button btn coming_soon">
+                            <img src="{% static 'images/filter_active.png' %}" alt="">
+                            <p>Features</p>
+                        </button>
+                        <button class="footer_button btn coming_soon">
+                            <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                            <p>Account</p>
+                        </button>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/setting.png' %}" alt="">
+                            <p>Settings</p>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'user_dashboard/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'support/css/support.css' %}">
+{% block support_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="support-container">
+    <div class="support-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="support-title mb-0">
+                        <i class="fas fa-life-ring me-2"></i>
+                        {% block page_title %}Support{% endblock %}
+                    </h1>
+                    <p class="support-subtitle mb-0">
+                        {% block page_subtitle %}We're here to help{% endblock %}
+                    </p>
+                </div>
+                <div>
+                    {% block header_actions %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="support-content">
+        <div class="container-fluid">
+            {% block support_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'support/js/ticket_detail.js' %}"></script>
+{% block support_js %}{% endblock %}
+{% endblock %}

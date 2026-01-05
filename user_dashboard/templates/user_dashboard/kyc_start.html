@@ -1,0 +1,124 @@
+{% extends 'user_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}<title>Start Verification - ChamaSpace</title>{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 800px;">
+    <div class="text-center mb-4">
+        <i class="fas fa-shield-check" style="font-size: 4rem; color: #0D7C83;"></i>
+        <h1 class="mt-3 fw-bold">Let's Verify Your Account</h1>
+        <p class="text-muted">This quick process helps us keep ChamaSpace safe for everyone</p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h3 class="fw-bold mb-4">What You'll Need</h3>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="d-flex gap-3">
+                        <div class="flex-shrink-0">
+                            <div style="width: 50px; height: 50px; background: #E8F5F6; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-id-card fa-lg" style="color: #0D7C83;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold">Valid ID</h5>
+                            <p class="mb-0 text-muted">National ID or Passport</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="d-flex gap-3">
+                        <div class="flex-shrink-0">
+                            <div style="width: 50px; height: 50px; background: #E8F5F6; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-camera fa-lg" style="color: #0D7C83;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold">Live Selfie</h5>
+                            <p class="mb-0 text-muted">Clear photo of your face</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-clock me-2"></i>
+                <strong>Time Required:</strong> 5 minutes to submit, 1-2 business days for review
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h3 class="fw-bold mb-3">Verification Steps</h3>
+            
+            <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                <div class="flex-shrink-0">
+                    <div class="badge bg-primary" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">1</div>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1">Verify Your Identity</h6>
+                    <p class="mb-0 text-muted small">Confirm your ID number and document type</p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                <div class="flex-shrink-0">
+                    <div class="badge bg-primary" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">2</div>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1">Upload Documents</h6>
+                    <p class="mb-0 text-muted small">Clear photos of front and back of your ID</p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                <div class="flex-shrink-0">
+                    <div class="badge bg-primary" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">3</div>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1">Take a Selfie</h6>
+                    <p class="mb-0 text-muted small">Live photo to match with your ID</p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3">
+                <div class="flex-shrink-0">
+                    <div class="badge bg-primary" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">4</div>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1">Review & Submit</h6>
+                    <p class="mb-0 text-muted small">Confirm everything looks good</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4" style="background: #FEF3C7;">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-lightbulb me-2"></i>Tips for Best Results</h5>
+            <ul class="mb-0">
+                <li>Use good lighting - avoid shadows</li>
+                <li>Make sure all text is clearly visible</li>
+                <li>Take photos on a plain background</li>
+                <li>Ensure your ID is not expired</li>
+                <li>Remove sunglasses for selfie</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3">
+        <a href="{% url 'user_dashboard:kyc:verify_identity' %}" class="btn btn-primary btn-lg flex-grow-1">
+            <i class="fas fa-arrow-right me-2"></i>
+            Start Verification
+        </a>
+        <a href="{% url 'user_dashboard:home' %}" class="btn btn-outline-secondary btn-lg">
+            Later
+        </a>
+    </div>
+</div>
+{% endblock %}

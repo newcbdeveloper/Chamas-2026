@@ -1,0 +1,1818 @@
+{%extends 'chamas/base.html'%} {% load humanize %} {%load static%} {% load custom_filters %} {%block head%}
+<title>Loans</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/loans.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/contribution.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/dashboard.css'%}" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{%endblock%} {%block body%}
+
+<div class="modern-loans">
+  <!-- Mobile View -->
+  <div class="mobile-loans d-block d-lg-none">
+    <!-- Tabs -->
+    <div class="mobile-tabs">
+      <button class="tab-btn admin active" data-tab="manage-loans">Manage Loans</button>
+      <button class="tab-btn member" data-tab="apply-loan">Apply for Loan</button>
+      <button class="tab-btn member" data-tab="my-loans">My Loans</button>
+      <button class="tab-btn admin" data-tab="active-loans">Active Loans</button>
+      <button class="tab-btn admin" data-tab="applications">Applications</button>
+    </div>
+
+    <!-- Manage Loans Tab Content -->
+    <div class="mobile-tab-content active" id="manage-loans">
+      <div class="mobile-create-form admin">
+        <!-- Create Loan Type Section -->
+        <div class="create-loan-card">
+          <div class="create-loan-header">
+            <i class='bx bx-money'></i>
+            <span>Create Loan Type</span>
+          </div>
+                                         <form id="mobile-create-loan-type-form" class="loan-card-form" onsubmit="submitForm(event); return false;">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-name">Name</label>
+                  <input type="text" id="mobile-name" name="name" class="form-input" placeholder="Enter loan type name" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-schedule">Schedule</label>
+                  <select id="mobile-schedule" name="schedule" class="form-input">
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-max">Max Amount (KSH)</label>
+                  <input type="number" id="mobile-max" name="max" class="form-input" placeholder="Enter max amount" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-max-due">Max Term</label>
+                  <input type="number" id="mobile-max-due" name="max-due" class="form-input" placeholder="Months/weeks" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-late-fine">Late Fine (KSH)</label>
+                  <input type="number" id="mobile-late-fine" name="late_fine" class="form-input" placeholder="Enter fine amount" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-grace-period">Grace Period (days)</label>
+                  <input type="text" id="mobile-grace-period" name="grace_period" class="form-input" placeholder="Enter days" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="mobile-interest-rate">Interest Rate (% annually)</label>
+                  <input type="number" id="mobile-interest-rate" name="intrest_rate" class="form-input" placeholder="Enter rate" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="mobile-description">Description</label>
+                  <textarea id="mobile-description" name="description" class="form-input" rows="2" placeholder="Enter description"></textarea>
+                </div>
+              </div>
+            </div>
+            <div id="mobile-create-loan-feedback" class="alert" style="display: none; margin-top: 10px;"></div>
+            <button type="submit" class="create-loan-btn beautiful-btn">
+              Create Loan Type
+            </button>
+          </form>
+        </div>
+
+        <!-- Issue Loan Section -->
+        <div class="create-loan-card">
+          <div class="create-loan-header">
+            <i class='bx bx-transfer'></i>
+            <span>Issue Loan</span>
+          </div>
+                               <form id="mobile-issue-loan-form" class="loan-card-form">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-loan-type">Loan Type</label>
+                  <select id="mobile-loan-type" name="loan_type" class="form-input" required>
+                    <option value="">Select loan type</option>
+                    {% for loan_type in loan_types %}
+                    <option value="{{ loan_type.id }}">{{ loan_type.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-member">Member</label>
+                  <select id="mobile-member" name="member" class="form-input" required>
+                    <option value="">Select member</option>
+                    {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-amount">Amount (KSH)</label>
+                  <input type="number" id="mobile-amount" name="amount" class="form-input" placeholder="Enter amount" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="mobile-term">Term</label>
+                  <input type="number" id="mobile-term" name="term" class="form-input" placeholder="Enter term" required>
+                </div>
+              </div>
+            </div>
+            <div id="mobile-issue-loan-feedback" class="alert" style="display: none; margin-top: 10px;"></div>
+            <button type="submit" class="create-loan-btn beautiful-btn">
+              Issue Loan
+            </button>
+          </form>
+        </div>
+              </div>
+      </div>
+
+    <!-- Apply for Loan Tab Content -->
+    <div class="mobile-tab-content" id="apply-loan">
+      <div class="mobile-create-form member">
+        <div class="create-loan-card member">
+          <div class="create-loan-header">
+            <i class='bx bx-wallet'></i>
+            <span>Apply for Loan</span>
+          </div>
+                                           <form id="mobile-apply-loan-form" class="loan-card-form" onsubmit="applyLoan(event); return false;">
+             <div class="row">
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label for="apply-loan-type">Loan Type</label>
+                   <select id="apply-loan-type" name="loan_type" class="form-input" required>
+                     <option value="">Select loan type</option>
+                     {% for loan_type in loan_types %}
+                     <option value="{{ loan_type.id }}">{{ loan_type.name }} ({{ loan_type.schedule }})</option>
+                     {% endfor %}
+                   </select>
+                 </div>
+               </div>
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label for="apply-amount">Amount (KSH)</label>
+                   <input type="number" id="apply-amount" name="amount" class="form-input" placeholder="Enter amount" required>
+                 </div>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-md-12">
+                 <div class="form-group">
+                   <label for="apply-term">Repayment Term (months/weeks)</label>
+                   <input type="number" id="apply-term" name="due" class="form-input" placeholder="Enter term" required>
+                 </div>
+               </div>
+             </div>
+            <div id="mobile-apply-loan-feedback" class="alert" style="display: none; margin-top: 10px;"></div>
+            <button type="submit" class="create-loan-btn beautiful-btn">
+              Apply for Loan
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Loans Tab Content -->
+    <div class="mobile-tab-content" id="my-loans">
+      <div class="mobile-loans-list">
+        <!-- Completed Loans -->
+        {% if my_completed_loans %}
+        <div class="mobile-loan-category">
+          <div class="mobile-category-header status-completed">
+            <i class='bx bx-check-circle'></i>
+            <span>My Completed Loans</span>
+          </div>
+          {% for loan in my_completed_loans %}
+          <div class="mobile-loan-card completed">
+            <div class="mobile-loan-header" onclick="toggleMobileLoanDetails(this)">
+              <div class="mobile-loan-info">
+                <div class="mobile-loan-member">
+                  {% if loan.member.profile %}
+                  <div class="mobile-member-avatar" style="background-image: url({{loan.member.profile.url}});"></div>
+                  {% else %}
+                  <div class="mobile-member-avatar default-avatar"></div>
+                  {% endif %}
+                  <span class="mobile-member-name">{{ loan.member.name }}</span>
+                </div>
+                <div class="mobile-loan-summary">
+                  <span class="mobile-loan-id">L{{ loan.id|stringformat:'03d' }}</span>
+                  <span class="mobile-loan-amount">Ksh{{ loan.amount|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              <i class='bx bx-chevron-down mobile-expand-icon'></i>
+            </div>
+            <div class="mobile-loan-details" style="display: none;">
+              <div class="mobile-detail-grid">
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Loan Type</span>
+                  <span class="mobile-detail-value">{{ loan.type.name }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_amount_to_be_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Start Date</span>
+                  <span class="mobile-detail-value">{{ loan.start_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.end_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Paid</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Interest Rate</span>
+                  <span class="mobile-detail-value">{{ loan.intrest_rate }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Active Loans -->
+        {% if my_active_loans %}
+        <div class="mobile-loan-category">
+          <div class="mobile-category-header status-active">
+            <i class='bx bx-time-five'></i>
+            <span>My Active Loans</span>
+          </div>
+          {% for loan in my_active_loans %}
+          <div class="mobile-loan-card active">
+            <div class="mobile-loan-header" onclick="toggleMobileLoanDetails(this)">
+              <div class="mobile-loan-info">
+                <div class="mobile-loan-member">
+                  {% if loan.member.profile %}
+                  <div class="mobile-member-avatar" style="background-image: url({{loan.member.profile.url}});"></div>
+                  {% else %}
+                  <div class="mobile-member-avatar default-avatar"></div>
+                  {% endif %}
+                  <span class="mobile-member-name">{{ loan.member.name }}</span>
+                </div>
+                <div class="mobile-loan-summary">
+                  <span class="mobile-loan-id">L{{ loan.id|stringformat:'03d' }}</span>
+                  <span class="mobile-loan-amount">Ksh{{ loan.amount|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              <i class='bx bx-chevron-down mobile-expand-icon'></i>
+            </div>
+            <div class="mobile-loan-details" style="display: none;">
+              <div class="mobile-detail-grid">
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Loan Type</span>
+                  <span class="mobile-detail-value">{{ loan.type.name }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_amount_to_be_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Balance</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.balance|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Start Date</span>
+                  <span class="mobile-detail-value">{{ loan.start_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.end_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Paid</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Interest Rate</span>
+                  <span class="mobile-detail-value">{{ loan.intrest_rate }}%</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Late Fine</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.type.late_fine|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Grace Period</span>
+                  <span class="mobile-detail-value">{{ loan.type.grace_period }} days</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Status</span>
+                  <span class="mobile-detail-value mobile-status-badge status-{{ loan.status|lower }}">{{ loan.status }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Defaulted Loans -->
+        {% if my_defaulted_loans %}
+        <div class="mobile-loan-category">
+          <div class="mobile-category-header status-defaulted">
+            <i class='bx bx-x-circle'></i>
+            <span>My Defaulted Loans</span>
+          </div>
+          {% for loan in my_defaulted_loans %}
+          <div class="mobile-loan-card defaulted">
+            <div class="mobile-loan-header" onclick="toggleMobileLoanDetails(this)">
+              <div class="mobile-loan-info">
+                <div class="mobile-loan-member">
+                  {% if loan.member.profile %}
+                  <div class="mobile-member-avatar" style="background-image: url({{loan.member.profile.url}});"></div>
+                  {% else %}
+                  <div class="mobile-member-avatar default-avatar"></div>
+                  {% endif %}
+                  <span class="mobile-member-name">{{ loan.member.name }}</span>
+                </div>
+                <div class="mobile-loan-summary">
+                  <span class="mobile-loan-id">L{{ loan.id|stringformat:'03d' }}</span>
+                  <span class="mobile-loan-amount">Ksh{{ loan.amount|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              <i class='bx bx-chevron-down mobile-expand-icon'></i>
+            </div>
+            <div class="mobile-loan-details" style="display: none;">
+              <div class="mobile-detail-grid">
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Loan Type</span>
+                  <span class="mobile-detail-value">{{ loan.type.name }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_amount_to_be_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Balance</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.balance|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Start Date</span>
+                  <span class="mobile-detail-value">{{ loan.start_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.end_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Paid</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Interest Rate</span>
+                  <span class="mobile-detail-value">{{ loan.intrest_rate }}%</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Late Fine</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.type.late_fine|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+
+
+        {% if not my_active_loans and not my_completed_loans and not my_defaulted_loans %}
+        <div class="no-loans">
+          <i class='bx bx-inbox'></i>
+          <p>You have no loans</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Active Loans Tab Content -->
+    <div class="mobile-tab-content" id="active-loans">
+      <div id="mobile-active-loans-feedback" class="alert" style="display: none; margin-bottom: 15px;"></div>
+      <div class="mobile-loans-list">
+        <!-- Completed Loans -->
+        {% if completed_loans %}
+        <div class="mobile-loan-category">
+          <div class="mobile-category-header status-completed">
+            <i class='bx bx-check-circle'></i>
+            <span>Completed Loans</span>
+          </div>
+          {% for loan in completed_loans %}
+          <div class="mobile-loan-card completed">
+            <div class="mobile-loan-header" onclick="toggleMobileLoanDetails(this)">
+              <div class="mobile-loan-info">
+                <div class="mobile-loan-member">
+                  {% if loan.member.profile %}
+                  <div class="mobile-member-avatar" style="background-image: url({{loan.member.profile.url}});"></div>
+                  {% else %}
+                  <div class="mobile-member-avatar default-avatar"></div>
+                  {% endif %}
+                  <span class="mobile-member-name">{{ loan.member.name }}</span>
+                </div>
+                <div class="mobile-loan-summary">
+                  <span class="mobile-loan-id">L{{ loan.id|stringformat:'03d' }}</span>
+                  <span class="mobile-loan-amount">Ksh{{ loan.amount|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              <i class='bx bx-chevron-down mobile-expand-icon'></i>
+            </div>
+            <div class="mobile-loan-details" style="display: none;">
+              <div class="mobile-detail-grid">
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Loan Type</span>
+                  <span class="mobile-detail-value">{{ loan.type.name }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_amount_to_be_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Start Date</span>
+                  <span class="mobile-detail-value">{{ loan.start_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.end_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Paid</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Interest Rate</span>
+                  <span class="mobile-detail-value">{{ loan.intrest_rate }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Active Loans -->
+        {% if active_loans %}
+        <div class="mobile-loan-category">
+          <div class="mobile-category-header status-active">
+            <i class='bx bx-time-five'></i>
+            <span>Active Loans</span>
+          </div>
+          {% for loan in active_loans %}
+          <div class="mobile-loan-card active">
+            <div class="mobile-loan-header" onclick="toggleMobileLoanDetails(this)">
+              <div class="mobile-loan-info">
+                <div class="mobile-loan-member">
+                  {% if loan.member.profile %}
+                  <div class="mobile-member-avatar" style="background-image: url({{loan.member.profile.url}});"></div>
+                  {% else %}
+                  <div class="mobile-member-avatar default-avatar"></div>
+                  {% endif %}
+                  <span class="mobile-member-name">{{ loan.member.name }}</span>
+                </div>
+                <div class="mobile-loan-summary">
+                  <span class="mobile-loan-id">L{{ loan.id|stringformat:'03d' }}</span>
+                  <span class="mobile-loan-amount">Ksh{{ loan.amount|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              <i class='bx bx-chevron-down mobile-expand-icon'></i>
+            </div>
+            <div class="mobile-loan-details" style="display: none;">
+              <div class="mobile-detail-grid">
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Loan Type</span>
+                  <span class="mobile-detail-value">{{ loan.type.name }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_amount_to_be_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Balance</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.balance|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Start Date</span>
+                  <span class="mobile-detail-value">{{ loan.start_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.end_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Next Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.calc_next_date }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Next Due Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.next_due_amount|floatformat:2|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Paid</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Interest Rate</span>
+                  <span class="mobile-detail-value">{{ loan.intrest_rate }}%</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Late Fine</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.type.late_fine|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Grace Period</span>
+                  <span class="mobile-detail-value">{{ loan.type.grace_period }} days</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Status</span>
+                  <span class="mobile-detail-value mobile-status-badge status-{{ loan.status|lower }}">{{ loan.status }}</span>
+                </div>
+              </div>
+              
+              <!-- Update Loan Form (Admin Only) -->
+              <div class="admin mobile-update-form">
+                <div class="mobile-update-header">
+                  <i class='bx bx-edit'></i>
+                  <span>Update Loan Payment</span>
+                </div>
+                <form class="mobile-repayment-form">
+                  <input type="hidden" name="loan_id" value="{{ loan.id }}">
+                  <div class="mobile-form-group">
+                    <label for="mobile-loan-amount-{{ loan.id }}">Payment Amount (KSH)</label>
+                    <input type="number" 
+                           name="loan-amount" 
+                           id="mobile-loan-amount-{{ loan.id }}" 
+                           class="mobile-form-input" 
+                           placeholder="Enter payment amount" 
+                           min="0" 
+                           step="0.01" 
+                           required>
+                  </div>
+                  <button type="submit" class="mobile-update-btn">
+                    <i class='bx bx-check'></i>
+                    Update Payment
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Defaulted Loans -->
+        {% if defaulted_loans %}
+        <div class="mobile-loan-category">
+          <div class="mobile-category-header status-defaulted">
+            <i class='bx bx-x-circle'></i>
+            <span>Defaulted Loans</span>
+          </div>
+          {% for loan in defaulted_loans %}
+          <div class="mobile-loan-card defaulted">
+            <div class="mobile-loan-header" onclick="toggleMobileLoanDetails(this)">
+              <div class="mobile-loan-info">
+                <div class="mobile-loan-member">
+                  {% if loan.member.profile %}
+                  <div class="mobile-member-avatar" style="background-image: url({{loan.member.profile.url}});"></div>
+                  {% else %}
+                  <div class="mobile-member-avatar default-avatar"></div>
+                  {% endif %}
+                  <span class="mobile-member-name">{{ loan.member.name }}</span>
+                </div>
+                <div class="mobile-loan-summary">
+                  <span class="mobile-loan-id">L{{ loan.id|stringformat:'03d' }}</span>
+                  <span class="mobile-loan-amount">Ksh{{ loan.amount|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              <i class='bx bx-chevron-down mobile-expand-icon'></i>
+            </div>
+            <div class="mobile-loan-details" style="display: none;">
+              <div class="mobile-detail-grid">
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Loan Type</span>
+                  <span class="mobile-detail-value">{{ loan.type.name }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Amount</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_amount_to_be_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Balance</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.balance|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Start Date</span>
+                  <span class="mobile-detail-value">{{ loan.start_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Due Date</span>
+                  <span class="mobile-detail-value">{{ loan.end_date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Total Paid</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.total_paid|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Interest Rate</span>
+                  <span class="mobile-detail-value">{{ loan.intrest_rate }}%</span>
+                </div>
+                <div class="mobile-detail-item">
+                  <span class="mobile-detail-label">Late Fine</span>
+                  <span class="mobile-detail-value">Ksh{{ loan.type.late_fine|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+              
+              <!-- Update Loan Form (Admin Only) -->
+              <div class="admin mobile-update-form">
+                <div class="mobile-update-header">
+                  <i class='bx bx-edit'></i>
+                  <span>Update Loan Payment</span>
+                </div>
+                <form class="mobile-repayment-form">
+                  <input type="hidden" name="loan_id" value="{{ loan.id }}">
+                  <div class="mobile-form-group">
+                    <label for="mobile-loan-amount-{{ loan.id }}">Payment Amount (KSH)</label>
+                    <input type="number" 
+                           name="loan-amount" 
+                           id="mobile-loan-amount-{{ loan.id }}" 
+                           class="mobile-form-input" 
+                           placeholder="Enter payment amount" 
+                           min="0" 
+                           step="0.01" 
+                           required>
+                  </div>
+                  <button type="submit" class="mobile-update-btn">
+                    <i class='bx bx-check'></i>
+                    Update Payment
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not active_loans and not completed_loans and not defaulted_loans %}
+        <div class="no-loans">
+          <i class='bx bx-inbox'></i>
+          <p>No loans found</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Applications Tab Content -->
+    <div class="mobile-tab-content" id="applications">
+      <div id="mobile-applications-feedback" class="alert" style="display: none; margin-bottom: 15px;"></div>
+      <div class="mobile-applications-list admin">
+        {% for application in applications %}
+        <div class="application-beautiful-card">
+          <div class="application-beautiful-row">
+            <div class="application-beautiful-label">Application ID</div>
+            <div class="application-beautiful-value">A{{application.id|stringformat:'03d'}}</div>
+            <div class="application-beautiful-label">Member</div>
+            <div class="application-beautiful-value">{{application.member.name}}</div>
+          </div>
+          <div class="application-beautiful-row">
+            <div class="application-beautiful-label">Amount</div>
+            <div class="application-beautiful-value">Ksh{{application.amount|floatformat:1}}</div>
+            <div class="application-beautiful-label">Type</div>
+            <div class="application-beautiful-value">{{application.type.name}}</div>
+          </div>
+          <p style="display: none" id="application-id">{{application.id}}</p>
+          <div class="application-actions">
+            <button class="approve-btn approve-button">Approve</button>
+            <button class="decline-btn cancel-button">Decline</button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-applications">
+          <i class='bx bx-inbox'></i>
+          <p>No pending applications</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop View -->
+  <div class="desktop-loans d-none d-lg-block">
+    <div class="text-capitalize">
+      <div class="row justify-content-center">
+
+        <div class="col-lg-5 col-md-12 col-sm-12 col-12 p-2 body-div admin">
+          <h6 class="section-header">Create Loan Type</h6>
+          <div class="loan-type-header">
+            <svg class="header-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+              fill="none">
+              <path
+                d="M4.5 14.6746H6.75993C7.77079 14.6746 8.79253 14.7799 9.7763 14.9826C11.5166 15.3411 13.3488 15.3845 15.1069 15.1C15.9738 14.9596 16.826 14.7451 17.5975 14.3727C18.2939 14.0366 19.1469 13.5628 19.7199 13.0321C20.2921 12.5022 20.888 11.6349 21.3109 10.9569C21.6736 10.3756 21.4982 9.66235 20.9245 9.22915C20.2873 8.74805 19.3417 8.74815 18.7046 9.22945L16.8974 10.5946C16.197 11.1237 15.432 11.6107 14.5206 11.7561C14.411 11.7736 14.2962 11.7895 14.1764 11.8034M14.1764 11.8034C14.1403 11.8076 14.1038 11.8116 14.0668 11.8154M14.1764 11.8034C14.3222 11.7722 14.4669 11.6822 14.6028 11.5637C15.246 11.0023 15.2866 10.0562 14.7285 9.42925C14.5991 9.28385 14.4475 9.16255 14.2791 9.06205C11.4817 7.39355 7.12942 8.66435 4.5 10.5291M14.1764 11.8034C14.1399 11.8112 14.1033 11.8154 14.0668 11.8154M14.0668 11.8154C13.5434 11.8691 12.9312 11.883 12.2518 11.8188"
+                stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" />
+              <path
+                d="M4.5 9.78613C4.5 8.95771 3.82843 8.28613 3 8.28613C2.17157 8.28613 1.5 8.95771 1.5 9.78613V14.7861C1.5 15.6146 2.17157 16.2861 3 16.2861C3.82843 16.2861 4.5 15.6146 4.5 14.7861V9.78613Z"
+                stroke="#2291A5" stroke-width="1.5" />
+            </svg>
+
+            <h6 class="header-text">Loan type</h6>
+          </div>
+          <div id="alert-div" class="alert" role="alert"></div>
+
+          <form action="" id="Create-loan-type" style="width: 100%">
+            <div class="input-sect">
+              <div class="some-cont">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" name="name" class="form-control" id="name" required />
+              </div>
+
+            </div>
+            <div class="input-sect">
+              <div class="some-cont p-3">
+                <label for="schedule" style="margin: 5px;">loan repayment schedule</label>
+                <select id="schedule" class="bg-white form-control" name="schedule" style="border: 1px solid rgba(167, 167, 167, 0.278);">
+                  <option value="weekly" class="text-capitalize">weekly</option>
+                  <option value="monthly" class="text-capitalize">monthly</option>
+                </select>
+              </div>
+            </div>
+
+              <div class="input-sect">
+                <div class="some-cont">
+                  <label for="max" class="form-label">Max loan amount(ksh)</label>
+                  <input type="number" name="max" class="form-control" id="max" required />
+                </div>
+
+                <div class="some-cont">
+                  <label for="max-due" class="form-label">max allowed term(months/weeks)</label>
+                  <input type="number" name="max-due" class="form-control" id="max-due" required />
+                </div>
+              </div>
+
+              <div class="input-sect">
+                <div class="some-cont">
+                  <label for="late-fine" class="form-label">late fine(ksh)</label>
+                  <input type="number" name="late_fine" class="form-control" id="late-fine" required />
+                </div>
+
+                <div class="some-cont">
+                  <label for="grace-period" class="form-label">Grace period(days)</label>
+                  <input type="text" name="grace_period" class="form-control" id="grace-period" required />
+                </div>
+              </div>
+              <div class="input-sect">
+                <div class="some-cont">
+                  <label for="intrest-rate" class="form-label">interest rate(% annually)</label>
+                  <input type="number" name="intrest_rate" class="form-control" id="intrest-rate" required />
+                </div>
+              </div>
+
+              <div class="some-cont mb-2 desc-area">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+              </div>
+
+              <button class="btn btn-primary border-0" onclick="submitForm(event)" style="width: 100%">
+                Create
+              </button>
+          </form>
+        </div>
+
+        <div class="col-lg-5 col-md-12 col-sm-12 col-12 p-2 body-div admin">
+          <h6 class="section-header">Issue Loan</h6>
+          <div class="loan-type-header">
+            <svg class="header-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+              fill="none">
+              <path
+                d="M4.5 14.6746H6.75993C7.77079 14.6746 8.79253 14.7799 9.7763 14.9826C11.5166 15.3411 13.3488 15.3845 15.1069 15.1C15.9738 14.9596 16.826 14.7451 17.5975 14.3727C18.2939 14.0366 19.1469 13.5628 19.7199 13.0321C20.2921 12.5022 20.888 11.6349 21.3109 10.9569C21.6736 10.3756 21.4982 9.66235 20.9245 9.22915C20.2873 8.74805 19.3417 8.74815 18.7046 9.22945L16.8974 10.5946C16.197 11.1237 15.432 11.6107 14.5206 11.7561C14.411 11.7736 14.2962 11.7895 14.1764 11.8034M14.1764 11.8034C14.1403 11.8076 14.1038 11.8116 14.0668 11.8154M14.1764 11.8034C14.3222 11.7722 14.4669 11.6822 14.6028 11.5637C15.246 11.0023 15.2866 10.0562 14.7285 9.42925C14.5991 9.28385 14.4475 9.16255 14.2791 9.06205C11.4817 7.39355 7.12942 8.66435 4.5 10.5291M14.1764 11.8034C14.1399 11.8112 14.1033 11.8154 14.0668 11.8154M14.0668 11.8154C13.5434 11.8691 12.9312 11.883 12.2518 11.8188"
+                stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" />
+              <path
+                d="M4.5 9.78613C4.5 8.95771 3.82843 8.28613 3 8.28613C2.17157 8.28613 1.5 8.95771 1.5 9.78613V14.7861C1.5 15.6146 2.17157 16.2861 3 16.2861C3.82843 16.2861 4.5 15.6146 4.5 14.7861V9.78613Z"
+                stroke="#2291A5" stroke-width="1.5" />
+            </svg>
+
+            <h6 class="header-text">Issue Loan</h6>
+          </div>
+          <div id="issue-loan-alert" class="alert" role="alert"></div>
+
+          <form action="" id="issue-loan-form" style="width: 100%">
+            <div class="input-sect">
+              <div class="some-cont p-3">
+                <label for="member">Member</label>
+                <select id="member" class="bg-white form-control" name="member">
+                  {%for member in members%}
+                  <option value="{{member.id}}" class="text-capitalize">{{member.name}}</option>
+                  {%endfor%}
+
+                </select>
+              </div>
+
+              <div class="some-cont p-3">
+                <label for="type">Type</label>
+                <select id="type" class="bg-white form-control" name="type">
+                  {%for loan_type in loan_types %}
+                  <option value="{{loan_type.id}}" class="text-capitalize">{{loan_type.name}}({{loan_type.schedule}})</option>
+                  {%endfor%}
+
+                </select>
+              </div>
+            </div>
+
+            <div class="input-sect">
+              <div class="some-cont">
+                <label for="amount" class="form-label">Loan amount(ksh)</label>
+                <input type="number" name="amount" class="form-control" id="amount" required />
+              </div>
+            </div>
+        
+            <div class="input-sect">
+              <div class="some-cont">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" name="start_date" class="form-control" placeholder="start date" id="start_date"
+                  required />
+              </div>
+              <div class="some-cont">
+                <label for="due" class="form-label">repayemt in(months/weeks)</label>
+                <input type="number" name="due" class="form-control" id="due" required />
+              </div>
+            </div>
+            <button class="btn btn-primary border-0" onclick="issueLoanForm(event)" style="width: 100%">
+              Issue Loan
+            </button>
+          </form>
+        </div>
+
+        <div class="col-lg-5 col-md-12 col-sm-12 col-12 p-2 body-div active-loans">
+          <h6 class="section-header">Active Loans</h6>
+          <div class="loan-type-header">
+            <svg class="header-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+              fill="none">
+              <path
+                d="M4.5 14.6746H6.75993C7.77079 14.6746 8.79253 14.7799 9.7763 14.9826C11.5166 15.3411 13.3488 15.3845 15.1069 15.1C15.9738 14.9596 16.826 14.7451 17.5975 14.3727C18.2939 14.0366 19.1469 13.5628 19.7199 13.0321C20.2921 12.5022 20.888 11.6349 21.3109 10.9569C21.6736 10.3756 21.4982 9.66235 20.9245 9.22915C20.2873 8.74805 19.3417 8.74815 18.7046 9.22945L16.8974 10.5946C16.197 11.1237 15.432 11.6107 14.5206 11.7561C14.411 11.7736 14.2962 11.7895 14.1764 11.8034M14.1764 11.8034C14.1403 11.8076 14.1038 11.8116 14.0668 11.8154M14.1764 11.8034C14.3222 11.7722 14.4669 11.6822 14.6028 11.5637C15.246 11.0023 15.2866 10.0562 14.7285 9.42925C14.5991 9.28385 14.4475 9.16255 14.2791 9.06205C11.4817 7.39355 7.12942 8.66435 4.5 10.5291M14.1764 11.8034C14.1399 11.8112 14.1033 11.8154 14.0668 11.8154M14.0668 11.8154C13.5434 11.8691 12.9312 11.883 12.2518 11.8188"
+                stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" />
+              <path
+                d="M4.5 9.78613C4.5 8.95771 3.82843 8.28613 3 8.28613C2.17157 8.28613 1.5 8.95771 1.5 9.78613V14.7861C1.5 15.6146 2.17157 16.2861 3 16.2861C3.82843 16.2861 4.5 15.6146 4.5 14.7861V9.78613Z"
+                stroke="#2291A5" stroke-width="1.5" />
+            </svg>
+            <h6 class="header-text">Active loans</h6>
+          </div>
+          <div class="updates-alerts-hub"></div>
+
+          {%for loan in active_loans%}
+          <div class="member-header">
+            <div class="member-header-inner">
+              <div class="leading">
+                <div class="leading-inner">
+                  {%if loan.member.profile%}
+
+                  <div class="loan-profile"
+                    style="background-image: url({{loan.member.profile.url}});background-position: center;"></div>
+
+                  {%else%}
+
+                  <div class="loan-profile" style="
+                      background-image: url('data:image/png;base64,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');
+                      background-position: center;"></div>
+
+                  {%endif%}
+
+
+                  <p style="margin: 0; padding: 0" class="member-name">
+                    {{loan.member.name}}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="loan-single" style="display: none;">
+
+            <div class="loan-details">
+              <div class="loan-details-row" style="width: 100%;">
+                <div class="loan-cube" style="width: 100%;">
+                  <h6 class="fw-semibold">Loan Type</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.type.name}} - {{loan.type.type_id}}</p>
+                  </div>
+                </div>
+
+              </div>
+              <div class="loan-details-row" style="width: 100%;">
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Loan amount</h6>
+                  <div class="amount-section">
+                    <p class="amount">ksh {{loan.amount | intcomma }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Total amount</h6>
+                  <div class="amount-section">
+                    <p class="amount">ksh {{loan.total_amount_to_be_paid | intcomma }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">balance</h6>
+                  <div class="amount-section">
+                    <p class="amount">ksh {{loan.balance | intcomma }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="loan-details-row" style="width: 100%;">
+                <div class="loan-cube" style="width: 100%;">
+                  <h6 class="fw-semibold">Start Date</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.start_date | date:"d/m/Y" }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Due date</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.end_date | date:"d/m/Y" }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">status</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.status }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Late fine</h6>
+                  <div class="amount-section">
+                    <p class="amount">
+                      ksh {{loan.type.late_fine | intcomma }}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+              <div class="loan-details-row" style="width: 100%;">
+                <div class="loan-cube">
+                    <h6 class="fw-semibold">Next Due date</h6>
+                    <div class="amount-section">
+                        <p class="amount">
+                          {{loan.calc_next_date}}
+                          
+                        </p>
+                    </div>
+                </div>
+                <div class="loan-cube">
+                    <h6 class="fw-semibold">Next Due amount</h6>
+                    <div class="amount-section">
+                        <p class="amount">
+                          ksh {{loan.next_due_amount | floatformat:2 | intcomma}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+
+              <div class="loan-details-row" style="width: 100%;">
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Total paid</h6>
+                  <div class="amount-section">
+                    <p class="amount">
+                      ksh {{loan.total_paid | intcomma }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Intrest rate</h6>
+                  <div class="amount-section">
+                    <p class="amount">
+                      {{loan.intrest_rate}}%
+                    </p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">grace period</h6>
+                  <div class="amount-section">
+                    <p class="amount">
+                      {{loan.type.grace_period}} days
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="admin">
+              <form action="" class="repayment-form">
+                <input type="hidden" name="loan_id" value="{{loan.id}}">
+
+                <div class="some-cont mb-2">
+                  <label for="loan-amount" class="form-label">Loan amount</label>
+                  <input type="number" name="loan-amount" class="form-control" id="loan-amount" value="0" />
+                </div>
+
+                <button class="btn btn-primary border-0" style="width: 100%">Update</button>
+              </form>
+            </div>
+
+          </div>
+          <br>
+          {%endfor%}
+        </div>
+
+        <div class="col-lg-5 col-md-12 col-sm-12 col-12 p-2 body-div loan-applications admin">
+          <h6 class="section-header">Loan Applications</h6>
+          <div class="loan-type-header">
+            <svg class="header-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+              fill="none">
+              <path
+                d="M4.5 14.6746H6.75993C7.77079 14.6746 8.79253 14.7799 9.7763 14.9826C11.5166 15.3411 13.3488 15.3845 15.1069 15.1C15.9738 14.9596 16.826 14.7451 17.5975 14.3727C18.2939 14.0366 19.1469 13.5628 19.7199 13.0321C20.2921 12.5022 20.888 11.6349 21.3109 10.9569C21.6736 10.3756 21.4982 9.66235 20.9245 9.22915C20.2873 8.74805 19.3417 8.74815 18.7046 9.22945L16.8974 10.5946C16.197 11.1237 15.432 11.6107 14.5206 11.7561C14.411 11.7736 14.2962 11.7895 14.1764 11.8034M14.1764 11.8034C14.1403 11.8076 14.1038 11.8116 14.0668 11.8154M14.1764 11.8034C14.3222 11.7722 14.4669 11.6822 14.6028 11.5637C15.246 11.0023 15.2866 10.0562 14.7285 9.42925C14.5991 9.28385 14.4475 9.16255 14.2791 9.06205C11.4817 7.39355 7.12942 8.66435 4.5 10.5291M14.1764 11.8034C14.1399 11.8112 14.1033 11.8154 14.0668 11.8154M14.0668 11.8154C13.5434 11.8691 12.9312 11.883 12.2518 11.8188"
+                stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" />
+              <path
+                d="M4.5 9.78613C4.5 8.95771 3.82843 8.28613 3 8.28613C2.17157 8.28613 1.5 8.95771 1.5 9.78613V14.7861C1.5 15.6146 2.17157 16.2861 3 16.2861C3.82843 16.2861 4.5 15.6146 4.5 14.7861V9.78613Z"
+                stroke="#2291A5" stroke-width="1.5" />
+            </svg>
+
+            <h6 class="header-text">Loan Applications</h6>
+          </div>
+          <div class="loan-alerts-hub"></div>
+
+          {%for application in applications%}
+            <div class="application-single">
+
+              <div class="application-single-header flex-wrap">
+                <div class="application-member-name">
+                  {%if application.member.profile%}
+
+                  <div class="member-image"
+                    style="background-image: url({{application.member.profile.url}});background-position: center;"></div>
+
+                  {%else%}
+
+                  <div class="member-image" style="
+                    background-image: url('data:image/png;base64,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');
+                    background-position: center;"></div>
+
+                  {%endif%}
+                  <h6 class="member-title">{{application.member.name}}</h6>
+                </div>
+                <div class="application-amount">
+                  <p class="amount">Amount</p>
+                  <p class="amount">ksh {{application.amount | intcomma }}</p>
+                </div>
+
+                <div class="application-loan-type">
+                  <div class="application-type">
+                    <p>{{application.type.type_id}}</p>
+                  </div>
+                  <div class="application-type">
+                    <p>{{application.due}} Month(s)</p>
+                  </div>
+                </div>
+              </div>
+
+              <p style="display: none" id="application-id">{{application.id}}</p>
+              <div class="button-cluster">
+                <button class="cancel-button">Cancel</button>
+                <button class="approve-button">Approve</button>
+              </div>
+            </div>
+          {%endfor%}
+        </div>
+
+        <div class="col-lg-5 col-md-12 col-sm-12 col-12 p-2 body-div my-loans member">
+          <h6 class="section-header">My Loans</h6>
+          <div class="loan-type-header">
+            <svg class="header-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+              fill="none">
+              <path
+                d="M4.5 14.6746H6.75993C7.77079 14.6746 8.79253 14.7799 9.7763 14.9826C11.5166 15.3411 13.3488 15.3845 15.1069 15.1C15.9738 14.9596 16.826 14.7451 17.5975 14.3727C18.2939 14.0366 19.1469 13.5628 19.7199 13.0321C20.2921 12.5022 20.888 11.6349 21.3109 10.9569C21.6736 10.3756 21.4982 9.66235 20.9245 9.22915C20.2873 8.74805 19.3417 8.74815 18.7046 9.22945L16.8974 10.5946C16.197 11.1237 15.432 11.6107 14.5206 11.7561C14.411 11.7736 14.2962 11.7895 14.1764 11.8034M14.1764 11.8034C14.1403 11.8076 14.1038 11.8116 14.0668 11.8154M14.1764 11.8034C14.3222 11.7722 14.4669 11.6822 14.6028 11.5637C15.246 11.0023 15.2866 10.0562 14.7285 9.42925C14.5991 9.28385 14.4475 9.16255 14.2791 9.06205C11.4817 7.39355 7.12942 8.66435 4.5 10.5291M14.1764 11.8034C14.1399 11.8112 14.1033 11.8154 14.0668 11.8154M14.0668 11.8154C13.5434 11.8691 12.9312 11.883 12.2518 11.8188"
+                stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" />
+              <path
+                d="M4.5 9.78613C4.5 8.95771 3.82843 8.28613 3 8.28613C2.17157 8.28613 1.5 8.95771 1.5 9.78613V14.7861C1.5 15.6146 2.17157 16.2861 3 16.2861C3.82843 16.2861 4.5 15.6146 4.5 14.7861V9.78613Z"
+                stroke="#2291A5" stroke-width="1.5" />
+            </svg>
+
+            <h6 class="header-text">active loans</h6>
+          </div>
+          {%for loan in my_loans%}
+          <div class="loan-single">
+            <div class="loan-details">
+              <div class="loan-details-row">
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Loan amount</h6>
+                  <div class="amount-section">
+                    <p class="amount">ksh {{loan.amount | intcomma}}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Loan balance</h6>
+                  <div class="amount-section">
+                    <p class="amount">ksh {{loan.balance | intcomma}}</p>
+                  </div>
+                </div>
+
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Due date</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.end_date| date:"d/m/Y" }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Intrest rate</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.intrest_rate}}%</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Start Date</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.start_date | date:"d/m/Y"  }}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">Total paid</h6>
+                  <div class="amount-section">
+                    <p class="amount">ksh {{loan.total_paid | intcomma}}</p>
+                  </div>
+                </div>
+
+                <div class="loan-cube">
+                  <h6 class="fw-semibold">grace period</h6>
+                  <div class="amount-section">
+                    <p class="amount">{{loan.type.grace_period}} days</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <br />
+          {% empty %}
+          <div class="no-loans">
+            <p class="text-center fw-semibold">You have no active loans</p>
+          </div>
+          <br />
+          {%endfor%}
+
+          <div class="loan-type-header">
+            <svg class="header-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25"
+              fill="none">
+              <path
+                d="M4.5 14.6746H6.75993C7.77079 14.6746 8.79253 14.7799 9.7763 14.9826C11.5166 15.3411 13.3488 15.3845 15.1069 15.1C15.9738 14.9596 16.826 14.7451 17.5975 14.3727C18.2939 14.0366 19.1469 13.5628 19.7199 13.0321C20.2921 12.5022 20.888 11.6349 21.3109 10.9569C21.6736 10.3756 21.4982 9.66235 20.9245 9.22915C20.2873 8.74805 19.3417 8.74815 18.7046 9.22945L16.8974 10.5946C16.197 11.1237 15.432 11.6107 14.5206 11.7561C14.411 11.7736 14.2962 11.7895 14.1764 11.8034M14.1764 11.8034C14.1403 11.8076 14.1038 11.8116 14.0668 11.8154M14.1764 11.8034C14.3222 11.7722 14.4669 11.6822 14.6028 11.5637C15.246 11.0023 15.2866 10.0562 14.7285 9.42925C14.5991 9.28385 14.4475 9.16255 14.2791 9.06205C11.4817 7.39355 7.12942 8.66435 4.5 10.5291M14.1764 11.8034C14.1399 11.8112 14.1033 11.8154 14.0668 11.8154M14.0668 11.8154C13.5434 11.8691 12.9312 11.883 12.2518 11.8188"
+                stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" />
+              <path
+                d="M4.5 9.78613C4.5 8.95771 3.82843 8.28613 3 8.28613C2.17157 8.28613 1.5 8.95771 1.5 9.78613V14.7861C1.5 15.6146 2.17157 16.2861 3 16.2861C3.82843 16.2861 4.5 15.6146 4.5 14.7861V9.78613Z"
+                stroke="#2291A5" stroke-width="1.5" />
+            </svg>
+
+            <h6 class="header-text">apply loan</h6>
+          </div>
+          <div class="apply-loan-alerts-hub"></div>
+
+          <form action="" id="apply-loan">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+
+            <div class="input-sect">
+              <div class="some-cont">
+                <label for="name" class="form-label">Amount</label>
+                <input type="number" name="apply-amount" class="form-control" id="apply-amount-pc" required />
+              </div>
+            </div>
+            <div class="input-sect">
+              <div class="some-cont" style="width: 100%">
+                <label for="loan-type">Loan type</label>
+                <select name="loan_type" id="loan-type-pc">
+                  {%for type in loan_types%}
+                  <option value="{{type.id}}">{{type.name}}({{type.schedule}})</option>
+                  {%endfor%}
+                </select>
+              </div>
+            </div>
+            <div class="input-sect">
+              <div class="some-cont">
+                <label for="due" class="form-label">repayemt in(months/weeks)</label>
+                <input type="number" name="apply-due" class="form-control" id="apply-due-pc" required />
+              </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="applyLoan(event)" style="width: 100%">
+              Apply
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function submitForm(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Determine if we're on mobile or desktop by checking which form is visible
+    var isMobile = window.getComputedStyle(document.querySelector('.mobile-loans')).display !== 'none';
+    
+    // Extract form values based on the active form
+    var name, max, late_fine, grace_period, intrest_rate, description, due, schedule;
+    
+         if (isMobile) {
+       // Use mobile form IDs
+       name = document.getElementById("mobile-name")?.value || '';
+       max = document.getElementById("mobile-max")?.value || '';
+       late_fine = document.getElementById("mobile-late-fine")?.value || '';
+       grace_period = document.getElementById("mobile-grace-period")?.value || '';
+       intrest_rate = parseFloat(document.getElementById("mobile-interest-rate")?.value || '0');
+       description = document.getElementById("mobile-description")?.value || '';
+       due = document.getElementById("mobile-max-due")?.value || '';
+       schedule = document.getElementById("mobile-schedule")?.value || '';
+     } else {
+       // Use desktop form IDs
+       name = document.getElementById("name")?.value || '';
+       max = document.getElementById("max")?.value || '';
+       late_fine = document.getElementById("late-fine")?.value || '';
+       grace_period = document.getElementById("grace-period")?.value || '';
+       intrest_rate = parseFloat(document.getElementById("intrest-rate")?.value || '0');
+       description = document.getElementById("description")?.value || '';
+       due = document.getElementById("max-due")?.value || '';
+       schedule = document.getElementById("schedule")?.value || '';
+     }
+
+    // Get chama_id from local storage
+    var chama_id = localStorage.getItem("groupId");
+
+    // Construct the URL
+    var url = `/chamas-bookeeping/create-loan-type/${chama_id}/`;
+
+    // Prepare the data to send
+    var data = {
+      name: name,
+      max: max,
+      late_fine: late_fine,
+      grace_period: grace_period,
+      intrest_rate: intrest_rate,
+      description: description,
+      chama_id: chama_id,
+      max_due: due,
+      schedule:schedule
+    };
+
+    // Send data to the server
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"), // Use the correct cookie name
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Update both desktop and mobile alert divs
+        var desktopAlertDiv = document.getElementById("alert-div");
+        var mobileAlertDiv = document.getElementById("mobile-create-loan-feedback");
+        
+        if (data.status === "success") {
+          if (desktopAlertDiv) {
+            desktopAlertDiv.className = "alert alert-success";
+            desktopAlertDiv.innerHTML = data.message;
+          }
+          if (mobileAlertDiv) {
+            mobileAlertDiv.className = "alert alert-success";
+            mobileAlertDiv.innerHTML = data.message;
+            mobileAlertDiv.style.display = "block";
+          }
+        } else {
+          if (desktopAlertDiv) {
+            desktopAlertDiv.className = "alert alert-danger";
+            desktopAlertDiv.innerHTML = data.message;
+          }
+          if (mobileAlertDiv) {
+            mobileAlertDiv.className = "alert alert-danger";
+            mobileAlertDiv.innerHTML = data.message;
+            mobileAlertDiv.style.display = "block";
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+</script>
+
+<!-- Include the script in your HTML -->
+<script>
+  function applyLoan(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Determine if we're on mobile or desktop by checking which form is visible
+    var isMobile = window.getComputedStyle(document.querySelector('.mobile-loans')).display !== 'none';
+    
+    // Extract form values based on the active form
+    var amount, loanType, due;
+    
+    if (isMobile) {
+      // Use mobile form IDs
+      amount = document.getElementById("apply-amount")?.value || '';
+      loanType = document.getElementById("apply-loan-type")?.value || '';
+      due = document.getElementById("apply-term")?.value || '';
+    } else {
+      // Use desktop form IDs
+      amount = document.getElementById("apply-amount-pc")?.value || '';
+      loanType = document.getElementById("loan-type-pc")?.value || '';
+      due = document.getElementById("apply-due-pc")?.value || '';
+    }
+
+    console.log("Amount:", amount, "Loan Type:", loanType, "Due:", due);
+
+    // Get chama_id from local storage
+    var chamaId = localStorage.getItem("groupId");
+
+    // Construct the URL
+    var url = `/chamas-bookeeping/apply-loan/${chamaId}/`;
+
+    // Prepare the data to send
+    var data = {
+      amount: amount,
+      loan_type: loanType,
+      due:due,
+    };
+
+    // Send data to the server
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"), // Use the correct cookie name
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        var alertDiv = document.querySelector(".apply-loan-alerts-hub");
+        var mobileAlertDiv = document.getElementById("mobile-apply-loan-feedback");
+        
+        if (data.status === "success") {
+          const successMessage = `<div class="alert alert-success" role="alert">${data.message}</div>`;
+          if (alertDiv) alertDiv.innerHTML = successMessage;
+          if (mobileAlertDiv) {
+            mobileAlertDiv.innerHTML = data.message;
+            mobileAlertDiv.className = "alert alert-success";
+            mobileAlertDiv.style.display = "block";
+          }
+
+          // Append the newly created application to the list
+          var applicationHtml = `<div class="application-item">
+                    <p>Amount: ${data.application.amount}</p>
+                    <p>Repayment Term: ${data.application.repayment_term}</p>
+                    <!-- Add more fields as needed -->
+                </div>`;
+
+          var applicationsList = document.querySelector(".applications-list");
+          if (applicationsList) applicationsList.insertAdjacentHTML("beforeend", applicationHtml);
+        } else {
+          const errorMessage = `<div class="alert alert-danger" role="alert">${data.message}</div>`;
+          if (alertDiv) alertDiv.innerHTML = errorMessage;
+          if (mobileAlertDiv) {
+            mobileAlertDiv.innerHTML = data.message;
+            mobileAlertDiv.className = "alert alert-danger";
+            mobileAlertDiv.style.display = "block";
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+
+</script>
+
+<script>
+  // Function to handle issue loan form submission for both mobile and desktop
+  function issueLoanForm(event) {
+    event.preventDefault();
+    
+    // Determine if we're on mobile or desktop
+    var isMobile = window.getComputedStyle(document.querySelector('.mobile-loans')).display !== 'none';
+    
+    // Get form data based on the active form
+    var jsonData = {};
+    
+         if (isMobile) {
+       // Mobile form field mapping
+       jsonData.member = document.getElementById("mobile-member")?.value || '';
+       jsonData.type = document.getElementById("mobile-loan-type")?.value || '';
+       jsonData.amount = document.getElementById("mobile-amount")?.value || '';
+       jsonData.due = document.getElementById("mobile-term")?.value || '';
+       // Mobile form doesn't have start_date, so use current date
+       jsonData.start_date = new Date().toISOString().split('T')[0];
+     } else {
+       // Desktop form
+       jsonData.member = document.getElementById("member")?.value || '';
+       jsonData.type = document.getElementById("type")?.value || '';
+       jsonData.amount = document.getElementById("amount")?.value || '';
+       jsonData.due = document.getElementById("due")?.value || '';
+       jsonData.start_date = document.getElementById("start_date")?.value || new Date().toISOString().split('T')[0];
+     }
+
+    // Fetch the CSRF token from the cookie
+    const csrftoken = getCookie("csrftoken");
+
+    // Send AJAX request to the backend
+    fetch(`/chamas-bookeeping/issue-loan/${localStorage.getItem('groupId')}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken
+      },
+      body: JSON.stringify(jsonData)
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Process the response and display alerts for both mobile and desktop
+        const desktopAlertHub = document.getElementById("issue-loan-alert");
+        const mobileAlertHub = document.getElementById("mobile-issue-loan-feedback");
+
+        if (data.status === "success") {
+          // Display success alert
+          if (desktopAlertHub) {
+            desktopAlertHub.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+          }
+          if (mobileAlertHub) {
+            mobileAlertHub.innerHTML = data.message;
+            mobileAlertHub.className = "alert alert-success";
+            mobileAlertHub.style.display = "block";
+          }
+        } else {
+          // Display error alert
+          if (desktopAlertHub) {
+            desktopAlertHub.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+          }
+          if (mobileAlertHub) {
+            mobileAlertHub.innerHTML = data.message;
+            mobileAlertHub.className = "alert alert-danger";
+            mobileAlertHub.style.display = "block";
+          }
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const desktopForm = document.getElementById("issue-loan-form");
+    const mobileForm = document.getElementById("mobile-issue-loan-form");
+
+    // Add event listeners for both forms
+    if (desktopForm) {
+      desktopForm.addEventListener("submit", issueLoanForm);
+    }
+    
+    if (mobileForm) {
+      mobileForm.addEventListener("submit", issueLoanForm);
+    }
+
+    // Function to get the value of a cookie by name
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add event listeners to all approve buttons
+    var approveButtons = document.querySelectorAll(".approve-button");
+    approveButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        // Handle both mobile (.application-beautiful-card) and desktop (.application-single) containers
+        var container = event.target.closest(".application-single") || event.target.closest(".application-beautiful-card");
+        var applicationId = container.querySelector("#application-id").innerText;
+        approveLoan(applicationId);
+      });
+    });
+
+    // Add event listeners to all decline buttons
+    var declineButtons = document.querySelectorAll(".cancel-button");
+    declineButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        // Handle both mobile (.application-beautiful-card) and desktop (.application-single) containers
+        var container = event.target.closest(".application-single") || event.target.closest(".application-beautiful-card");
+        var applicationId = container.querySelector("#application-id").innerText;
+        declineLoan(applicationId);
+      });
+    });
+  });
+
+  function approveLoan(applicationId) {
+    var chamaId = localStorage.getItem("groupId");
+    var url = `/chamas-bookeeping/approve-loan/${chamaId}/${applicationId}/`;
+
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        handleLoanResponse(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  function declineLoan(applicationId) {
+    var chama_id = localStorage.getItem('groupId')
+    var url = `/chamas-bookeeping/decline-loan/${chama_id}/${applicationId}/`;
+
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        handleLoanResponse(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  function handleLoanResponse(data) {
+    // Update both desktop and mobile alert divs
+    var desktopAlertDiv = document.querySelector(".loan-alerts-hub");
+    var mobileAlertDiv = document.getElementById("mobile-applications-feedback");
+
+    if (data.status === "success") {
+      // Desktop alert
+      if (desktopAlertDiv) {
+        desktopAlertDiv.innerHTML = `<div class="alert alert-success" role="alert">${data.message}</div>`;
+      }
+      // Mobile alert
+      if (mobileAlertDiv) {
+        mobileAlertDiv.innerHTML = data.message;
+        mobileAlertDiv.className = "alert alert-success";
+        mobileAlertDiv.style.display = "block";
+      }
+    } else {
+      // Desktop alert
+      if (desktopAlertDiv) {
+        desktopAlertDiv.innerHTML = `<div class="alert alert-danger" role="alert">${data.message}</div>`;
+      }
+      // Mobile alert
+      if (mobileAlertDiv) {
+        mobileAlertDiv.innerHTML = data.message;
+        mobileAlertDiv.className = "alert alert-danger";
+        mobileAlertDiv.style.display = "block";
+      }
+    }
+  }
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Desktop update forms
+    var updateForms = document.querySelectorAll(".repayment-form");
+    updateForms.forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        // Extract form values
+        var loanId = form.querySelector('input[name="loan_id"]').value;
+        var loanAmount = form.querySelector('input[name="loan-amount"]').value;
+
+        // Construct the URL
+        var url = `/chamas-bookeeping/update-loan/${loanId}/`;
+
+        // Prepare the data to send
+        var data = {
+          loan_amount: loanAmount,
+        };
+
+        // Send data to the server
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            handleLoanResponse(data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      });
+    });
+
+    // Mobile update forms
+    var mobileUpdateForms = document.querySelectorAll(".mobile-repayment-form");
+    mobileUpdateForms.forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        // Extract form values
+        var loanId = form.querySelector('input[name="loan_id"]').value;
+        var loanAmount = form.querySelector('input[name="loan-amount"]').value;
+
+        // Construct the URL
+        var url = `/chamas-bookeeping/update-loan/${loanId}/`;
+
+        // Prepare the data to send
+        var data = {
+          loan_amount: loanAmount,
+        };
+
+        // Send data to the server
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            handleMobileLoanResponse(data);
+            // Clear the form after successful update
+            if (data.status === "success") {
+              form.reset();
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      });
+    });
+  });
+
+  function handleLoanResponse(data) {
+    var alertDiv = document.querySelector(".updates-alerts-hub");
+
+    if (data.status === "success") {
+      alertDiv.innerHTML = `<div class="alert alert-success" role="alert">${data.message}</div>`;
+      // You can update the UI or perform any other actions here
+    } else {
+      alertDiv.innerHTML = `<div class="alert alert-danger" role="alert">${data.message}</div>`;
+    }
+  }
+
+  function handleMobileLoanResponse(data) {
+    var alertDiv = document.getElementById("mobile-active-loans-feedback");
+
+    if (data.status === "success") {
+      alertDiv.innerHTML = data.message;
+      alertDiv.className = "alert alert-success";
+      alertDiv.style.display = "block";
+      
+      // Auto-hide the alert after 5 seconds
+      setTimeout(function() {
+        alertDiv.style.display = "none";
+      }, 5000);
+    } else {
+      alertDiv.innerHTML = data.message;
+      alertDiv.className = "alert alert-danger";
+      alertDiv.style.display = "block";
+      
+      // Auto-hide the alert after 5 seconds
+      setTimeout(function() {
+        alertDiv.style.display = "none";
+      }, 5000);
+    }
+  }
+
+  function toggleMobileLoanDetails(headerElement) {
+    var detailsElement = headerElement.nextElementSibling;
+    var expandIcon = headerElement.querySelector('.mobile-expand-icon');
+    
+    if (detailsElement.style.display === "none" || detailsElement.style.display === "") {
+      detailsElement.style.display = "block";
+      expandIcon.classList.add('expanded');
+    } else {
+      detailsElement.style.display = "none";
+      expandIcon.classList.remove('expanded');
+    }
+  }
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+</script>
+
+<!-- Mobile Tab Functionality -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Mobile tab functionality
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.mobile-tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetTab = this.getAttribute('data-tab');
+        
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        // Add active class to clicked button and corresponding content
+        this.classList.add('active');
+        const targetContent = document.getElementById(targetTab);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+
+    // Download report functionality
+    window.downloadReport = function() {
+      // Add download report logic here
+      console.log('Downloading loan report...');
+      // You can implement the actual download logic based on your backend API
+    };
+
+    // Desktop loan header functionality
+    const memberHeaders = document.querySelectorAll(".member-header");
+
+    memberHeaders.forEach(function (memberHeader) {
+      const loanSingle = memberHeader.nextElementSibling;
+
+      // Initially hide the loan details
+      loanSingle.style.display = "none";
+
+      // Add click event listener to each member header
+      memberHeader.addEventListener("click", function () {
+        // Toggle the display of the corresponding loan details
+        if (loanSingle.style.display === "none") {
+          loanSingle.style.display = "block";
+        } else {
+          loanSingle.style.display = "none";
+        }
+      });
+    });
+  });
+</script>
+{%endblock%}

@@ -1,0 +1,286 @@
+/* General Layout */
+.modern-dashboard {
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Enhanced Header */
+.enhanced-header {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    color: white;
+    padding-top: 2rem;
+    padding-bottom: 5rem; /* Large padding to make room for card overlap */
+    position: relative;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+.user-greeting h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+}
+.user-greeting p {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Premium Wallet Card (Group Goal) */
+.personal-wallet-card {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(4, 120, 87, 0.3);
+    transition: all 0.3s ease;
+    margin-top: -3.5rem; /* Move card up to overlap the header */
+}
+.personal-wallet-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(4, 120, 87, 0.4);
+}
+.wallet-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+.wallet-amount {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+/* Ensure the interest earned is visible */
+.personal-wallet-card .text-success {
+    color: #a7f3d0 !important;
+}
+
+
+/* Action Cards */
+.action-card {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+.action-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+}
+.action-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.75rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+.action-card:hover .action-icon {
+    transform: scale(1.1);
+}
+.action-label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+.action-icon img {
+    filter: invert(100%); /* Makes the icons white against the colored background */
+}
+
+/* Donut Chart */
+.donut-container {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    position: relative;
+}
+.donut-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, white 80%, transparent 81% 100%),
+        conic-gradient(#047857 calc(var(--progress)), #e2e8f0 0);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: donutFill 1.4s ease-out forwards;
+    box-shadow: 0 6px 20px rgba(4, 120, 87, 0.18);
+}
+.donut-center {
+    text-align: center;
+}
+.donut-percentage {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #047857, #065f46);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.donut-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+}
+@keyframes donutFill {
+    from { background: radial-gradient(closest-side, white 80%, transparent 81% 100%), conic-gradient(#047857 0%, #e2e8f0 0); }
+}
+
+/* Section Header for Lists */
+.section-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+}
+.section-header-modern h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+.active-badge {
+    padding: 0.3rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.active-badge.success { background-color: #d1fae5; color: #065f46; }
+.active-badge.info { background-color: #dbeafe; color: #1e40af; }
+
+
+/* Lists (Group Members and Activities) */
+.transactions-list, .members-list, .activities-list {
+    margin-top: 1rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+}
+.transaction-item {
+    background: white;
+    border-radius: 0;
+    transition: all 0.2s ease;
+}
+.transactions-list .transaction-item:first-child {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+.transactions-list .transaction-item:last-child {
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom: none !important;
+}
+
+.transaction-item:hover {
+    background: #f8fafc;
+    transform: none; /* Removed translate for list items */
+    box-shadow: none;
+}
+.transaction-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+.grp-box-avatar img {
+    border-radius: 50%;
+}
+
+
+/* Empty State */
+.empty-state {
+    color: #64748b;
+    padding: 2rem 0;
+}
+.empty-state h4 {
+    font-weight: 600;
+    margin-top: 0.75rem;
+}
+.empty-state p {
+    font-size: 0.9rem;
+}
+
+/* Footer (Same as existing) */
+.mbl_footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+.footer_row {
+    padding: 0.5rem 0;
+}
+.footer_button {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 0.75rem;
+    transition: color 0.2s;
+}
+.footer_button:hover {
+    color: #047857;
+}
+.footer_button img {
+    height: 24px;
+    width: 24px;
+    margin-bottom: 0.25rem;
+}
+.footer_button p {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Modal for Coming Soon */
+#comingSoonModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+#comingSoonModal.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#comingSoonModal .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+#comingSoonModal .close-btn {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    border: none;
+    background: none;
+}
+#comingSoonModal .close-btn:hover,
+#comingSoonModal .close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+.modal-icon {
+    margin-bottom: 20px;
+}
+.modal-icon svg {
+    color: #047857;
+}

@@ -1,0 +1,161 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+
+{% block title %}Insights{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-lightbulb me-2"></i>Smart Insights</h2>
+            <p class="text-muted">Smart spending analysis and recommendations</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'expense_tracker:insights' %}?generate=true" class="btn btn-primary">
+                <i class="fas fa-sync-alt me-2"></i>Generate New Insights
+            </a>
+        </div>
+    </div>
+
+    <!-- Unread Insights -->
+    {% if unread_insights %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h4 class="mb-3">New Insights</h4>
+            {% for insight in unread_insights %}
+                <div class="card mb-3 border-start border-5 insight-card-{{ insight.type }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="insight-icon me-2">
+                                        {% if insight.type == 'increase' %}
+                                            <i class="fas fa-arrow-trend-up text-danger"></i>
+                                        {% elif insight.type == 'decrease' %}
+                                            <i class="fas fa-arrow-trend-down text-success"></i>
+                                        {% elif insight.type == 'budget_warning' %}
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        {% elif insight.type == 'savings' %}
+                                            <i class="fas fa-piggy-bank text-success"></i>
+                                        {% else %}
+                                            <i class="fas fa-chart-line text-info"></i>
+                                        {% endif %}
+                                    </span>
+                                    <h5 class="mb-0">{{ insight.title }}</h5>
+                                </div>
+                                <p class="mb-2">{{ insight.message }}</p>
+                                {% if insight.category %}
+                                    <span class="badge bg-secondary">
+                                        {{ insight.category.icon }} {{ insight.category.name }}
+                                    </span>
+                                {% endif %}
+                                <small class="text-muted d-block mt-2">
+                                    <i class="fas fa-clock me-1"></i>{{ insight.created_at|timesince }} ago
+                                </small>
+                            </div>
+                            <div>
+                                <form method="post" action="{% url 'expense_tracker:mark_insight_read' insight.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Mark as read">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Read Insights -->
+    {% if read_insights %}
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="mb-3">Previous Insights</h4>
+            <div class="accordion" id="readInsightsAccordion">
+                {% for insight in read_insights %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ insight.pk }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ insight.pk }}">
+                                <span class="me-2">
+                                    {% if insight.type == 'increase' %}
+                                        <i class="fas fa-arrow-trend-up text-danger"></i>
+                                    {% elif insight.type == 'decrease' %}
+                                        <i class="fas fa-arrow-trend-down text-success"></i>
+                                    {% elif insight.type == 'budget_warning' %}
+                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    {% elif insight.type == 'savings' %}
+                                        <i class="fas fa-piggy-bank text-success"></i>
+                                    {% else %}
+                                        <i class="fas fa-chart-line text-info"></i>
+                                    {% endif %}
+                                </span>
+                                {{ insight.title }}
+                                <small class="text-muted ms-2">({{ insight.created_at|date:"d M Y" }})</small>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ insight.pk }}" class="accordion-collapse collapse" data-bs-parent="#readInsightsAccordion">
+                            <div class="accordion-body">
+                                <p>{{ insight.message }}</p>
+                                {% if insight.category %}
+                                    <span class="badge bg-secondary">
+                                        {{ insight.category.icon }} {{ insight.category.name }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Empty State -->
+    {% if not unread_insights and not read_insights %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-lightbulb fa-4x text-muted mb-4"></i>
+                    <h4>No Insights Yet</h4>
+                    <p class="text-muted mb-4">
+                        We'll analyze your spending patterns and provide insights as you add more transactions.
+                    </p>
+                    <a href="{% url 'expense_tracker:insights' %}?generate=true" class="btn btn-primary">
+                        <i class="fas fa-sync-alt me-2"></i>Generate Insights Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Insights Info -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5><i class="fas fa-info-circle me-2"></i>About Insights</h5>
+                    <ul class="mb-0">
+                        <li>Insights are automatically generated based on your spending patterns</li>
+                        <li>We compare your current spending with previous periods to identify trends</li>
+                        <li>Budget warnings help you stay within your spending limits</li>
+                        <li>Click "Generate New Insights" to get the latest analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.insight-card-increase { border-left-color: #e74c3c !important; }
+.insight-card-decrease { border-left-color: #27ae60 !important; }
+.insight-card-budget_warning { border-left-color: #f39c12 !important; }
+.insight-card-savings { border-left-color: #1abc9c !important; }
+.insight-card-trend { border-left-color: #3498db !important; }
+</style>
+{% endblock %}

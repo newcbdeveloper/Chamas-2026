@@ -1,0 +1,93 @@
+<!-- templates/admin/wallet/pendingtransfer/change_form.html -->
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block after_field_sets %}
+{{ block.super }}
+
+{% if original.status == 'pending' and original.transfer_type == 'mpesa_withdraw' %}
+<div class="submit-row" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
+    <h3 style="color: #333; margin-bottom: 15px;">
+        <i class="fas fa-shield-alt"></i> Withdrawal Approval Actions
+    </h3>
+    
+    <!-- User Info Card -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #007bff;">
+        <h4 style="margin-top: 0;">User Information</h4>
+        <table style="width: 100%;">
+            <tr>
+                <td style="padding: 5px;"><strong>User:</strong></td>
+                <td>{{ original.wallet.user.get_full_name|default:original.wallet.user.username }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px;"><strong>Email:</strong></td>
+                <td>{{ original.wallet.user.email }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px;"><strong>Phone:</strong></td>
+                <td>{{ original.metadata.phone_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px;"><strong>Amount:</strong></td>
+                <td><strong style="font-size: 1.2em; color: #dc3545;">KES {{ original.amount }}</strong></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px;"><strong>Available Balance:</strong></td>
+                <td>KES {{ original.wallet.available_balance }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px;"><strong>Requested:</strong></td>
+                <td>{{ original.initiated_at }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- KYC Status -->
+    {% load kyc_tags %}
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid {% if original.wallet.user|is_kyc_verified %}#28a745{% else %}#dc3545{% endif %};">
+        <h4 style="margin-top: 0;">KYC Verification Status</h4>
+        {% if original.wallet.user|is_kyc_verified %}
+            <p style="color: #28a745; margin: 0;">
+                <i class="fas fa-check-circle"></i> <strong>Verified</strong>
+            </p>
+        {% else %}
+            <p style="color: #dc3545; margin: 0;">
+                <i class="fas fa-times-circle"></i> <strong>Not Verified</strong>
+            </p>
+        {% endif %}
+    </div>
+    
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <form method="post" action="{% url 'admin:wallet_pendingtransfer_changelist' %}" style="flex: 1;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="approve_and_process_transfers">
+            <input type="hidden" name="_selected_action" value="{{ original.pk }}">
+            <button type="submit" 
+                    class="btn btn-success" 
+                    style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;"
+                    onclick="return confirm('Are you sure you want to APPROVE and send KES {{ original.amount }} to {{ original.metadata.phone_number }}?');">
+                <i class="fas fa-check"></i> APPROVE & SEND TO M-PESA
+            </button>
+        </form>
+        
+        <form method="post" action="{% url 'admin:wallet_pendingtransfer_changelist' %}" style="flex: 1;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject_transfers">
+            <input type="hidden" name="_selected_action" value="{{ original.pk }}">
+            <button type="submit" 
+                    class="btn btn-danger" 
+                    style="width: 100%; padding: 12px; background: #dc3545; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;"
+                    onclick="return confirm('Are you sure you want to REJECT this withdrawal? Funds will be refunded to the user.');">
+                <i class="fas fa-times"></i> REJECT & REFUND
+            </button>
+        </form>
+    </div>
+    
+    <p style="margin-top: 15px; font-size: 0.9em; color: #666; text-align: center;">
+        <i class="fas fa-info-circle"></i> 
+        Approving will immediately trigger M-Pesa B2C payment. Rejecting will refund funds to user's wallet.
+    </p>
+</div>
+{% endif %}
+{% endblock %}

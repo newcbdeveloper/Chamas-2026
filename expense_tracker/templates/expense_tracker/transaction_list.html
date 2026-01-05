@@ -1,0 +1,159 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Transactions{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-list me-2"></i>All Transactions</h2>
+            <p class="text-muted">{{ start_date|date:"d M Y" }} to {{ end_date|date:"d M Y" }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'expense_tracker:transaction_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Transaction
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="income" {% if selected_type == 'income' %}selected{% endif %}>Income</option>
+                                <option value="expense" {% if selected_type == 'expense' %}selected{% endif %}>Expense</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ category.icon }} {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Period</label>
+                            <select name="period" class="form-select">
+                                <option value="today" {% if selected_period == 'today' %}selected{% endif %}>Today</option>
+                                <option value="this_week" {% if selected_period == 'this_week' %}selected{% endif %}>This Week</option>
+                                <option value="this_month" {% if selected_period == 'this_month' %}selected{% endif %}>This Month</option>
+                                <option value="last_month" {% if selected_period == 'last_month' %}selected{% endif %}>Last Month</option>
+                                <option value="this_year" {% if selected_period == 'this_year' %}selected{% endif %}>This Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-2"></i>Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <h6>Total Income</h6>
+                    <h4>{{ summary.income|currency }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-danger text-white">
+                <div class="card-body">
+                    <h6>Total Expenses</h6>
+                    <h4>{{ summary.expenses|currency }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <h6>Balance</h6>
+                    <h4>{{ summary.balance|currency }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <h6>Transactions</h6>
+                    <h4>{{ summary.transaction_count }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions List -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="transactions-list">
+                            <div class="row g-3">
+                                {% for transaction in page_obj %}
+                                    <div class="col-md-6 col-12">
+                                        {% include 'expense_tracker/partials/transaction_card.html' %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if page_obj.has_other_pages %}
+                            <nav class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_period %}&period={{ selected_period }}{% endif %}">First</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_period %}&period={{ selected_period }}{% endif %}">Previous</a>
+                                        </li>
+                                    {% endif %}
+
+                                    <li class="page-item active">
+                                        <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                                    </li>
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_period %}&period={{ selected_period }}{% endif %}">Next</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_period %}&period={{ selected_period }}{% endif %}">Last</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <h5>No transactions found</h5>
+                            <p>Try adjusting your filter or add a new transaction</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

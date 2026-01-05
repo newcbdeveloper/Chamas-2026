@@ -1,0 +1,700 @@
+/* =============================================
+   NOTIFICATIONS PAGE — ChamaSpace (Optimized)
+   ============================================= */
+
+:root {
+  /* Theme Colors */
+  --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-urgent: #fef2f2;
+  --border-color: #e2e8f0;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-urgent: #dc2626;
+  --primary: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Layout */
+  --radius: 0.75rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --transition: all 0.25s ease;
+}
+
+/* 🔒 CRITICAL: Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.notifications-frame {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+  min-height: calc(100vh - 6rem);
+  background-color: var(--bg-body);
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+.command-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.command-title-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.command-title h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.intelligent-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.urgent-count {
+  font-weight: 700;
+  color: var(--text-urgent);
+  background-color: var(--bg-urgent);
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+
+/* Meta Actions (now includes inline search) */
+.meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Inline Search */
+.search-shortcut-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius);
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  min-width: 180px;
+}
+
+.cmd-search-inline::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.mark-all-read {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.mark-all-read:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.settings-icon {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.settings-icon:hover {
+  color: var(--text-main);
+  transform: rotate(90deg);
+}
+
+/* =============================================
+   JUMP-TO-BAR — Now isolated and scrollable
+   ============================================= */
+.jump-to-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.jump-to-bar {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Ensure no negative margin or padding causes overflow */
+  margin: 0 -1rem;
+  padding: 0.25rem 1rem;
+}
+
+.jump-to-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.pill-tab {
+  padding: 0.375rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-muted);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pill-tab:hover {
+  background-color: #f1f5f9;
+  color: var(--text-main);
+}
+
+.pill-tab.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* =============================================
+   ZONE LABELS — Mobile-friendly
+   ============================================= */
+.zone-label-row {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.zone-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0;
+  transition: var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+  
+  /* ADD THIS LINE */
+  text-transform: none; 
+}
+
+.zone-indicator:hover,
+.zone-indicator.active {
+  color: var(--primary);
+}
+
+.zone-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+}
+
+.zone-dot.urgent {
+  background-color: var(--text-urgent);
+}
+
+.zone-indicator.active .zone-dot {
+  transform: scale(1.3);
+}
+
+/* =============================================
+   TRIAGE SECTIONS — Smaller titles
+   ============================================= */
+.triage-section {
+  margin-bottom: 2rem;
+}
+
+.section-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-hdr h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: capitalize; /* This forces 'Recent activity' style */
+}
+
+.badge-count {
+  background-color: var(--text-urgent);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+}
+
+.section-hdr a {
+  font-size: 0.8125rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: var(--transition);
+}
+
+.section-hdr a:hover {
+  text-decoration: underline;
+}
+
+/* =============================================
+   URGENT CARD — Redesigned
+   ============================================= */
+.urgency-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.urgent-card {
+  position: relative;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.urgent-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Top-right: amount + actions */
+.urgent-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.urgent-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-urgent);
+  white-space: nowrap;
+}
+
+.urgent-card-actions-top {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.urgent-card-actions-top .action-icon {
+  cursor: pointer;
+  padding: 0.375rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.urgent-card-actions-top .action-icon:hover {
+  transform: scale(1.15);
+}
+
+.urgent-card-actions-top .fa-check:hover {
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.urgent-card-actions-top .fa-trash:hover {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Icon + title */
+.urgent-card-title-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.urgent-icon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  color: var(--text-urgent);
+  margin-top: 2px;
+}
+
+.urgent-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.urgent-meta {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.urgent-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* Action buttons on same row */
+.urgent-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-pay,
+.btn-remind {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  min-width: 100px;
+  flex: 1;
+  max-width: 180px;
+}
+
+.btn-pay {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-pay:hover {
+  background-color: #2563eb;
+}
+
+.btn-remind {
+  background-color: #f1f5f9;
+  color: var(--text-main);
+}
+
+.btn-remind:hover {
+  background-color: #e2e8f0;
+}
+
+/* "View More" link */
+.urgency-stack > a {
+  background-color: #f8fafc;
+  text-align: center;
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.urgency-stack > a:hover {
+  background-color: #f1f5f9;
+  color: var(--primary);
+}
+
+/* =============================================
+   RECENT ACTIVITY (unchanged from previous version)
+   ============================================= */
+/* ... keep your existing .recent-activity-card styles here ... */
+/* (Assuming you already applied the previous update) */
+
+/* If not, let me know — but to avoid bloat, I’m assuming it's in place */
+
+/* =============================================
+   INFORMATIONAL GRID
+   ============================================= */
+/* ... keep as before ... */
+
+/* =============================================
+   MOBILE RESPONSIVE
+   ============================================= */
+@media (max-width: 768px) {
+  .notifications-frame {
+    padding: 1rem 0.75rem;
+  }
+
+  .command-title-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .meta-actions {
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .search-shortcut-inline {
+    min-width: 140px;
+    padding: 0.375rem 0.6rem;
+  }
+
+  .cmd-search-inline {
+    width: 100px;
+    font-size: 0.8125rem;
+  }
+
+  /* Zone labels scrollable */
+  .zone-label-row {
+    display: flex;
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 1.25rem;
+    padding: 0.5rem 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .zone-label-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-utility-bar {
+    display: flex;
+  }
+
+  /* Urgent card on mobile */
+  .urgent-card {
+    padding: 1rem;
+  }
+
+  .urgent-card-header {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .urgent-amount {
+    font-size: 1.125rem;
+    align-self: flex-start;
+  }
+
+  .urgent-card-title-row {
+    gap: 0.625rem;
+  }
+
+  .urgent-icon {
+    font-size: 1.125rem;
+  }
+
+  .urgent-title {
+    font-size: 1rem;
+  }
+
+  .btn-pay,
+  .btn-remind {
+    min-width: auto;
+    font-size: 0.875rem;
+    padding: 0.4rem 0.8rem;
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .command-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .intelligent-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .pill-tab {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .zone-indicator {
+    font-size: 0.875rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* =============================================
+   RECENT ACTIVITY — Restored & Aligned with Info Cards
+   ============================================= */
+
+.daily-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.log-item {
+  position: relative;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.log-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Hover actions (top-right) */
+.log-item-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.375rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.log-item:hover .log-item-actions {
+  opacity: 1;
+}
+
+.log-item-actions .action-icon {
+  cursor: pointer;
+  padding: 0.375rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.log-item-actions .action-icon:hover {
+  transform: scale(1.15);
+}
+
+.log-item-actions .fa-check:hover {
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.log-item-actions .fa-trash:hover {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Icon + text layout */
+.log-content-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.log-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.log-icon.success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.log-icon.danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.log-icon.info { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+.log-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.log-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-main);
+  margin: 0 0 0.25rem;
+}
+
+.log-body {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.log-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}

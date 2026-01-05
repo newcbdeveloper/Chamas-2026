@@ -1,0 +1,64 @@
+{% extends 'subscriptions/base_pricing.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="px-6 py-8">
+        <h2 class="text-2xl font-semibold text-gray-800 text- mb-4">Complete Payment <span class="text-green-600">({{plan.name}})</span> </h2>
+        <form 
+        action="{% url 'subscribe' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="phone" class="block text-gray-700 text-sm font-bold mb-2">Mpesa Phone Number</label>
+                <input 
+                type="text" 
+                id="phone" 
+                name="phone" 
+                placeholder="Enter your mpesa phone number"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value="+254">
+
+                <input type="hidden" name="amount" id="amount" value={{receipt_total_amount}}>
+                <input type="hidden" name="user_id" id="user_id" value={{user_id}}>
+                <input type="hidden" name="chama_id" id="chama_id" value={{chama_id}}>
+                <input type="hidden" name="plan_id" id="plan_id" value={{plan_id}}>
+            </div>
+
+
+            <div class="flex flex-col">
+                <div
+                class="flex flex-row justify-between">
+                    <p class="text- py-2"><strong>Amount:</strong></p>
+                    <p class="text- py-2">KES {{ receipt_amount }}</p>
+                </div>
+                {% for tax in  taxes %}
+                <div
+                class="flex flex-row justify-between">
+                    <p class="text- py-2"><strong>{{ tax.name }}:</strong></p>
+                    <p class="text- py-2">KES {{ tax.tax_price}} </p>
+                </div>
+                {% endfor %}
+                <div
+                class="flex flex-row justify-between border-t">
+                    <p class="text- py-2"><strong>Total Amount:</strong></p>
+                    <p class="text- py-2">KES {{ receipt_total_amount }}</p>
+                </div>
+            </div>
+        
+            <div class="flex items-center justify-center mt-6">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Pay with M-Pesa</button>
+            </div>
+        </form>
+
+         <!-- Loading Animation -->
+        <div id="loading" class="hidden mt-4">
+            <div class="spinner-border text-blue-500"></div>
+            <p class="text-sm mt-2">Processing payment...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

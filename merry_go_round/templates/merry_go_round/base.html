@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Merry-Go-Round{% endblock %} | ChamaSpace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'merry_go_round/css/main.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar-wrapper" id="sidebar">
+        <div class="brand-section">
+            <a href="{% url 'merry_go_round:dashboard' %}" class="d-flex align-items-center text-decoration-none gap-2">
+                <div class="bg-dark text-white rounded p-1 d-flex align-items-center justify-content-center"
+                    style="width: 32px; height: 32px;">
+                    <span class="fw-bold">M</span>
+                </div>
+                <h5 class="fw-bold">Merry-Go-Round</h5>
+            </a>
+        </div>
+        <nav class="nav-section">
+            <div class="nav flex-column mb-4">
+                
+                <a href="{% url 'merry_go_round:dashboard' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+                <a href="{% url 'merry_go_round:join_round' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'join_round' %}active{% endif %}">
+                    <i class="fas fa-search"></i> <span>Join Round</span>
+                </a>
+                <a href="{% url 'merry_go_round:create_round' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'create_round' %}active{% endif %}">
+                    <i class="fas fa-plus-circle"></i> <span>Create Round</span>
+                </a>
+                <a href="{% url 'merry_go_round:my_rounds' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'my_rounds' %}active{% endif %}">
+                    <i class="fas fa-layer-group"></i> <span>My Rounds</span>
+                </a>
+                <a href="{% url 'merry_go_round:wallet_dashboard' %}"
+                    class="nav-link {% if 'wallet' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-wallet"></i> <span>My Wallet</span>
+                </a>
+                <a href="{% url 'merry_go_round:notifications' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                    <i class="fas fa-bell"></i> <span>Notifications</span>
+                    {% if unread_count > 0 %}
+                    <span class="badge bg-danger rounded-pill ms-auto">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+            <div class="nav flex-column">
+                <small class="text-uppercase text-muted fw-bold mb-2 ms-3"
+                    style="font-size: 0.7rem; letter-spacing: 0.05em;">Reports & Activity</small>
+                <a href="{% url 'merry_go_round:contribution_history' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'contribution_history' %}active{% endif %}">
+                    <i class="fas fa-history"></i> <span>Contribution History</span>
+                </a>
+                <a href="{% url 'merry_go_round:payout_history' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'payout_history' %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave"></i> <span>Payout History</span>
+                </a>
+                <a href="{% url 'merry_go_round:my_rounds' %}" class="nav-link">
+                    <i class="fas fa-list-ul"></i> <span>All Rounds</span>
+                </a>
+                <div class="mt-4 pt-4 border-top">
+                    <a href="{% url 'user_dashboard:home' %}" class="nav-link text-muted">
+                        <i class="fas fa-arrow-left"></i> <span>Back to Home</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <!-- Trust Score (Bottom Sidebar) -->
+        <div class="position-absolute bottom-0 w-100 p-3">
+            <div class="bg-light rounded p-3 border">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Trust Score</small>
+                    <i class="fas fa-shield-alt text-muted"></i>
+                </div>
+                <div class="d-flex align-items-end gap-2">
+                    <h3 class="mb-0 fw-bold">{{ user.mgr_profile.trust_score|default:"0" }}</h3>
+                    <small class="text-muted mb-1">/ 100</small>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-dark" role="progressbar"
+                        style="width: {{ user.mgr_profile.trust_score|default:'0' }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <!-- Top Navbar (Mobile Only Toggle + User Menu) -->
+        <header class="d-flex justify-content-between align-items-center mb-4 pt-2">
+            <button class="btn btn-light d-lg-none me-2" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <!-- Notifications moved to sidebar -->
+
+            </div>
+        </header>
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+    <!-- Mobile Footer -->
+    <footer class="mbl_footer">
+        <div class="container">
+            <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                    <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                    <p>Home</p>
+                </a>
+                <a href="#" class="footer_button btn">
+                    <img src="{% static 'images/filter_active.png' %}" alt="">
+                    <p>Features</p>
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                    <p>Wallet</p>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                    <img src="{% static 'images/setting.png' %}" alt="">
+                    <p>Settings</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarToggle').on('click', function () {
+                $('#sidebar').toggleClass('show');
+            });
+            // Close sidebar when clicking outside on mobile
+            $(document).on('click', function (e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).closest('#sidebarToggle').length && $('#sidebar').hasClass('show')) {
+                        $('#sidebar').removeClass('show');
+                    }
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

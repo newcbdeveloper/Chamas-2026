@@ -1,0 +1,165 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block title %}Create Group Goal{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/create_group_goal.css' %}"> 
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <div class="header-inner">
+            <a href="{% url 'goals:wekeza_dashboard' %}">
+                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="Chama Bora" height="40">
+            </a>
+            <button class="back-btn" onclick="history.back()">
+                <img src="{% static 'images/left_arrow.png' %}" alt="Back" height="24">
+            </button>
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <!-- Form Card -->
+        <div class="form-card">
+            <h1>Create a New Group Goal</h1>
+            <p class="subtitle">
+                Groups can have a maximum of 15 members and minimum of 2 members.
+            </p>
+
+            <form id="group_goal_form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Group Goal Name</label>
+                    <input type="text" name="goal_name" id="goal_name" placeholder="e.g., Chama Trip to Coast" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Group Goal Mission</label>
+                    <textarea name="goal_mission" id="goal_mission" rows="4" 
+                              placeholder="Describe what this group is saving for..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Select goal type</label>
+                    <select name="saving_type_input" id="saving_type_input" required>
+                        <option value="">Choose a goal type</option>
+                        <option value="regular" selected>Regular Saving ({{ regular_rate }}% interest p.a)</option>
+                        <option value="fixed">Fixed Saving ({{ fixed_rate }}% interest p.a)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Amount</label>
+                    <input type="number" name="target_amount" id="target_amount" placeholder="Ksh" min="1000" required>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" name="start_date" id="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" name="end_date" id="end_date" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Create Group Goal</button>
+            </form>
+        </div>
+
+        
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    const today = new Date().toISOString().split('T')[0];
+    $('#start_date').val(today).attr('min', today);
+    $('#end_date').attr('min', today);
+
+    function formatKsh(amount) {
+        return 'Ksh ' + parseFloat(amount || 0).toLocaleString('en-KE');
+    }
+
+    function updatePreview() {
+        const name = $('#goal_name').val() || 'New Group Goal';
+        const amount = $('#target_amount').val() || 0;
+        const type = $('#saving_type_input option:selected').text().split(' (')[0] || 'Regular Saving';
+        const start = $('#start_date').val();
+        const end = $('#end_date').val();
+
+        let duration = 'Not set';
+        if (start && end) {
+            const s = new Date(start);
+            const e = new Date(end);
+            const months = (e.getFullYear() - s.getFullYear()) * 12 + e.getMonth() - s.getMonth();
+            duration = months > 0 ? `${months} month${months > 1 ? 's' : ''}` : 'Less than a month';
+        }
+
+        $('#preview-goal-name').text(name);
+        $('#preview-total, #preview-target').text(formatKsh(amount));
+        $('#preview-type').text(type);
+        $('#preview-duration').text(duration);
+    }
+
+    // Initial + live update
+    $('input, select').on('input change', updatePreview);
+    updatePreview();
+
+    // Form submission with validation
+    $('#group_goal_form').on('submit', function (e) {
+        e.preventDefault();
+
+        const startDate = $('#start_date').val();
+        const endDate = $('#end_date').val();
+
+        if (startDate < today) {
+            alert('Start date cannot be in the past.');
+            return;
+        }
+        if (endDate < today) {
+            alert('End date cannot be in the past.');
+            return;
+        }
+        if (endDate <= startDate) {
+            alert('End date must be after start date.');
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:create_group_goal' %}",
+            data: {
+                goal_name: $('#goal_name').val(),
+                goal_mission: $('#goal_mission').val(),
+                saving_type_input: $('#saving_type_input').val(),
+                target_amount: $('#target_amount').val(),
+                start_date: startDate,
+                end_date: endDate,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (response) {
+                if (response.success === '1') {
+                    window.location.href = "{% url 'goals:group_goal_details' 0 %}".replace('0', response.goal_id);
+                } else {
+                    alert(response.error || "Error creating group goal.");
+                }
+            },
+            error: function () {
+                alert("An error occurred. Please try again.");
+            }
+        });
+    });
+
+    // Update end date min when start changes
+    $('#start_date').on('change', function () {
+        $('#end_date').attr('min', this.value);
+        updatePreview();
+    });
+});
+</script>
+{% endblock %}

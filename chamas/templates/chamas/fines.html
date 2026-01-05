@@ -1,0 +1,1421 @@
+{%extends 'chamas/base.html'%} {% load humanize %} {%load static%} {% load custom_filters %} {%block head%}
+<title>Fines</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/reports.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/loans.css'%}" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style rel="stylesheet">
+    .fab-label {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+</style>
+{%endblock%} {%block body%}
+
+<div class="reports-container full-width">
+    <!-- Page Header -->
+    <div class="reports-header">
+        <div class="reports-header-content">
+            <h1 class="reports-title text-brand-primary">Fines Management</h1>
+            <p class="reports-subtitle">Manage fine types, loan fines, contribution fines, and payments</p>
+        </div>
+    </div>
+    
+    <!-- CSRF Token for JavaScript -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- Desktop Floating Action Buttons -->
+    <div class="floating-actions desktop-floating">
+        <button class="btn-floating admin" id="createFineTypeBtnDesktop" title="Create Fine Type">
+            <i class='bx bx-plus'></i>
+            <span>Create Fine Type</span>
+        </button>
+    </div>
+
+    <!-- Mobile FAB Container -->
+    <div class="fab-backdrop" id="fabBackdrop"></div>
+    <div class="fab-container">
+        <button class="fab-create" id="fabCreate">
+            <i class='bx bx-plus'></i>
+        </button>
+        
+        <button class="mini-fab mini-fab-create-type admin" id="createFineTypeBtnMobile">
+            <i class='bx bx-plus'></i>
+            <span class="fab-label">Create Fine Type</span>
+        </button>
+    </div>
+
+    <!-- Fines Tabs Navigation -->
+    <div class="reports-tabs-wrapper">
+        <ul class="reports-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active admin" id="loan-fines-tab" data-bs-toggle="tab" href="#tab-loan-fines" role="tab">
+                    <i class="bx bx-error-circle"></i>
+                    Loan Fines
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin" id="contribution-fines-tab" data-bs-toggle="tab" href="#tab-contribution-fines" role="tab">
+                    <i class="bx bx-receipt"></i>
+                    Contributions Fines
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link member" id="my-fines-tab" data-bs-toggle="tab" href="#tab-my-fines" role="tab">
+                    <i class="bx bx-user"></i>
+                    My Fines
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin" id="fine-types-tab" data-bs-toggle="tab" href="#tab-fine-types" role="tab">
+                    <i class="bx bx-list-ul"></i>
+                    Fine Types
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin member" id="active-loans-tab" data-bs-toggle="tab" href="#tab-active-loans" role="tab">
+                    <i class="bx bx-credit-card"></i>
+                    Active Loans
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="reports-content">
+        <div class="tab-content">
+            <!-- Loan Fines Tab -->
+            <div class="tab-pane active" id="tab-loan-fines" role="tabpanel">
+                <div class="reports-grid">
+                    <div class="report-card brand-card admin">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Loan Fines</h3>
+                                <p class="report-description">Active loan fines and payments</p>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-download-individual bg-brand-primary" id="download-loan-fines-report">
+                                    <i class="bx bx-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="loan-fines-items" class="data-container">
+                                {% if fines %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Fine Type</th>
+                                                <th>Loan Amount</th>
+                                                <th>Loan Balance</th>
+                                                <th>Fine Amount</th>
+                                                <th>Fine Balance</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th class="admin">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for fine in fines %}
+                                            <tr>
+                                                <td>{{ fine.member.name }}</td>
+                                                <td>{{ fine.fine_type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ fine.loan_amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ fine.loan_balance | intcomma }}</td>
+                                                <td class="text-error">KSH {{ fine.fine_amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ fine.fine_balance | intcomma }}</td>
+                                                <td><span class="status-badge {{ fine.status }}">{{ fine.status|title }}</span></td>
+                                                <td>{{ fine.created|date:"M d, Y" }}</td>
+                                                <td class="admin">
+                                                    <button class="btn-action btn-success-sm" onclick="openPayFineModal({{ fine.id }}, '{{ fine.member.name }}', {{ fine.fine_balance }}, 'loan')">
+                                                        <i class="bx bx-credit-card"></i>
+                                                        Pay
+                                                    </button>
+                                                    <button class="btn-action btn-primary-sm" onclick="viewFineDetails({{ fine.id }})">
+                                                        <i class="bx bx-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-error-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Loan Fines</p>
+                                    <p class="empty-state-description">There are currently no active loan fines</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contribution Fines Tab -->
+            <div class="tab-pane" id="tab-contribution-fines" role="tabpanel">
+                <div class="reports-grid">
+                    <div class="report-card brand-card admin">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Contribution Fines</h3>
+                                <p class="report-description">Active contribution fines and payments</p>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-download-individual bg-brand-primary" id="download-contribution-fines-report">
+                                    <i class="bx bx-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="contribution-fines-items" class="data-container">
+                                {% if contribution_fines %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Fine Type</th>
+                                                <th>Contribution</th>
+                                                <th>Contribution Amount</th>
+                                                <th>Contribution Balance</th>
+                                                <th>Fine Amount</th>
+                                                <th>Fine Balance</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th class="admin">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for fine in contribution_fines %}
+                                            <tr>
+                                                <td>{{ fine.member.name }}</td>
+                                                <td>{{ fine.fine_type.name }}</td>
+                                                <td>{{ fine.contribution.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ fine.contribution.amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ fine.contribution_balance | intcomma }}</td>
+                                                <td class="text-error">KSH {{ fine.fine_amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ fine.fine_balance | intcomma }}</td>
+                                                <td><span class="status-badge {{ fine.status }}">{{ fine.status|title }}</span></td>
+                                                <td>{{ fine.created|date:"M d, Y" }}</td>
+                                                <td class="admin">
+                                                    <button class="btn-action btn-success-sm" onclick="openPayFineModal({{ fine.id }}, '{{ fine.member.name }}', {{ fine.fine_balance }}, 'contribution')">
+                                                        <i class="bx bx-credit-card"></i>
+                                                        Pay
+                                                    </button>
+                                                    <button class="btn-action btn-primary-sm" onclick="viewFineDetails({{ fine.id }})">
+                                                        <i class="bx bx-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-receipt empty-state-icon"></i>
+                                    <p class="empty-state-message">No Contribution Fines</p>
+                                    <p class="empty-state-description">There are currently no active contribution fines</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Fines Tab -->
+            <div class="tab-pane" id="tab-my-fines" role="tabpanel">
+                <div class="reports-grid">
+                    <!-- My Loan Fines -->
+                    <div class="report-card brand-card member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">My Loan Fines</h3>
+                                <p class="report-description">Your active loan fines</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="my-loan-fines-items" class="data-container">
+                                {% if my_loan_fines %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fine Type</th>
+                                                <th>Fine Amount</th>
+                                                <th>Paid Amount</th>
+                                                <th>Balance</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for fine in my_loan_fines %}
+                                            <tr>
+                                                <td>{{ fine.fine_type.name }}</td>
+                                                <td class="text-error">KSH {{ fine.fine_amount | intcomma }}</td>
+                                                <td class="text-success">KSH {{ fine.paid_fine_amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ fine.fine_balance | intcomma }}</td>
+                                                <td><span class="status-badge {{ fine.status }}">{{ fine.status|title }}</span></td>
+                                                <td>{{ fine.created|date:"M d, Y" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-check-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Loan Fines</p>
+                                    <p class="empty-state-description">You don't have any active loan fines</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Contribution Fines -->
+                    <div class="report-card brand-card member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">My Contribution Fines</h3>
+                                <p class="report-description">Your active contribution fines</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="my-contribution-fines-items" class="data-container">
+                                {% if my_contribution_fines %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fine Type</th>
+                                                <th>Contribution</th>
+                                                <th>Fine Amount</th>
+                                                <th>Paid Amount</th>
+                                                <th>Balance</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for fine in my_contribution_fines %}
+                                            <tr>
+                                                <td>{{ fine.fine_type.name }}</td>
+                                                <td>{{ fine.contribution.name }}</td>
+                                                <td class="text-error">KSH {{ fine.fine_amount | intcomma }}</td>
+                                                <td class="text-success">KSH {{ fine.paid_fine_amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ fine.fine_balance | intcomma }}</td>
+                                                <td><span class="status-badge {{ fine.status }}">{{ fine.status|title }}</span></td>
+                                                <td>{{ fine.created|date:"M d, Y" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-check-circle empty-state-icon"></i>
+                                    <p class="empty-state-message">No Contribution Fines</p>
+                                    <p class="empty-state-description">You don't have any active contribution fines</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fine Types Tab -->
+            <div class="tab-pane" id="tab-fine-types" role="tabpanel">
+                <div class="reports-grid">
+                    <div class="report-card brand-card admin">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Fine Types</h3>
+                                <p class="report-description">Manage available fine types</p>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="fine-types-items" class="data-container">
+                                {% if fine_types %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Amount</th>
+                                                <th>Description</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for fine_type in fine_types %}
+                                            <tr id="fine-type-row-{{ fine_type.id }}">
+                                                <td class="font-weight-bold">{{ fine_type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ fine_type.amount | intcomma }}</td>
+                                                <td>{{ fine_type.description|truncatewords:10 }}</td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <button class="btn-action btn-primary-sm" onclick="editFineType({{ fine_type.id }})" title="Edit">
+                                                            <i class="bx bx-edit"></i>
+                                                        </button>
+                                                        <button class="btn-action btn-error-sm" onclick="deleteFineType({{ fine_type.id }})" title="Delete">
+                                                            <i class="bx bx-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-list-ul empty-state-icon"></i>
+                                    <p class="empty-state-message">No Fine Types</p>
+                                    <p class="empty-state-description">Create your first fine type to get started</p>
+                                    <button class="btn-primary" onclick="openCreateFineTypeModal()">
+                                        <i class="bx bx-plus"></i>
+                                        Create Fine Type
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Loans Tab -->
+            <div class="tab-pane" id="tab-active-loans" role="tabpanel">
+                <div class="reports-grid">
+                    <div class="report-card brand-card admin member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">Active Loans</h3>
+                                <p class="report-description">Active loans available for fining</p>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-download-individual bg-brand-primary" id="download-active-loans-fines-report">
+                                    <i class="bx bx-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                            <div id="active-loans-fines-items" class="data-container">
+                                {% if loans %}
+                                <div class="brand-table-responsive">
+                                    <table class="brand-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Loan Type</th>
+                                                <th>Amount</th>
+                                                <th>Balance</th>
+                                                <th>Interest Rate</th>
+                                                <th>Start Date</th>
+                                                <th>Next Due</th>
+                                                <th>Status</th>
+                                                <th class="admin">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for loan in loans %}
+                                            <tr>
+                                                <td>{{ loan.member.name }}</td>
+                                                <td>{{ loan.type.name }}</td>
+                                                <td class="text-brand-primary">KSH {{ loan.amount | intcomma }}</td>
+                                                <td class="text-warning">KSH {{ loan.balance | intcomma }}</td>
+                                                <td>{{ loan.intrest_rate }}%</td>
+                                                <td>{{ loan.start_date|date:"M d, Y" }}</td>
+                                                <td>{{ loan.next_due|date:"M d, Y" }}</td>
+                                                <td><span class="status-badge {{ loan.status }}">{{ loan.status|title }}</span></td>
+                                                <td class="admin">
+                                                    <button class="btn-action btn-warning-sm" onclick="openImposeFineModal({{ loan.id }}, '{{ loan.member.name }}')">
+                                                        <i class="bx bx-error-circle"></i>
+                                                        Fine
+                                                    </button>
+                                                    <button class="btn-action btn-primary-sm" onclick="viewLoanDetails({{ loan.id }})">
+                                                        <i class="bx bx-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="bx bx-credit-card empty-state-icon"></i>
+                                    <p class="empty-state-message">No Active Loans</p>
+                                    <p class="empty-state-description">There are currently no active loans available for fining</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Fine Type Modal -->
+<div class="modal fade" id="createFineTypeModal" tabindex="-1" aria-labelledby="createFineTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="createFineTypeModalLabel">
+                    <i class='bx bx-plus'></i>
+                    Create New Fine Type
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createFineTypeForm" class="brand-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fineTypeName" class="form-label">Fine Type Name *</label>
+                                <input type="text" id="fineTypeName" name="name" class="form-control" placeholder="e.g., Late Payment Fine" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fineTypeAmount" class="form-label">Fine Amount (KSH) *</label>
+                                <input type="number" id="fineTypeAmount" name="amount" class="form-control" placeholder="500" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6" >
+                        <label for="fineTypeDescription" class="form-label">Description *</label>
+                        <textarea id="fineTypeDescription" name="description" class="form-control " rows="3" placeholder="Describe when this fine applies" required></textarea>
+                    </div>
+                    <div id="createFineTypeFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="createFineTypeForm" class="btn btn-primary">
+                    <i class='bx bx-plus'></i>
+                    Create Fine Type
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pay Fine Modal -->
+<div class="modal fade" id="payFineModal" tabindex="-1" aria-labelledby="payFineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="payFineModalLabel">
+                    <i class='bx bx-credit-card'></i>
+                    Process Fine Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="fine-payment-info mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Member:</strong> <span id="payFineMemberName"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Current Balance:</strong> <span id="payFineCurrentBalance" class="text-warning"></span>
+                        </div>
+                    </div>
+                </div>
+                <form id="payFineForm" class="brand-form">
+                    <input type="hidden" id="payFineId" name="fine_id">
+                    <input type="hidden" id="payFineType" name="fine_type">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="finePaymentAmount" class="form-label">Payment Amount (KSH) *</label>
+                                <input type="number" id="finePaymentAmount" name="fine-amount" class="form-control" placeholder="500" min="1" step="0.01" required>
+                                <small class="form-text text-muted">Enter the amount being paid</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="finePaymentDate" class="form-label">Payment Date *</label>
+                                <input type="date" id="finePaymentDate" name="payment_date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="finePaymentNotes" class="form-label">Payment Notes</label>
+                        <textarea id="finePaymentNotes" name="notes" class="form-control" rows="3" placeholder="Additional notes about this payment"></textarea>
+                    </div>
+                    <div id="payFineFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="payFineForm" class="btn btn-success">
+                    <i class='bx bx-check'></i>
+                    Process Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Impose Fine Modal -->
+<div class="modal fade" id="imposeFineModal" tabindex="-1" aria-labelledby="imposeFineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="imposeFineModalLabel">
+                    <i class='bx bx-error-circle'></i>
+                    Impose Fine on Loan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="impose-fine-info mb-3">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>Member:</strong> <span id="imposeFineeMemberName"></span>
+                        </div>
+                    </div>
+                </div>
+                <form id="imposeFineForm" class="brand-form">
+                    <input type="hidden" id="imposeFineeLoanId" name="loan_id">
+                    <div class="form-group">
+                        <label for="imposeFineType" class="form-label">Fine Type *</label>
+                        <select id="imposeFineType" name="fine_type" class="form-control" required>
+                            <option value="">Select fine type</option>
+                            {% for fine_type in fine_types %}
+                            <option value="{{ fine_type.id }}">{{ fine_type.name }} - KSH {{ fine_type.amount | intcomma }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="imposeFineReason" class="form-label">Reason</label>
+                        <textarea id="imposeFineReason" name="reason" class="form-control" rows="3" placeholder="Reason for imposing this fine"></textarea>
+                    </div>
+                    <div id="imposeFineeFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="imposeFineForm" class="btn btn-warning">
+                    <i class='bx bx-error-circle'></i>
+                    Impose Fine
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Inherit all styles from loans.css and add fine-specific styles */
+
+/* Desktop Floating Action Buttons */
+.floating-actions.desktop-floating {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    z-index: 900;
+}
+
+/* Hide desktop floating buttons on mobile */
+@media (max-width: 768px) {
+    .floating-actions.desktop-floating {
+        display: none !important;
+    }
+}
+
+.btn-floating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    box-shadow: var(--brand-shadow-lg);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.btn-floating:hover {
+    background: var(--brand-primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--brand-shadow-lg);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-floating i {
+    font-size: 16px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-success-sm {
+    background: var(--brand-success);
+    color: white;
+}
+
+.btn-success-sm:hover {
+    background: #059669;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-error-sm {
+    background: var(--brand-error);
+    color: white;
+}
+
+.btn-error-sm:hover {
+    background: #dc2626;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-primary-sm {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.btn-primary-sm:hover {
+    background: var(--brand-primary-light);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-secondary-sm {
+    background: var(--brand-gray-500);
+    color: white;
+}
+
+.btn-secondary-sm:hover {
+    background: var(--brand-gray-600);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-warning-sm {
+    background: var(--brand-warning);
+    color: white;
+}
+
+.btn-warning-sm:hover {
+    background: #d97706;
+    color: white;
+    text-decoration: none;
+}
+
+/* Mobile FAB Styles */
+.fab-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.fab-backdrop.active {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.fab-container {
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    z-index: 1050;
+}
+
+.fab-create {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--brand-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fab-create:hover {
+    background: var(--brand-primary-light);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(33, 145, 165, 0.6);
+}
+
+.fab-create.active {
+    transform: rotate(45deg);
+    background: var(--brand-primary-light);
+}
+
+/* Mini FABs */
+.mini-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--brand-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    right: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mini-fab.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.mini-fab-create-type.show {
+    transform: scale(1) translateY(-80px);
+    transition-delay: 0.1s;
+}
+
+.mini-fab:hover {
+    background: var(--brand-primary-light);
+    transform: scale(1.1) translateY(var(--translate-y));
+}
+
+.mini-fab-create-type:hover {
+    --translate-y: -80px;
+}
+
+/* FAB Labels */
+.fab-label {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.mini-fab:hover .fab-label {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(-8px);
+}
+
+/* Show FAB only on mobile */
+@media (max-width: 768px) {
+    .fab-container {
+        display: block !important;
+    }
+    
+    .fab-backdrop {
+        display: none !important;
+    }
+    
+    .fab-backdrop.active {
+        display: block !important;
+    }
+}
+
+/* Hide FAB on desktop */
+@media (min-width: 769px) {
+    .fab-container,
+    .fab-backdrop {
+        display: none !important;
+    }
+}
+
+/* Fine-specific status badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.partial {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.overdue {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-badge.completed,
+.status-badge.cleared {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-badge.defaulted {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Fine amount styling */
+.text-error {
+    color: var(--brand-error, #dc2626);
+    font-weight: 600;
+}
+
+/* Fine payment info styling */
+.fine-payment-info {
+    background: var(--brand-gray-50);
+    border: 1px solid var(--brand-gray-200);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.impose-fine-info {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* Empty state button styling */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background: var(--brand-primary-light);
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.btn-primary i {
+    font-size: 16px;
+}
+
+/* Modal button styling */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: var(--brand-gray-500);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: var(--brand-gray-600);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-success {
+    background: var(--brand-success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-warning {
+    background: var(--brand-warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    color: white;
+    text-decoration: none;
+}
+
+/* Mobile responsiveness adjustments */
+@media (max-width: 768px) {
+    .brand-table th:nth-child(n+6),
+    .brand-table td:nth-child(n+6) {
+        display: none;
+    }
+    
+    .brand-table th:nth-child(4),
+    .brand-table td:nth-child(4),
+    .brand-table th:nth-child(5),
+    .brand-table td:nth-child(5) {
+        font-size: 12px;
+        padding: 8px 4px;
+    }
+    
+    .action-buttons {
+        justify-content: center;
+    }
+    
+    .btn-action {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+/* Hide elements based on role */
+.admin {
+    display: var(--admin-display, block);
+}
+
+.member {
+    display: var(--member-display, block);
+}
+
+/* Toast notifications for feedback */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--brand-shadow-lg);
+    border: 1px solid var(--brand-gray-200);
+    min-width: 300px;
+}
+
+.toast.success {
+    border-left: 4px solid var(--brand-success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--brand-error);
+}
+
+.toast.warning {
+    border-left: 4px solid var(--brand-warning);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tabs
+    const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = this.getAttribute('href');
+            
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            this.classList.add('active');
+            document.querySelector(target).classList.add('active');
+        });
+    });
+    
+    // Desktop floating action button handlers
+    const createFineTypeBtnDesktop = document.getElementById('createFineTypeBtnDesktop');
+    
+    if (createFineTypeBtnDesktop) {
+        createFineTypeBtnDesktop.addEventListener('click', function() {
+            openCreateFineTypeModal();
+        });
+    }
+
+    // Mobile FAB functionality
+    const fabCreate = document.getElementById('fabCreate');
+    const fabBackdrop = document.getElementById('fabBackdrop');
+    const miniFabs = document.querySelectorAll('.mini-fab');
+    const createFineTypeBtnMobile = document.getElementById('createFineTypeBtnMobile');
+    let isExpanded = false;
+
+    function expandFAB() {
+        isExpanded = true;
+        if (fabCreate) fabCreate.classList.add('active');
+        if (fabBackdrop) {
+            fabBackdrop.style.display = 'block';
+            fabBackdrop.classList.add('active');
+        }
+        miniFabs.forEach(function(fab) {
+            fab.classList.add('show');
+        });
+    }
+
+    function collapseFAB() {
+        isExpanded = false;
+        if (fabCreate) fabCreate.classList.remove('active');
+        if (fabBackdrop) {
+            fabBackdrop.classList.remove('active');
+            setTimeout(() => {
+                fabBackdrop.style.display = 'none';
+            }, 300);
+        }
+        miniFabs.forEach(function(fab) {
+            fab.classList.remove('show');
+        });
+    }
+
+    function toggleFAB() {
+        if (isExpanded) {
+            collapseFAB();
+        } else {
+            expandFAB();
+        }
+    }
+
+    // FAB event handlers
+    if (fabCreate) {
+        fabCreate.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleFAB();
+        });
+    }
+
+    if (fabBackdrop) {
+        fabBackdrop.addEventListener('click', function() {
+            collapseFAB();
+        });
+    }
+
+    // Mobile mini-fab handlers
+    if (createFineTypeBtnMobile) {
+        createFineTypeBtnMobile.addEventListener('click', function() {
+            collapseFAB();
+            openCreateFineTypeModal();
+        });
+    }
+   
+    // Form submission handlers
+    document.getElementById('createFineTypeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitCreateFineType();
+    });
+    
+    document.getElementById('payFineForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitPayFine();
+    });
+    
+    document.getElementById('imposeFineForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitImposeFine();
+    });
+});
+
+// Modal functions
+function openCreateFineTypeModal() {
+    const modal = new bootstrap.Modal(document.getElementById('createFineTypeModal'));
+    modal.show();
+}
+
+function openPayFineModal(fineId, memberName, balance, fineType) {
+    document.getElementById('payFineId').value = fineId;
+    document.getElementById('payFineType').value = fineType;
+    document.getElementById('payFineMemberName').textContent = memberName;
+    document.getElementById('payFineCurrentBalance').textContent = `KSH ${balance.toLocaleString()}`;
+    
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('finePaymentDate').value = today;
+    
+    const modal = new bootstrap.Modal(document.getElementById('payFineModal'));
+    modal.show();
+}
+
+function openImposeFineModal(loanId, memberName) {
+    document.getElementById('imposeFineeLoanId').value = loanId;
+    document.getElementById('imposeFineeMemberName').textContent = memberName;
+    
+    const modal = new bootstrap.Modal(document.getElementById('imposeFineModal'));
+    modal.show();
+}
+
+// Form submission functions
+function submitCreateFineType() {
+    const form = document.getElementById('createFineTypeForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Show loading state
+    showFeedback('createFineTypeFeedback', 'Creating fine type...', 'info');
+    
+    fetch(`/chamas-bookeeping/create-fine-type/${localStorage.getItem('groupId')}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(data)
+   })
+   .then(response => response.json())
+   .then(result => {
+       if (result.status === 'success') {
+           showFeedback('createFineTypeFeedback', result.message, 'success');
+           setTimeout(() => {
+               location.reload();
+           }, 1500);
+       } else {
+           showFeedback('createFineTypeFeedback', result.message, 'error');
+       }
+   })
+   .catch(error => {
+       showFeedback('createFineTypeFeedback', 'Error creating fine type. Please try again.', 'error');
+   });
+}
+
+function submitPayFine() {
+    const form = document.getElementById('payFineForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Show loading state
+    showFeedback('payFineFeedback', 'Processing payment...', 'info');
+    
+    fetch(`/chamas-bookeeping/update-fine/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showFeedback('payFineFeedback', result.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showFeedback('payFineFeedback', result.message, 'error');
+        }
+    })
+    .catch(error => {
+        showFeedback('payFineFeedback', 'Error processing payment. Please try again.', 'error');
+    });
+}
+
+function submitImposeFine() {
+    const form = document.getElementById('imposeFineForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Show loading state
+    showFeedback('imposeFineeFeedback', 'Imposing fine...', 'info');
+    
+    fetch(`/chamas-bookeeping/impose-fine/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showFeedback('imposeFineeFeedback', result.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showFeedback('imposeFineeFeedback', result.message, 'error');
+        }
+    })
+    .catch(error => {
+        showFeedback('imposeFineeFeedback', 'Error imposing fine. Please try again.', 'error');
+    });
+}
+
+// Utility functions
+function showFeedback(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.className = `alert alert-${type === 'error' ? 'danger' : type}`;
+    element.style.display = 'block';
+}
+
+function showToast(message, type) {
+    // Create toast container if it doesn't exist
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div class="toast-body p-3">
+            <div class="d-flex align-items-center">
+                <i class="bx bx-${type === 'success' ? 'check-circle' : type === 'error' ? 'error-circle' : 'info-circle'} me-2"></i>
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Remove toast after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => container.removeChild(toast), 300);
+    }, 5000);
+}
+
+function getCsrfToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfToken) {
+        return csrfToken.value;
+    }
+    // Fallback to cookie method
+    const value = "; " + document.cookie;
+    const parts = value.split("; csrftoken=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return '';
+}
+
+// Additional utility functions for other actions
+function viewFineDetails(fineId) {
+    // Implementation for viewing fine details
+    console.log('View fine details:', fineId);
+}
+
+function editFineType(fineTypeId) {
+    // Implementation for editing fine type
+    console.log('Edit fine type:', fineTypeId);
+}
+
+function deleteFineType(fineTypeId) {
+    if (!confirm('Are you sure you want to delete this fine type?')) {
+        return;
+    }
+    // Implementation for deleting fine type
+    console.log('Delete fine type:', fineTypeId);
+}
+
+function viewLoanDetails(loanId) {
+    // Implementation for viewing loan details
+    console.log('View loan details:', loanId);
+}
+</script>
+
+{%endblock%}

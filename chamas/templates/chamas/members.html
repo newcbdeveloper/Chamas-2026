@@ -1,0 +1,1419 @@
+{% extends 'chamas/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block head %}
+<title>Members - {{ group.name }}</title>
+<link rel="stylesheet" href="{% static 'chamas/brand-colors.css' %}">
+<link rel="stylesheet" href="{% static 'chamas/reports.css' %}">
+<link rel="stylesheet" href="{% static 'chamas/loans.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Additional Members Page Styles */
+.members-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--brand-primary);
+    flex-shrink: 0;
+}
+
+.members-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.member-name {
+    font-weight: 600;
+    color: var(--brand-gray-900);
+    margin: 0;
+}
+
+.member-role-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.admin-bulb {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.member-bulb {
+    background: var(--brand-success);
+    color: white;
+}
+
+.treasurer-bulb {
+    background: var(--brand-warning);
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-action {
+    padding: 0.375rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+}
+
+.btn-edit {
+    background: #f39c12;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #e67e22;
+}
+
+.btn-remove {
+    background: var(--brand-error);
+    color: white;
+}
+
+.btn-remove:hover {
+    background: #dc2626;
+}
+
+.btn-remove:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.search-container {
+    margin-bottom: 1.5rem;
+}
+
+.search-wrapper {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid var(--brand-gray-200);
+    border-radius: var(--brand-border-radius);
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(33, 145, 165, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--brand-gray-400);
+}
+
+/* Mobile FAB styles */
+.fab-container {
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    z-index: 1000;
+    display: none;
+}
+
+.fab-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.fab-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+}
+
+.fab-create {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.fab-create:hover {
+    background: var(--brand-primary-hover);
+    transform: scale(1.05);
+}
+
+.fab-create.active {
+    transform: rotate(45deg);
+}
+
+.mini-fab {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    color: var(--brand-primary);
+    border: 2px solid var(--brand-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0);
+    right: 4px;
+}
+
+.mini-fab.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.mini-fab-add-member {
+    bottom: 80px;
+    transition-delay: 0.1s;
+}
+
+.fab-label {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+   opacity: 1 !important;
+    visibility: visible !important;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.mini-fab:hover .fab-label {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Desktop floating actions */
+.floating-actions {
+    position: fixed;
+    top: 120px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-floating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-floating:hover {
+    background: var(--brand-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .floating-actions {
+        display: none !important;
+    }
+    
+    .fab-container {
+        display: block !important;
+    }
+    
+    .search-wrapper {
+        max-width: 100%;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .btn-action {
+        min-width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .floating-actions {
+        display: flex !important;
+    }
+    
+    .fab-container, .fab-backdrop {
+        display: none !important;
+    }
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: var(--brand-border-radius);
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+/* Fix Bootstrap modal visibility and styling */
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+.modal-dialog {
+    z-index: 1056 !important;
+    position: relative !important;
+}
+
+.modal-content {
+    z-index: 1057 !important;
+    position: relative !important;
+    background: white !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.brand-modal {
+    background: white !important;
+}
+
+.brand-modal-header {
+    background: #2ba6bd !important;
+    border-bottom: 1px solid #2ba6bd !important;
+    padding: 1.5rem;
+}
+
+.brand-modal-header .modal-title {
+    color: white !important;
+}
+
+.brand-modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+.brand-modal-footer {
+    background: white !important;
+    border-top: 1px solid #dee2e6 !important;
+    padding: 1.5rem;
+}
+
+.brand-form .form-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 0.2rem rgba(33, 145, 165, 0.25);
+}
+
+.alert {
+    border-radius: var(--brand-border-radius, 4px);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- CSRF Token for JavaScript -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+<div class="reports-container full-width" data-chama-id="{{ chama_id }}">
+    <!-- Page Header -->
+    <div class="reports-header">
+        <div class="reports-header-content">
+            <h1 class="reports-title text-brand-primary">Members Management</h1>
+            <p class="reports-subtitle">Manage chama members, roles, and member information</p>
+        </div>
+    </div>
+
+    <!-- Desktop Floating Action Buttons -->
+    <div class="floating-actions desktop-floating">
+        <button class="btn-floating admin" onclick="openAddMemberModal()" title="Add Member">
+            <i class='bx bx-plus'></i>
+            <span>Add Member</span>
+        </button>
+    </div>
+
+    <!-- Mobile FAB Container -->
+    <div class="fab-backdrop" id="fabBackdrop"></div>
+    <div class="fab-container">
+        <button class="fab-create" id="fabCreate">
+            <i class='bx bx-plus'></i>
+        </button>
+        
+        <button class="mini-fab mini-fab-add-member admin" onclick="openAddMemberModal()">
+            <i class='bx bx-user-plus'></i>
+            <span class="fab-label">Add Member</span>
+        </button>
+    </div>
+
+    <!-- Alerts Container -->
+    <div id="alerts-container"></div>
+
+    <!-- Members Content -->
+    <div class="reports-content">
+        <div class="reports-grid">
+            <!-- Members Table Card -->
+            <div class="report-card brand-card admin member">
+                <div class="report-card-header brand-card-header">
+                    <div class="report-header-info">
+                        <h3 class="report-title text-brand-primary">Chama Members</h3>
+                        <p class="report-description">All members in {{ group.name }} ({{ members_count|default:0 }} total)</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn-download-individual bg-brand-primary" id="download-members-report">
+                            <i class="bx bx-download"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search Section -->
+                <div class="search-container" style="padding: 0 2rem;">
+                    <div class="search-wrapper">
+                        <i class="bx bx-search search-icon"></i>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="Search members by name, email, or phone..."
+                            id="memberSearch"
+                            onkeyup="filterMembers()"
+                        >
+                    </div>
+                </div>
+
+                <div class="report-data brand-card-body">
+                    <div id="members-items" class="data-container">
+                        {% if members %}
+                        <div class="brand-table-responsive">
+                            <table class="brand-table" id="membersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Role</th>
+                                        <th>Contact</th>
+                                        <th>ID Number</th>
+                                        <th>Member Since</th>
+                                        <th>Contributions</th>
+                                        <th>Loans</th>
+                                        <th class="admin">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for member in members %}
+                                    <tr class="member-row" 
+                                        data-member-id="{{ member.id }}"
+                                        data-member-name="{{ member.name|lower }}"
+                                        data-member-email="{{ member.email|lower }}"
+                                        data-member-mobile="{{ member.mobile|lower }}"
+                                        data-is-creator="{% if member.user and member.user == group.created_by %}true{% else %}false{% endif %}">
+                                        <td onclick="openMemberModal({{ member.id }})" style="cursor: pointer;">
+                                            <div class="member-info">
+                                                <div class="members-avatar">
+                                                    {% if member.profile %}
+                                                        <img src="{{ member.profile }}" alt="{{ member.name }}" loading="lazy">
+                                                    {% else %}
+                                                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNSIgcj0iNyIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNNyAzM0M3IDI3IDEyLjUgMjIgMjAgMjJTMzMgMjcgMzMgMzNWMzNIN1YzM1oiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg==" alt="Default Avatar">
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <p class="member-name">{{ member.name|title }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="member-role-badge {{ member.role.name|lower }}-bulb">
+                                                {{ member.role.name|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style="font-size: 0.875rem;">
+                                                <div>{{ member.email }}</div>
+                                                <div style="color: var(--brand-gray-600);">{{ member.mobile }}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span style="font-size: 0.875rem;">
+                                                {{ member.member_id|default:"Not assigned" }}
+                                            </span>
+                                        </td>
+                                        <td>{{ member.member_since|date:"M Y" }}</td>
+                                        <td class="text-brand-primary">
+                                            KSh {{ member.total_contributions|floatformat:0|intcomma|default:"0" }}
+                                        </td>
+                                        <td class="text-warning">{{ member.total_loans|default:"0" }}</td>
+                                        <td class="admin">
+                                            <div class="action-buttons">
+                                                <button class="btn-action btn-edit admin" 
+                                                        onclick="openEditMemberModal({{ member.id }})" 
+                                                        title="Edit {{ member.name }}'s details">
+                                                    <i class="bx bx-edit"></i>
+                                                </button>
+                                                <button class="btn-action btn-remove admin" 
+                                                        onclick="confirmRemoveMember({{ member.id }}, '{{ member.name|escapejs }}')" 
+                                                        title="{% if member.user and member.user == group.created_by %}Cannot remove chama creator{% else %}Remove {{ member.name }} from chama{% endif %}"
+                                                        {% if member.user and member.user == group.created_by %}disabled{% endif %}>
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="bx bx-users empty-state-icon"></i>
+                            <p class="empty-state-message">No Members Found</p>
+                            <p class="empty-state-description">Start by adding your first member to the chama</p>
+                            <button class="btn-primary admin" onclick="openAddMemberModal()">
+                                <i class="bx bx-plus"></i>
+                                Add First Member
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Member Details Modal -->
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="memberModalTitle">
+                    <i class='bx bx-user'></i>
+                    Member Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="memberModalBody">
+                <div class="text-center">
+                    <i class="bx bx-loader-alt bx-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+                    <p>Loading member details...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="addMemberModalTitle">
+                    <i class='bx bx-user-plus'></i>
+                    Add New Member
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMemberForm" class="brand-form">
+                    <input type="hidden" id="memberChamaId" name="chama_id" value="{{ chama.id }}">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="memberName" class="form-label">Full Name *</label>
+                                <input type="text" id="memberName" name="name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="memberEmail" class="form-label">Email *</label>
+                                <input type="email" id="memberEmail" name="email" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="memberPhone" class="form-label">Phone Number *</label>
+                                <input type="tel" id="memberPhone" name="mobile" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="memberIdNumber" class="form-label">ID Number</label>
+                                <input type="text" id="memberIdNumber" name="id_number" class="form-control" placeholder="Enter member's ID number">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberRole" class="form-label">Role *</label>
+                        <select id="memberRole" name="role" class="form-control" required>
+                            <option value="">Select a role</option>
+                            {% for role in roles %}
+                            <option value="{{ role.id }}">{{ role.name|title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div id="addMemberFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="addMemberForm" class="btn btn-primary admin">
+                    <i class='bx bx-plus'></i>
+                    Add Member
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="editMemberModalTitle">
+                    <i class='bx bx-edit'></i>
+                    Edit Member
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editMemberForm" class="brand-form">
+                    <input type="hidden" id="editMemberId" name="member_id">
+                    <input type="hidden" id="editMemberChamaId" name="chama_id" value="{{ chama.id }}">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editMemberName" class="form-label">Full Name *</label>
+                                <input type="text" id="editMemberName" name="name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editMemberEmail" class="form-label">Email *</label>
+                                <input type="email" id="editMemberEmail" name="email" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editMemberPhone" class="form-label">Phone Number *</label>
+                                <input type="tel" id="editMemberPhone" name="mobile" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editMemberIdNumber" class="form-label">ID Number</label>
+                                <input type="text" id="editMemberIdNumber" name="id_number" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editMemberRole" class="form-label">Role *</label>
+                        <select id="editMemberRole" name="role" class="form-control" required>
+                            <option value="">Select a role</option>
+                            {% for role in roles %}
+                            <option value="{{ role.id }}">{{ role.name|title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div id="editMemberFeedback" class="alert" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="editMemberForm" class="btn btn-primary admin">
+                    <i class='bx bx-save'></i>
+                    Update Member
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Member Confirmation Modal -->
+<div class="modal fade" id="removeMemberModal" tabindex="-1" aria-labelledby="removeMemberModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content brand-modal">
+            <div class="modal-header brand-modal-header">
+                <h5 class="modal-title text-brand-primary" id="removeMemberModalTitle">
+                    <i class='bx bx-trash'></i>
+                    Remove Member
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="bx bx-error-circle" style="font-size: 3rem; color: var(--brand-error);"></i>
+                </div>
+                <p class="text-center mb-3">
+                    Are you sure you want to remove <strong id="removeMemberName"></strong> from the chama?
+                </p>
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> This action cannot be undone. All member data will be permanently removed.
+                </div>
+                <input type="hidden" id="removeMemberId">
+            </div>
+            <div class="modal-footer brand-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveMember">
+                    <i class='bx bx-trash'></i>
+                    Remove Member
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let currentPage = 1;
+let allMembers = [];
+let filteredMembers = [];
+const membersPerPage = 10;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMembers();
+    setupEventListeners();
+    setupFAB();
+});
+
+function initializeMembers() {
+    const memberRows = document.querySelectorAll('.member-row');
+    allMembers = Array.from(memberRows);
+    filteredMembers = [...allMembers];
+}
+
+function setupEventListeners() {
+    // Form submission handlers
+    document.getElementById('addMemberForm').addEventListener('submit', submitAddMember);
+    document.getElementById('editMemberForm').addEventListener('submit', submitEditMember);
+    
+    // Remove member confirmation
+    document.getElementById('confirmRemoveMember').addEventListener('click', function() {
+        const memberId = document.getElementById('removeMemberId').value;
+        const memberName = document.getElementById('removeMemberName').textContent;
+        performRemoveMember(memberId, memberName);
+    });
+}
+
+// Setup Mobile FAB
+function setupFAB() {
+    const fabCreate = document.getElementById('fabCreate');
+    const fabBackdrop = document.getElementById('fabBackdrop');
+    const miniFabs = document.querySelectorAll('.mini-fab');
+    
+    if (fabCreate) {
+        fabCreate.addEventListener('click', function() {
+            const isActive = this.classList.contains('active');
+            
+            if (isActive) {
+                // Close FAB
+                this.classList.remove('active');
+                fabBackdrop.classList.remove('active');
+                miniFabs.forEach(fab => fab.classList.remove('show'));
+            } else {
+                // Open FAB
+                this.classList.add('active');
+                fabBackdrop.classList.add('active');
+                miniFabs.forEach(fab => fab.classList.add('show'));
+            }
+        });
+    }
+    
+    if (fabBackdrop) {
+        fabBackdrop.addEventListener('click', function() {
+            fabCreate.classList.remove('active');
+            this.classList.remove('active');
+            miniFabs.forEach(fab => fab.classList.remove('show'));
+        });
+    }
+}
+
+// Helper function to close FAB
+function closeFAB() {
+    const fabCreate = document.getElementById('fabCreate');
+    const fabBackdrop = document.getElementById('fabBackdrop');
+    const miniFabs = document.querySelectorAll('.mini-fab');
+    
+    if (fabCreate && fabBackdrop) {
+        fabCreate.classList.remove('active');
+        fabBackdrop.classList.remove('active');
+        miniFabs.forEach(fab => fab.classList.remove('show'));
+    }
+}
+
+function filterMembers() {
+    const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+    
+    filteredMembers = allMembers.filter(row => {
+        const name = row.dataset.memberName || '';
+        const email = row.dataset.memberEmail || '';
+        const mobile = row.dataset.memberMobile || '';
+        
+        return name.includes(searchTerm) || 
+               email.includes(searchTerm) || 
+               mobile.includes(searchTerm);
+    });
+    
+    // Show/hide rows based on filter
+    allMembers.forEach(row => {
+        if (filteredMembers.includes(row)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Member Modal Functions
+function openMemberModal(memberId) {
+    const modalBody = document.getElementById('memberModalBody');
+    
+    // Show loading state
+    modalBody.innerHTML = `
+        <div class="text-center">
+            <i class="bx bx-loader-alt bx-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+            <p>Loading member details...</p>
+        </div>
+    `;
+    
+    // Show modal using jQuery
+    $('#memberModal').modal('show');
+    
+    // Load member details
+    loadMemberDetails(memberId);
+}
+
+function loadMemberDetails(memberId) {
+    const modalBody = document.getElementById('memberModalBody');
+    const chamaId = document.querySelector('.reports-container').dataset.chamaId;
+    
+    if (!memberId || !chamaId) {
+        modalBody.innerHTML = `
+            <div class="text-center">
+                <i class="bx bx-error-circle" style="font-size: 2rem; color: var(--brand-error);"></i>
+                <h3>Error Loading Member Details</h3>
+                <p>Missing required parameters</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const url = `/chamas-bookeeping/member-detail/${memberId}/${chamaId}/`;
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            renderMemberDetails(data);
+        } else {
+            throw new Error(data.message || 'Failed to load member details');
+        }
+    })
+    .catch(error => {
+        modalBody.innerHTML = `
+            <div class="text-center">
+                <i class="bx bx-error-circle" style="font-size: 2rem; color: var(--brand-error);"></i>
+                <h3>Error Loading Member Details</h3>
+                <p>${error.message}</p>
+                <button onclick="loadMemberDetails(${memberId})" class="btn-primary" style="margin-top: 1rem;">
+                    <i class="bx bx-refresh"></i> Try Again
+                </button>
+            </div>
+        `;
+    });
+}
+
+function renderMemberDetails(data) {
+    const modalBody = document.getElementById('memberModalBody');
+    const member = data.member;
+    
+    // Update modal title
+    document.getElementById('memberModalTitle').textContent = `${member.name} - Member Details`;
+    
+    modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem;">
+            <div style="text-align: center;">
+                <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 3px solid var(--brand-primary); margin: 0 auto 1rem;">
+                    <img src="${member.profile || getDefaultAvatar()}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h3>${member.name}</h3>
+                <span class="member-role-badge ${member.role.toLowerCase()}-bulb">${member.role}</span>
+                <p style="margin-top: 0.5rem; color: var(--brand-gray-600);">
+                    ${member.member_id ? `ID: ${member.member_id}` : 'No ID assigned'}
+                </p>
+            </div>
+            <div style="background: var(--brand-gray-50); padding: 1.5rem; border-radius: var(--brand-border-radius);">
+                <h4 style="margin-bottom: 1rem;">Contact Information</h4>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <i class="bx bx-envelope" style="color: var(--brand-primary);"></i>
+                    <span>${member.email}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <i class="bx bx-phone" style="color: var(--brand-primary);"></i>
+                    <span>${member.mobile}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <i class="bx bx-calendar" style="color: var(--brand-primary);"></i>
+                    <span>Member since: ${member.member_since}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <i class="bx bx-chart-line" style="color: var(--brand-primary);"></i>
+                    <span>Total Contributions: KSh ${formatCurrency(member.total_contributions)}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <i class="bx bx-credit-card" style="color: var(--brand-primary);"></i>
+                    <span>Active Loans: ${member.total_loans}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="bx bx-error-circle" style="color: var(--brand-primary);"></i>
+                    <span>Outstanding Fines: KSh ${formatCurrency(member.total_fines)}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Add Member Functions
+function openAddMemberModal() {
+    // Close FAB if open
+    closeFAB();
+    
+    // Show modal using jQuery
+    $('#addMemberModal').modal('show');
+    
+    // Focus on first input after modal is shown
+    $('#addMemberModal').on('shown.bs.modal', function() {
+        setTimeout(() => {
+            document.getElementById('memberName').focus();
+        }, 100);
+    });
+}
+
+function submitAddMember(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const memberData = Object.fromEntries(formData.entries());
+    const chamaId = document.querySelector('.reports-container').dataset.chamaId;
+    
+    memberData.chama_id = chamaId;
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#addMemberModal button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Adding...';
+    submitBtn.disabled = true;
+    
+    // Clear previous feedback
+    const feedback = document.getElementById('addMemberFeedback');
+    feedback.style.display = 'none';
+    
+    // Validate required fields
+    if (!memberData.name || !memberData.email || !memberData.mobile || !memberData.role || !chamaId) {
+        const missingFields = [];
+        if (!memberData.name) missingFields.push('name');
+        if (!memberData.email) missingFields.push('email');
+        if (!memberData.mobile) missingFields.push('mobile');
+        if (!memberData.role) missingFields.push('role');
+        if (!chamaId) missingFields.push('chama_id');
+        
+        showAlert(`Missing required fields: ${missingFields.join(', ')}`, 'error');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    const url = '/chamas-bookeeping/add-member/';
+    
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(memberData),
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        return response.json().then(data => {
+            if (response.ok && data.status === 'success') {
+                // Close the modal using jQuery
+                $('#addMemberModal').modal('hide');
+                
+                showAlert(data.message, 'success');
+                
+                // Reset form
+                document.getElementById('addMemberForm').reset();
+                
+                // Refresh the page to show the new member
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                const errorMessage = data.message || `Server error: ${response.status}`;
+                throw new Error(errorMessage);
+            }
+        });
+    })
+    .catch(error => {
+        let errorMessage = error.message;
+        if (errorMessage.includes('Failed to fetch')) {
+            errorMessage = 'Network error: Could not connect to server';
+        }
+        
+        // Show error in modal
+        const feedback = document.getElementById('addMemberFeedback');
+        feedback.className = 'alert alert-danger';
+        feedback.textContent = 'Error adding member: ' + errorMessage;
+        feedback.style.display = 'block';
+        
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+// Edit Member Functions
+function openEditMemberModal(memberId) {
+    fetchMemberDataAndPopulateForm(memberId);
+}
+
+function fetchMemberDataAndPopulateForm(memberId) {
+    const chamaId = getChamaIdFromUrl() || document.querySelector('.reports-container')?.dataset?.chamaId;
+    
+    if (!chamaId) {
+        alert('Unable to determine chama ID');
+        return;
+    }
+    
+    fetch(`/chamas-bookeeping/member-detail/${memberId}/${chamaId}/`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+        }
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            populateEditForm(memberId, data.member);
+        } else {
+            alert('Error loading member details: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error loading member details. Please try again.');
+    });
+}
+
+function populateEditForm(memberId, memberData) {
+    try {
+        const formFields = {
+            editMemberId: document.getElementById('editMemberId'),
+            editMemberChamaId: document.getElementById('editMemberChamaId'),
+            editMemberName: document.getElementById('editMemberName'),
+            editMemberEmail: document.getElementById('editMemberEmail'),
+            editMemberPhone: document.getElementById('editMemberPhone'),
+            editMemberIdNumber: document.getElementById('editMemberIdNumber'),
+            editMemberRole: document.getElementById('editMemberRole')
+        };
+        
+        // Check for missing elements
+        const missingFields = [];
+        for (const [fieldName, element] of Object.entries(formFields)) {
+            if (!element) {
+                missingFields.push(fieldName);
+            }
+        }
+        
+        if (missingFields.length > 0) {
+            alert('Form fields are missing: ' + missingFields.join(', '));
+            return;
+        }
+        
+        // Populate form fields
+        formFields.editMemberId.value = memberId;
+        
+        const chamaId = getChamaIdFromUrl() || document.querySelector('.reports-container')?.dataset?.chamaId;
+        if (chamaId) {
+            formFields.editMemberChamaId.value = chamaId;
+        }
+        
+        formFields.editMemberName.value = memberData.name || '';
+        formFields.editMemberEmail.value = memberData.email || '';
+        formFields.editMemberPhone.value = memberData.mobile || '';
+        
+        // Handle member ID
+        let memberIdValue = '';
+        if (memberData.member_id !== null && memberData.member_id !== undefined && memberData.member_id !== 'null' && memberData.member_id !== 'None') {
+            memberIdValue = String(memberData.member_id).trim();
+        }
+        formFields.editMemberIdNumber.value = memberIdValue;
+        
+        // Set role
+        if (memberData.role_id) {
+            formFields.editMemberRole.value = memberData.role_id;
+        }
+        
+        // Show the modal
+        showEditModal();
+        
+    } catch (error) {
+        alert('Error populating form: ' + error.message);
+    }
+}
+
+function showEditModal() {
+    // Show modal using jQuery
+    $('#editMemberModal').modal('show');
+    
+    // Focus on first field after modal is shown
+    $('#editMemberModal').on('shown.bs.modal', function() {
+        setTimeout(() => {
+            document.getElementById('editMemberName').focus();
+        }, 100);
+    });
+}
+
+function submitEditMember(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const memberData = Object.fromEntries(formData.entries());
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#editMemberModal button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Updating...';
+    submitBtn.disabled = true;
+    
+    // Clear previous feedback
+    const feedback = document.getElementById('editMemberFeedback');
+    feedback.style.display = 'none';
+    
+    // Validate required fields
+    if (!memberData.member_id || !memberData.name || !memberData.email || !memberData.mobile || !memberData.role) {
+        showAlert('All fields except ID Number are required', 'error');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    const url = '/chamas-bookeeping/edit-member/';
+    
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(memberData),
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        return response.json().then(data => {
+            if (response.ok && data.status === 'success') {
+                // Close the modal using jQuery
+                $('#editMemberModal').modal('hide');
+                
+                showAlert(data.message, 'success');
+                
+                // Refresh the page
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                const errorMessage = data.message || `Server error: ${response.status}`;
+                throw new Error(errorMessage);
+            }
+        });
+    })
+    .catch(error => {
+        let errorMessage = error.message;
+        if (errorMessage.includes('Failed to fetch')) {
+            errorMessage = 'Network error: Could not connect to server';
+        }
+        
+        // Show error in modal
+        const feedback = document.getElementById('editMemberFeedback');
+        feedback.className = 'alert alert-danger';
+        feedback.textContent = 'Error updating member: ' + errorMessage;
+        feedback.style.display = 'block';
+        
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+// Remove Member Functions
+function confirmRemoveMember(memberId, memberName) {
+    // Set member data in modal
+    document.getElementById('removeMemberId').value = memberId;
+    document.getElementById('removeMemberName').textContent = memberName;
+    
+    // Show confirmation modal using jQuery
+    $('#removeMemberModal').modal('show');
+}
+
+function performRemoveMember(memberId, memberName) {
+    const chamaId = document.querySelector('.reports-container').dataset.chamaId;
+    
+    const url = '/chamas-bookeeping/remove-member/';
+    const data = {
+        member_id: memberId,
+        chama_id: chamaId
+    };
+    
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        return response.json().then(data => {
+            if (response.ok && data.status === 'success') {
+                // Close the modal using jQuery
+        $('#removeMemberModal').modal('hide');
+        
+        showAlert(`${memberName} has been removed from the chama`, 'success');
+                
+        // Remove the row from table
+        const memberRow = document.querySelector(`[data-member-id="${memberId}"]`);
+        if (memberRow) {
+            memberRow.remove();
+        }
+        
+        // Update member count
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+            } else {
+                const errorMessage = data.message || `Server error: ${response.status}`;
+                throw new Error(errorMessage);
+            }
+        });
+    })
+    .catch(error => {
+        let errorMessage = error.message;
+        if (errorMessage.includes('Failed to fetch')) {
+            errorMessage = 'Network error: Could not connect to server';
+        }
+        
+        showAlert('Error removing member: ' + errorMessage, 'error');
+    });
+}
+
+// Utility Functions
+function getChamaIdFromUrl() {
+    try {
+        const path = window.location.pathname;
+        const pathSegments = path.split('/').filter(segment => segment);
+        const membersIndex = pathSegments.indexOf('members');
+        
+        if (membersIndex !== -1 && pathSegments[membersIndex + 1]) {
+            const chamaId = parseInt(pathSegments[membersIndex + 1]);
+            return chamaId;
+        }
+        
+        return null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+           document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || 
+           '';
+}
+
+function formatCurrency(amount) {
+    if (!amount) return '0';
+    return parseFloat(amount).toLocaleString();
+}
+
+function getDefaultAvatar() {
+    return "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNSIgcj0iNyIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNNyAzM0M3IDI3IDEyLjUgMjIgMjAgMjJTMzMgMjcgMzMgMzNWMzNIN1YzM1oiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg==";
+}
+
+function showAlert(message, type) {
+    const alertsContainer = document.getElementById('alerts-container');
+    const alertElement = document.createElement('div');
+    alertElement.className = `alert alert-${type}`;
+    alertElement.textContent = message;
+    
+    alertsContainer.appendChild(alertElement);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        alertElement.remove();
+    }, 5000);
+}
+
+// Fix modal backdrop interaction issues
+$(document).ready(function() {
+    // Simple backdrop click fix
+    $(document).on('click', '.modal', function(e) {
+        if (e.target === this) {
+            $(this).modal('hide');
+        }
+    });
+    
+    // Fix z-index stacking when modal shows
+    $(document).on('show.bs.modal', '.modal', function() {
+        const modal = $(this);
+        const modalDialog = modal.find('.modal-dialog');
+        const modalContent = modal.find('.modal-content');
+        
+        // Set proper z-index values
+        modal.css('z-index', '1055');
+        modalDialog.css('z-index', '1056');
+        modalContent.css('z-index', '1057');
+        
+        // Ensure backdrop is behind modal
+        setTimeout(() => {
+            $('.modal-backdrop').css('z-index', '1050');
+        }, 0);
+    });
+});
+</script>
+{% endblock %}

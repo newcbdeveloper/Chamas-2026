@@ -1,0 +1,238 @@
+{% load static %}
+{% load expense_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Expense Tracker{% endblock %} - ChamaSpace</title>
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{% static 'expense_tracker/css/tracker.css' %}">    
+    <link rel="stylesheet" href="{% static 'expense_tracker/css/date_selector.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container-fluid">
+            <!-- Mobile Menu Toggle -->
+            <button class="btn btn-link text-white d-md-none" id="sidebarToggle">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+            
+            <a class="navbar-brand" href="{% url 'expense_tracker:dashboard' %}">
+                <i class="fas fa-wallet me-2"></i>Expense Tracker
+            </a>
+
+            <!-- Notifications Bell -->
+            {% if unread_insights_count > 0 or budget_alerts_count > 0 %}
+            <div class="ms-auto">
+                <div class="dropdown">
+                    <a class="nav-link text-white position-relative p-0" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ unread_insights_count|add:budget_alerts_count }}
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% if budget_alerts_count > 0 %}
+                            <li><h6 class="dropdown-header">Budget Alerts</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'expense_tracker:budget_list' %}">
+                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                {{ budget_alerts_count }} budget alert{{ budget_alerts_count|pluralize }}
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                        {% endif %}
+                        {% if unread_insights_count > 0 %}
+                            <li><h6 class="dropdown-header">New Insights</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'expense_tracker:insights' %}">
+                                <i class="fas fa-lightbulb text-warning me-2"></i>
+                                {{ unread_insights_count }} new insight{{ unread_insights_count|pluralize }}
+                            </a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'expense_tracker:dashboard' %}">
+                            <i class="fas fa-home"></i><span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'transaction_create' %}active{% endif %}" href="{% url 'expense_tracker:transaction_create' %}">
+                            <i class="fas fa-plus-circle"></i><span>Add Transaction</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'charts' %}active{% endif %}" href="{% url 'expense_tracker:charts' %}">
+                            <i class="fas fa-chart-line"></i><span>Charts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}" href="{% url 'expense_tracker:reports' %}">
+                            <i class="fas fa-file-alt"></i><span>Reports & Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'budget' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'expense_tracker:budget_list' %}">
+                            <i class="fas fa-wallet"></i><span>Budgets</span>
+                            {% if budget_alerts_count > 0 %}
+                                <span class="badge bg-danger ms-auto">{{ budget_alerts_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'recurring' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'expense_tracker:recurring_list' %}">
+                            <i class="fas fa-sync-alt"></i><span>Recurring</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'expense_tracker:category_list' %}">
+                            <i class="fas fa-tags"></i><span>Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'insights' %}active{% endif %}" href="{% url 'expense_tracker:insights' %}">
+                            <i class="fas fa-lightbulb"></i><span>Insights</span>
+                            {% if unread_insights_count > 0 %}
+                                <span class="badge bg-warning ms-auto">{{ unread_insights_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    <!-- Preferences -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'user_preferences' %}active{% endif %}" href="{% url 'expense_tracker:user_preferences' %}">
+                            <i class="fas fa-cog"></i><span>Preferences</span>
+                        </a>
+                    </li>
+
+                    <!-- Back to Main Dashboard -->
+                    <li class="nav-item mt-4 pt-3 border-top">
+                        <a class="nav-link text-info fw-bold" href="{% url 'user_dashboard:home' %}">
+                            <i class="fas fa-arrow-left me-2"></i><span>Back to Home</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content flex-grow-1">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="container-fluid mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Budget Alerts -->
+            {% if budget_alerts and request.resolver_match.url_name == 'dashboard' %}
+                <div class="container-fluid mt-3">
+                    {% for alert in budget_alerts %}
+                        <div class="alert alert-{{ alert.type }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>{{ alert.message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Mobile Bottom Footer (Global) -->
+    <footer class="mbl_footer d-md-none" style="background: #2291A5 !important; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 10px 0;">
+        <div class="container">
+            <div class="footer_row d-flex justify-content-between align-items-center" style="padding: 0 15px;">
+                <a href="{% url 'user_dashboard:home' %}" class="footer_button btn text-white text-decoration-none d-flex flex-column align-items-center py-2">
+                    <img src="{% static 'images/home_white.png' %}" alt="Home" style="width: 24px; height: 24px; filter: brightness(0) invert(1); margin-bottom: 4px;">
+                    <small>Home</small>
+                </a>
+                <a href="#" class="footer_button btn text-white text-decoration-none d-flex flex-column align-items-center py-2" id="featuresBtn">
+                    <img src="{% static 'images/filter_active.png' %}" alt="Features" style="width: 24px; height: 24px; filter: brightness(0) invert(1); margin-bottom: 4px;">
+                    <small style="font-weight:600;">Features</small>
+                </a>
+                <a href="#" class="footer_button btn text-white text-decoration-none d-flex flex-column align-items-center py-2 coming_soon">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="Account" style="width: 24px; height: 24px; filter: brightness(0) invert(1); margin-bottom: 4px;">
+                    <small>Account</small>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn text-white text-decoration-none d-flex flex-column align-items-center py-2">
+                    <img src="{% static 'images/setting.png' %}" alt="Settings" style="width: 24px; height: 24px; filter: brightness(0) invert(1); margin-bottom: 4px;">
+                    <small>Settings</small>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Sidebar toggle (mobile)
+        document.getElementById('sidebarToggle')?.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar on link click (mobile)
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('show');
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', e => {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            if (window.innerWidth <= 768 && sidebar?.classList.contains('show')) {
+                if (!sidebar.contains(e.target) && !toggle?.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+
+        // FEATURES BUTTON → Opens the GLOBAL ChamaSpace drawer
+        const featuresBtn = document.getElementById('featuresBtn');
+        if (featuresBtn) {
+            featuresBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('sidebar')?.classList.remove('show'); // close local sidebar
+                if (typeof openDrawer === 'function') {
+                    openDrawer(); // this function exists globally from chamas_base.html
+                }
+            });
+        }
+    </script>
+
+    <!-- Bootstrap, jQuery, Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

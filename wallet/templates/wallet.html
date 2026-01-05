@@ -1,0 +1,1057 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+        <main role="main" class="main-content p-0">
+
+             <div class="modal fade" id="exampleModal8" tabindex="-1" aria-labelledby="exampleModal8Label"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+
+                        <div class="modal-body">
+                            <div class="popup_box" id="firstInnerHowmuch">
+                                <h4 class="popup_heading">
+                                    How much do you want to <br>load?
+                                </h4>
+
+                                <form id="add_amount_form" method="post" class="mt-25">
+                                    {% csrf_token %}
+                                    <label for="add_money">
+                                        Add amount
+                                    </label>
+                                    <input type="number" name="add_money" id="add_money" placeholder="Enter Amount"
+                                           class="mt-1" required>
+
+                                    <p class="mt-4">This money will be added to your main wallet</p>
+                                    <button type="submit" class="btn popup_btn">
+                                        Add
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="popupTwo" id="secondInnerHowmuch" style="display: none;">
+
+                                <div class="popup_box">
+                                    <h4 class="popup_heading">
+                                        Success!
+
+                                    </h4>
+
+
+                                    <div class="text-center mt-3 mb-3">
+                                        <img src="{% static 'images/success.png' %}" alt="">
+                                    </div>
+                                    <h4 class="popup_heading">
+
+                                       Request successfully. Please check your phone for a prompt.
+                                    </h4>
+
+
+                                    <button class="btn popup_btn"
+                                            data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="popupTwo" id="deposit_deniedInnerHowmuch" style="display: none;">
+
+                                <div class="popup_box">
+                                    <h4 class="popup_heading">
+                                        Sorry!
+
+                                    </h4>
+
+
+
+                                    <h4 class="popup_heading">
+
+                                        We are unable to process your request at the moment, please check your phone or contact support.
+                                    </h4>
+
+
+                                    <button class="btn popup_btn"
+                                            data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+
+
+
+
+
+            <section class="wallet-banner">
+                <div class="container">
+                    <nav class="page_nav mob_nav show_on_mobile">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+                            <li class="" data-toggle="modal" data-target=".modal-notif">
+                                <img src="{% static 'images/Notifications.png' %}" alt="">
+                            </li>
+                            <li class="">
+
+                                <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+
+                                    <img src="{% static 'images/menu.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="c-o-b-e-dwrapper">
+                        <div class="wallet-content">
+                            <h4 class="h-heding">
+                                Wallet
+                            </h4>
+                            <h5 class="balance">
+                                Available Balance
+                            </h5>
+                            <h6 class="b-value">
+                                Kshs. {{ user_wallet.available_for_withdraw }}
+                            </h6>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="m-r-b-box cursot-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal8">
+                                <div class="wallet-roned">
+                                    <img src="{% static 'images/wallet-money_.png' %}" alt="">
+                                </div>
+                                <h6 class="w-p-w-heding">
+                                    Load Money
+                                </h6>
+                            </div>
+                            <div class="m-r-b-box">
+                                <div class="wallet-roned">
+                                    <img src="{% static 'images/money-send_.png' %}" alt="">
+                                </div>
+                                <h6 class="w-p-w-heding">
+                                    Withdraw Money
+                                </h6>
+                            </div>
+                            <div class="m-r-b-box">
+                                <div class="wallet-roned">
+                                    <img src="{% static 'images/kopesha.png' %}" alt="">
+                                </div>
+                                <h6 class="w-p-w-heding">
+                                    Transfer Money
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+<!--            <section class="wallet-sumery-section mb-0 wallet-sumery-mbl">-->
+<!--                <div class="container">-->
+<!--                    <div class="sumery-content">-->
+<!--                        <h3>-->
+<!--                            Summary:-->
+<!--                        </h3>-->
+<!--                    </div>-->
+<!--                    <div class="summery-wraper-boxes">-->
+<!--                        &lt;!&ndash;a single box&ndash;&gt;-->
+<!--                        &lt;!&ndash;a single box&ndash;&gt;-->
+
+<!--                        <div class="summery-inner-boxes mb-2">-->
+<!--                            <div class="che-b-heading">-->
+<!--                                <h4>Chamaz</h4>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex align-items-center justify-content-between">-->
+<!--                                <div>-->
+<!--                                    <svg width="44" height="45" viewBox="0 0 44 45" fill="none"-->
+<!--                                         xmlns="http://www.w3.org/2000/svg">-->
+<!--                                        <path-->
+<!--                                                d="M34.1413 12.6824C33.9875 12.6604 33.8336 12.6604 33.6797 12.6824C30.2729 12.5725 27.5693 9.78103 27.5693 6.35218C27.5693 2.85738 30.4047 0 33.9215 0C37.4163 0 40.2737 2.8354 40.2737 6.35218C40.2517 9.78103 37.5482 12.5725 34.1413 12.6824Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                        <path-->
+<!--                                                d="M41.3111 27.9139C38.8494 29.5623 35.3985 30.1778 32.2115 29.7602C33.0467 27.9578 33.4863 25.9576 33.5083 23.8476C33.5083 21.6496 33.0247 19.5615 32.1016 17.7372C35.3546 17.2976 38.8054 17.913 41.2891 19.5615C44.762 21.8474 44.762 25.606 41.3111 27.9139Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                        <path-->
+<!--                                                d="M9.76762 12.6824C9.92148 12.6604 10.0753 12.6604 10.2292 12.6824C13.6361 12.5725 16.3396 9.78103 16.3396 6.35218C16.3396 2.8354 13.5042 0 9.98742 0C6.49263 0 3.65723 2.8354 3.65723 6.35218C3.65723 9.78103 6.36075 12.5725 9.76762 12.6824Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                        <path-->
+<!--                                                d="M10.0118 23.848C10.0118 25.98 10.4734 28.0022 11.3086 29.8265C8.20947 30.1562 4.97844 29.4968 2.60461 27.9363C-0.868204 25.6284 -0.868204 21.8698 2.60461 19.5619C4.95646 17.9794 8.27541 17.3419 11.3966 17.6936C10.4954 19.54 10.0118 21.628 10.0118 23.848Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                        <path-->
+<!--                                                d="M22.2541 30.4869C22.0782 30.4649 21.8804 30.4649 21.6826 30.4869C17.6383 30.355 14.4072 27.036 14.4072 22.9478C14.4292 18.7716 17.7922 15.3867 21.9903 15.3867C26.1665 15.3867 29.5514 18.7716 29.5514 22.9478C29.5294 27.036 26.3203 30.355 22.2541 30.4869Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                        <path-->
+<!--                                                d="M15.1103 35.0364C11.7914 37.2564 11.7914 40.905 15.1103 43.103C18.8909 45.6307 25.0892 45.6307 28.8697 43.103C32.1887 40.883 32.1887 37.2344 28.8697 35.0364C25.1112 32.5087 18.9129 32.5087 15.1103 35.0364Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                    </svg>-->
+<!--                                </div>-->
+<!--                                <div class="dfd-inner-table">-->
+<!--                                    <table class="dd-table">-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                Your Chamaz:-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                3-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                Total Security Fee:-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                KShs.3,500.00-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                <button class="btn tabel-button me-2">-->
+<!--                                                    All Transactions-->
+<!--                                                </button>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <button class="btn tabel-button">-->
+<!--                                                    All Transactions-->
+<!--                                                </button>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        &lt;!&ndash;a single box&ndash;&gt;-->
+<!--                        <div class="summery-inner-boxes mb-2">-->
+<!--                            <div class="che-b-heading">-->
+<!--                                <h4>Wekeza Goals</h4>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex align-items-center justify-content-between">-->
+<!--                                <div>-->
+<!--                                    <svg width="40" height="38" viewBox="0 0 40 38" fill="none"-->
+<!--                                         xmlns="http://www.w3.org/2000/svg">-->
+<!--                                        <path-->
+<!--                                                d="M28 18C28.5667 18 29.0417 17.8083 29.425 17.425C29.8083 17.0417 30 16.5667 30 16C30 15.4333 29.8083 14.9583 29.425 14.575C29.0417 14.1917 28.5667 14 28 14C27.4333 14 26.9583 14.1917 26.575 14.575C26.1917 14.9583 26 15.4333 26 16C26 16.5667 26.1917 17.0417 26.575 17.425C26.9583 17.8083 27.4333 18 28 18ZM12 14H22V10H12V14ZM5 38C3.86667 34.2 2.75 30.4083 1.65 26.625C0.55 22.8417 0 18.9667 0 15C0 11.9333 1.06667 9.33333 3.2 7.2C5.33333 5.06667 7.93333 4 11 4H21C21.9667 2.73333 23.1417 1.75 24.525 1.05C25.9083 0.35 27.4 0 29 0C29.8333 0 30.5417 0.291667 31.125 0.875C31.7083 1.45833 32 2.16667 32 3C32 3.2 31.975 3.4 31.925 3.6C31.875 3.8 31.8167 3.98333 31.75 4.15C31.6167 4.51667 31.4917 4.89167 31.375 5.275C31.2583 5.65833 31.1667 6.05 31.1 6.45L35.65 11H40V24.95L34.35 26.8L31 38H20V34H16V38H5ZM8 34H12V30H24V34H28L31.1 23.7L36 22.05V15H34L27 8C27 7.33333 27.0417 6.69167 27.125 6.075C27.2083 5.45833 27.3333 4.83333 27.5 4.2C26.5333 4.46667 25.6833 4.925 24.95 5.575C24.2167 6.225 23.6833 7.03333 23.35 8H11C9.06667 8 7.41667 8.68333 6.05 10.05C4.68333 11.4167 4 13.0667 4 15C4 18.2667 4.45 21.4583 5.35 24.575C6.25 27.6917 7.13333 30.8333 8 34Z"-->
+<!--                                                fill="#2291A5"/>-->
+<!--                                    </svg>-->
+<!--                                </div>-->
+<!--                                <div class="dfd-inner-table">-->
+<!--                                    <table class="dd-table">-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                Your Saving Goals:-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                6-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                Your Total Savings:-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                KShs.3,500.00-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        </tr>-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                Group Goals:-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                1-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr class="mb-1">-->
+<!--                                            <td>-->
+<!--                                                <button class="btn tabel-button me-2">-->
+<!--                                                    Open Goals-->
+<!--                                                </button>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <button class="btn tabel-button">-->
+<!--                                                    All Transactions-->
+<!--                                                </button>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        &lt;!&ndash;a single box&ndash;&gt;-->
+<!--                        <div class="summery-inner-boxes mb-2">-->
+<!--                            <div class="che-b-heading">-->
+<!--                                <h4>Kopeshana</h4>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex align-items-center justify-content-between">-->
+<!--                                <div>-->
+<!--                                    <img src="{% static 'images/Kopeshana.png' %}" alt="">-->
+<!--                                </div>-->
+<!--                                <div>-->
+<!--                                    <div class="dfd-inner-table inner-border mb-2">-->
+<!--                                        <table class="dd-table ">-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Your Borrowings:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    2-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Amount Borrowed:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.22,000.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+<!--                                        </table>-->
+
+<!--                                    </div>-->
+<!--                                    <div class="dfd-inner-table inner-border">-->
+
+<!--                                        <table class="dd-table ">-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Your Chamaz:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    3-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Total Security Fee:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.3,500.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Total Security Fee:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.3,500.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+<!--                                        </table>-->
+<!--                                    </div>-->
+<!--                                    <div class="d-flex justify-content-between-->
+<!--                                    mt-2">-->
+
+<!--                                        <button class="btn tabel-button me-2">-->
+<!--                                            All Transactions-->
+<!--                                        </button>-->
+
+<!--                                        <button class="btn tabel-button">-->
+<!--                                            All Transactions-->
+<!--                                        </button>-->
+
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        &lt;!&ndash;a single box&ndash;&gt;-->
+
+
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </section>-->
+
+
+<!--            <section class="wallet-sumery-section wallet-sumery-mbl">-->
+<!--                <div class="container">-->
+<!--                    <div class="sumery-content">-->
+<!--                        <h3>-->
+<!--                            Transact:-->
+<!--                        </h3>-->
+<!--                        <p>Choose What to do With your money</p>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash;a transact box1&ndash;&gt;-->
+<!--                    <div class="wallent-chammax mb-2">-->
+<!--                        <div class="che-b-heading">-->
+<!--                            <h4>Chamaz:</h4>-->
+<!--                            <p>Quick Contribute to Upcoming Chamaz</p>-->
+<!--                        </div>-->
+<!--                        <div class="chamaz2">-->
+
+<!--                            <div class="chamaz2-inner">-->
+<!--                                &lt;!&ndash; suggested-chamaz1 &ndash;&gt;-->
+<!--                                <div class="suggested-chamaz">-->
+<!--                                    <div class="suggested-card suggested-card2">-->
+<!--                                        <h5 class="suggested-card-h5">10W500-2</h5>-->
+<!--                                        <div class="hr2 hr4"></div>-->
+<!--                                        <table class="dd-table ">-->
+<!--                                            <tbody>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Contribute:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.22,000.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Due Date:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    12-11-2023-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+<!--                                            </tbody>-->
+<!--                                        </table>-->
+<!--                                        <button class="suggested-card-btn suggested-desktop">Pay</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                                &lt;!&ndash; suggested-chamaz2 &ndash;&gt;-->
+<!--                                <div class="suggested-chamaz">-->
+<!--                                    <div class="suggested-card suggested-card2">-->
+<!--                                        <h5 class="suggested-card-h5">10W500-2</h5>-->
+<!--                                        <div class="hr2 hr4"></div>-->
+<!--                                        <table class="dd-table ">-->
+<!--                                            <tbody>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Contribute:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.22,000.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Due Date:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    12-11-2023-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+<!--                                            </tbody>-->
+<!--                                        </table>-->
+<!--                                        <button class="suggested-card-btn suggested-desktop">Pay</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash;a transact box&ndash;&gt;-->
+
+<!--                    &lt;!&ndash;a transact box2&ndash;&gt;-->
+<!--                    <div class="wallent-chammax mb-2">-->
+<!--                        <div class="che-b-heading">-->
+<!--                            <h4>Wekeza Savings</h4>-->
+<!--                            <p>Quick Save to your Goals</p>-->
+<!--                        </div>-->
+<!--                        <div class="chamaz2">-->
+
+<!--                            <div class="chamaz2-inner">-->
+<!--                                &lt;!&ndash; suggested-chamaz3 &ndash;&gt;-->
+<!--                                <div class="suggested-chamaz">-->
+<!--                                    <div class="suggested-card suggested-card2">-->
+<!--                                        <h5 class="suggested-card-h5">Buying a Car</h5>-->
+<!--                                        <div class="hr2 hr4"></div>-->
+<!--                                        <table class="dd-table ">-->
+<!--                                            <tbody>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Contribute:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.22,000.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Due Date:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    12-11-2023-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+<!--                                            </tbody>-->
+<!--                                        </table>-->
+<!--                                        <button class="suggested-card-btn suggested-desktop">Save</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                &lt;!&ndash; suggested-chamaz4 &ndash;&gt;-->
+<!--                                <div class="suggested-chamaz">-->
+<!--                                    <div class="suggested-card suggested-card2">-->
+<!--                                        <h5 class="suggested-card-h5">Buy a Land</h5>-->
+<!--                                        <div class="hr2 hr4"></div>-->
+<!--                                        <table class="dd-table ">-->
+<!--                                            <tbody>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Next Saving:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    KShs.22,000.00-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                            <tr class="mb-1">-->
+<!--                                                <td>-->
+<!--                                                    Due Date:-->
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    12-11-2023-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+<!--                                            </tbody>-->
+<!--                                        </table>-->
+<!--                                        <button class="suggested-card-btn suggested-desktop">Pay</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash;a transact box&ndash;&gt;-->
+<!--                </div>-->
+<!--            </section>-->
+
+<!--            <section class="wallet-sumery-section wallet-sumery-mbl fines">-->
+<!--                <div class="container">-->
+
+<!--                    &lt;!&ndash;a transact box1&ndash;&gt;-->
+<!--                    <div class="wallent-chammax mb-2">-->
+<!--                        <div class="che-b-heading">-->
+<!--                            <h4>Fines:</h4>-->
+<!--                            <p>Pay you fines</p>-->
+<!--                        </div>-->
+<!--                        <div class="chamaz2-fines">-->
+
+<!--                            <div class="chamazfine-inner">-->
+<!--                                <div class="fine-head d-flex justify-content-between">-->
+<!--                                    <h4 class="left-h">Fine SN01</h4>-->
+<!--                                    <h4 class="right-h">KShs.10.00</h4>-->
+<!--                                </div>-->
+<!--                                <div class="d-flex justify-content-around align-items-center"-->
+<!--                                ">-->
+<!--                                <div class="left-img">-->
+<!--                                    <img src="{% static 'images/flash.png' %}" alt="">-->
+<!--                                </div>-->
+<!--                                <div class="right-side">-->
+<!--                                    <h5>Dscription</h5>-->
+<!--                                    <p>Lorem ipsum dolor sit</p>-->
+<!--                                    <p>Lorem ipsum dolor sit</p>-->
+<!--                                    <button class="fine-btn">Pay Fine</button>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                &lt;!&ndash;a transact box&ndash;&gt;-->
+
+
+<!--    </section>-->
+
+    <section class="wallet-sumery-section fines mb-4">
+        <div class="container">
+            <div class="sumery-content d-flex justify-content-between">
+                <h3>
+                    Transact:
+                </h3>
+                <h4 class="statement">
+                    Get All Statment <i class="fa-solid fa-chevron-right"></i>
+                </h4>
+            </div>
+            <!--a transact box1-->
+            <!-- <div class="wallent-chammax3 mb-2">
+                <div class="che-b-heading">
+
+                </div>
+                <div class="chamaz2-fines">
+
+                    <div class="chamazfine-inner transsection">
+                        <p class="transsection-p">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sapiente
+                            enim repellendus doloremque expedita neque quisquam.</p>
+                        <div class="fine-head d-flex justify-content-between align-items-center">
+                            <h4 class="transsection-h">Saturday 24th June 2023</h4>
+                            <h4 class="transsection-h">10.00 am</h4>
+                        </div>
+
+                    </div>
+                </div>
+            </div> -->
+            <!-- <div class="wallent-chammax3 mb-2">
+                <div class="che-b-heading">
+
+                </div>
+                <div class="chamaz2-fines">
+
+                    <div class="chamazfine-inner transsection">
+                        <p class="transsection-p">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sapiente
+                            enim repellendus doloremque expedita neque quisquam.</p>
+                        <div class="fine-head d-flex justify-content-between align-items-center">
+                            <h4 class="transsection-h">Saturday 24th June 2023</h4>
+                            <h4 class="transsection-h">10.00 am</h4>
+                        </div>
+
+                    </div>
+                </div>
+            </div> -->
+            <!--a transact box-->
+        </div>
+    </section>
+
+    <footer class="mbl_footer">
+        <div class="container">
+            <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                <a href="{% url 'my_goals' %}" class="footer_button btn">
+                    <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                    <p>Home</p>
+                </a>
+                <a href="#" class="footer_button btn" id="featuresBtn">
+                    <img src="{% static 'images/filter_active.png' %}" alt="">
+                    <p>Features</p>
+                </a>
+                <a href="#" class="footer_button btn coming_soon">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                    <p>Account</p>
+                </a>
+                <a href="{% url 'Setting' %}" class="footer_button btn">
+                    <img src="{% static 'images/setting.png' %}" alt="">
+                    <p>Settings</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+    </main>
+    </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+
+  <script>
+
+
+
+        $('#add_amount_form').on('submit', function (e) {
+            e.preventDefault();
+
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'load_money' %}",
+                data: {
+
+                    amount: $('#add_money').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    dataType: "json",
+                },
+                success: function (response) {
+                    if (response.success === '1') {
+                        console.log("Inside success response:", response.success)
+
+
+                        $('#firstInnerHowmuch').hide();
+
+
+                        $('#secondInnerHowmuch').show();
+
+
+                    } else {
+
+                        $('#firstInnerHowmuch').hide();
+
+
+                        $('#deposit_deniedInnerHowmuch').show();
+
+
+                    }
+                }
+            });
+        });
+    </script>
+
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+
+<!-- Bottom Drawer -->
+<div id="bottomDrawer" class="bottom-drawer">
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer-content">
+    <div class="drawer-header">
+      <h3>Features</h3>
+      <button class="drawer-close" id="drawerClose">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <div class="feature-grid">
+        <!-- Chamas Feature -->
+        <div class="feature-item" data-feature="chamas">
+          <div class="feature-icon">
+            <img src="{% static 'images/icon_people.png' %}" alt="Chamas" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Chamas</h4>
+            <p>Join and manage group savings</p>
+          </div>
+        </div>
+        
+        <!-- Wekeza Goals Feature -->
+        <div class="feature-item coming-soon-item" data-feature="wekeza">
+          <div class="feature-icon">
+            <img src="{% static 'images/service-icon-01.png' %}" alt="Wekeza Goals" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Wekeza Goals</h4>
+            <p>Personal savings & investment goals</p>
+          </div>
+          <div class="coming-soon-badge">Coming Soon</div>
+        </div>
+        
+        <!-- Kopesha Feature -->
+        <div class="feature-item coming-soon-item" data-feature="kopesha">
+          <div class="feature-icon">
+            <img src="{% static 'images/kopesha.png' %}" alt="Kopesha" style="width: 40px; height: 40px;">
+          </div>
+          <div class="feature-content">
+            <h4>Kopesha</h4>
+            <p>Quick loans & financial assistance</p>
+          </div>
+          <div class="coming-soon-badge">Coming Soon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Bottom Drawer Styles */
+.bottom-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.3s, opacity 0.3s;
+}
+
+.bottom-drawer.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.drawer-content {
+  position: relative;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 2;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.bottom-drawer.show .drawer-content {
+  transform: translateY(0);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.drawer-header h3 {
+  margin: 0;
+  color: #2291A5;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.drawer-close:hover {
+  background-color: #f0f0f0;
+}
+
+.drawer-body {
+  padding: 20px 25px 30px;
+}
+
+.feature-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+}
+
+.feature-item:hover {
+  border-color: #2291A5;
+  box-shadow: 0 4px 12px rgba(34, 145, 165, 0.1);
+  transform: translateY(-2px);
+}
+
+.feature-item:active {
+  transform: translateY(0);
+}
+
+.feature-icon {
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-content h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.feature-content p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.coming-soon-item {
+  opacity: 0.7;
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff6b6b;
+  color: white;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Mobile footer display rules */
+@media screen and (min-width: 992px) {
+  .mbl_footer { display: none !important; }
+  .bottom-drawer { display: none !important; }
+}
+@media screen and (max-width: 991px) {
+  body { padding-bottom: 80px !important; }
+  .mbl_footer { display: block !important; }
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .drawer-content {
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .bottom-drawer.show .drawer-content {
+    transform: translateY(-20px);
+  }
+}
+</style>
+
+<script>
+// Bottom Drawer Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const featuresBtn = document.getElementById('featuresBtn');
+  const bottomDrawer = document.getElementById('bottomDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const drawerClose = document.getElementById('drawerClose');
+  const comingSoonItems = document.querySelectorAll('.coming-soon-item');
+  const chamasItem = document.querySelector('[data-feature="chamas"]');
+  const comingSoonModal = document.getElementById('comingSoonModal');
+
+  // Open drawer when features button is clicked
+  if (featuresBtn) {
+    featuresBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openDrawer();
+    });
+  }
+
+  // Close drawer functions
+  function closeDrawer() {
+    if (bottomDrawer) {
+      bottomDrawer.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function openDrawer() {
+    if (bottomDrawer) {
+      bottomDrawer.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Close drawer on overlay click
+  if (drawerOverlay) {
+    drawerOverlay.addEventListener('click', closeDrawer);
+  }
+
+  // Close drawer on close button click
+  if (drawerClose) {
+    drawerClose.addEventListener('click', closeDrawer);
+  }
+
+  // Handle chamas item click
+  if (chamasItem) {
+    chamasItem.addEventListener('click', function() {
+      closeDrawer();
+      // Navigate to chamas page
+      window.location.href = "/chamas-bookeeping/chamas/";
+    });
+  }
+
+  // Handle coming soon items
+  comingSoonItems.forEach(item => {
+    item.addEventListener('click', function() {
+      closeDrawer();
+      // Show coming soon modal after a short delay
+      setTimeout(() => {
+        if (comingSoonModal) {
+          comingSoonModal.classList.add('show');
+        }
+      }, 300);
+    });
+  });
+
+  // Close drawer on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && bottomDrawer && bottomDrawer.classList.contains('show')) {
+      closeDrawer();
+    }
+  });
+
+  // Prevent body scroll when drawer is open
+  if (bottomDrawer) {
+    bottomDrawer.addEventListener('touchmove', function(e) {
+      if (bottomDrawer.classList.contains('show')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  }
+});
+</script>
+
+{% endblock %}

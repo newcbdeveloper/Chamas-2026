@@ -1,0 +1,48 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock %}
+{% block content %}
+
+<body>
+    <div class="app-container">
+                
+        <main class="main-content">
+            <div class="card login-card">
+                <div class="logo-center">
+                    <img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="ChamaSpace">
+                </div>
+
+                <p class="card-instruction">Use your credentials to login</p>
+                <h5 style="text-decoration:#00a65a">{% include '_messages.html' %}</h5>
+                
+                <div class="divider"></div>
+                
+                <form id="loginForm" method="post" action ="{% url 'Login' %}" class="login-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="label">ID No.</label>
+                        <input class="input" type="text" name="un" placeholder="Enter Your ID No." required>                                                
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="label" >Password</label>
+                        <input class="input" type="password" name="password" placeholder="Enter Password" required>
+                    </div>                  
+                                        
+                    <button type="submit" name="button" class="primary-btn">Login</button>
+                    
+                    <div class="links">
+                        <a href="{% url 'forget_password' %}" class="forgot-password">Forgot Password</a>
+                        <p class="signup-text">Don't have an account? <a href="{% url 'Sign_up' %}" class="accent-link">Sign up</a>.</p>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+
+
+{% endblock %}

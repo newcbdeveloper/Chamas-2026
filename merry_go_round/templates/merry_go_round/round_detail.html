@@ -1,0 +1,526 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}{{ round.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'merry_go_round/css/round_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== ROUND HEADER CARD ===== -->
+<div class="card rounded-4 shadow-sm mb-6">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div>
+        <h1 class="h3 fw-bold mb-2 text-slate-900">{{ round.name }}</h1>
+        <div class="d-flex flex-wrap gap-2 mt-1">
+          {% if round.start_date %}
+            <span class="badge bg-cyan-500 text-white px-2 py-1 rounded-pill fw-bold fs-8">
+              <i class="fas fa-calendar-start me-1"></i> Started: {{ round.start_date|date:"M d, Y" }}
+            </span>
+          {% endif %}
+          {% if round.end_date %}
+            <span class="badge bg-slate-500 text-white px-2 py-1 rounded-pill fw-bold fs-8">
+              <i class="fas fa-calendar-check me-1"></i> Ends: {{ round.end_date|date:"M d, Y" }}
+            </span>
+          {% endif %}
+          {% if not round.start_date %}
+            <span class="badge bg-amber-400 text-slate-900 px-2 py-1 rounded-pill fw-bold fs-8">
+              <i class="fas fa-clock me-1"></i> Not yet started
+            </span>
+          {% endif %}
+        </div>
+      </div>
+      <div>
+        {% if round.status == 'active' %}
+          <span class="badge bg-emerald-500 text-white px-3 py-2 rounded-3 fw-bold fs-7">
+            <i class="fas fa-circle-notch fa-spin me-2"></i> Active
+          </span>
+        {% elif round.status == 'open' %}
+          <span class="badge bg-cyan-500 text-white px-3 py-2 rounded-3 fw-bold fs-7">
+            <i class="fas fa-door-open me-2"></i> Open
+          </span>
+        {% elif round.status == 'draft' %}
+          <span class="badge bg-amber-400 text-slate-900 px-3 py-2 rounded-3 fw-bold fs-7">
+            <i class="fas fa-pencil-alt me-2"></i> Draft
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== INTEGRATED STATS ROW ===== -->
+<div class="row g-4 mb-6">
+  <div class="col-12 col-md-9">
+
+    <!-- Mobile: Horizontal Scroll Container -->
+    <div class="d-md-none d-flex gap-3 pb-3 overflow-x-auto" style="padding-bottom: 1rem; -webkit-overflow-scrolling: touch;">
+      <!-- Members -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-cyan-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-users text-cyan-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">{{ round.current_members }}/{{ round.max_members }}</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">MEMBERS</div>
+        {% if round.is_full %}
+          <span class="badge bg-emerald-100 text-emerald-800 mt-1 px-2 py-1 rounded-pill fw-bold fs-9">Full</span>
+        {% endif %}
+      </div>
+
+      <!-- Contribution -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-yellow-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-coins text-yellow-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">KES {{ round.contribution_amount|floatformat:0 }}</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">CONTRIBUTION</div>
+        <div class="text-muted fs-9 mt-1">{{ round.get_frequency_display }}</div>
+      </div>
+
+      <!-- Pool -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-green-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-piggy-bank text-green-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">KES {{ round.total_pool|floatformat:2 }}</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">TOTAL POOL</div>
+      </div>
+
+      <!-- Interest -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-purple-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-percentage text-purple-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">{{ round.interest_rate }}%</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">INTEREST</div>
+        <div class="text-muted fs-9 mt-1">Per Annum</div>
+      </div>
+    </div>
+
+    <!-- Desktop: Single Horizontal Row -->
+        <div class="d-none d-md-flex flex-nowrap gap-3 overflow-visible" style="min-width: max-content;">
+      <!-- Members -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-cyan-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-users text-cyan-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">{{ round.current_members }}/{{ round.max_members }}</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">MEMBERS</div>
+        {% if round.is_full %}
+          <span class="badge bg-emerald-100 text-emerald-800 mt-1 px-2 py-1 rounded-pill fw-bold fs-9">Full</span>
+        {% endif %}
+      </div>
+
+      <!-- Contribution -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-yellow-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-coins text-yellow-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">KES {{ round.contribution_amount|floatformat:0 }}</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">CONTRIBUTION</div>
+        <div class="text-muted fs-9 mt-1">{{ round.get_frequency_display }}</div>
+      </div>
+
+      <!-- Pool -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-green-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-piggy-bank text-green-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">KES {{ round.total_pool|floatformat:2 }}</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">TOTAL POOL</div>
+      </div>
+
+      <!-- Interest -->
+      <div class="stat-card card border rounded-4 shadow-sm p-3 text-center flex-shrink-0" style="width: 180px;">
+        <div class="stat-icon rounded-circle bg-purple-100 d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 32px; height: 32px;">
+          <i class="fas fa-percentage text-purple-600 fs-5"></i>
+        </div>
+        <div class="stat-value fw-bold fs-6 text-slate-900">{{ round.interest_rate }}%</div>
+        <div class="stat-label text-uppercase text-slate-400 fw-bold fs-9 mt-1">INTEREST</div>
+        <div class="text-muted fs-9 mt-1">Per Annum</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Info Card -->
+  <div class="col-12 col-md-3">
+    <div class="info-card card h-100 border rounded-4 shadow-sm p-4">
+      <h5 class="fw-bold mb-4 text-slate-900">
+        <i class="fas fa-info-circle me-2 text-slate-500"></i> Round Info
+      </h5>
+      <div class="d-flex flex-column gap-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fs-9">Type</span>
+          <span class="badge bg-cyan-500 text-white fs-9 fw-bold rounded-2">{{ round.get_round_type_display }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fs-9">Model</span>
+          <span class="badge bg-emerald-500 text-white fs-9 fw-bold rounded-2">{{ round.get_payout_model_display }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fs-9">Frequency</span>
+          <span class="text-slate-900 fs-9">{{ round.get_frequency_display }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fs-9">Contribution</span>
+          <span class="text-slate-900 fs-9">KES {{ round.contribution_amount|floatformat:0 }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fs-9">Interest</span>
+          <span class="text-slate-900 fs-9">{{ round.interest_rate }}% p.a</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fs-9">Min. Trust</span>
+          <span class="text-slate-900 fs-9">{{ round.min_trust_score }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CREATOR ACTIONS ===== -->
+{% if is_creator %}
+  {% if round.status == 'draft' or round.status == 'open' %}
+    <div class="d-flex flex-wrap gap-3 mb-6">
+      {% if round.can_start %}
+        <button class="btn btn-cyan start-round-btn" data-round-id="{{ round.id }}">
+          <i class="fas fa-play-circle me-2"></i> Start Round Now
+        </button>
+      {% else %}
+        <div class="alert alert-warning border-0 rounded-3 p-3 d-flex align-items-center">
+          <i class="fas fa-info-circle me-2"></i> Need at least 2 members to start
+        </div>
+      {% endif %}
+      <button class="btn btn-danger delete-round-btn" data-round-id="{{ round.id }}" data-round-name="{{ round.name }}">
+        <i class="fas fa-trash me-2"></i> Delete Round
+      </button>
+    </div>
+  {% endif %}
+{% endif %}
+
+<!-- ===== ACTIVE ROUND PROGRESS ===== -->
+{% if round.status == 'active' %}
+  <div class="alert alert-cyan rounded-4 mb-6 p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <strong>Round Progress: {{ progress_percentage|floatformat:0 }}%</strong>
+      <div class="progress mt-2" style="width: 280px; height: 6px; border-radius: 3px;">
+        <div class="progress-bar bg-emerald-500" style="width: {{ progress_percentage }}%"></div>
+      </div>
+    </div>
+    <div class="text-end">
+      <div class="text-muted fs-9 text-uppercase">Projected Interest (after tax)</div>
+      <div class="h5 mb-0 text-emerald-600">KES {{ round.get_accurate_projected_interest_after_tax|floatformat:2 }}</div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- ===== MAIN DASHBOARD GRID ===== -->
+<div class="row g-4 mb-6">
+  <!-- Members List -->
+  <div class="col-12 col-lg-8">
+    <div class="card rounded-4 shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center border-0 py-3 px-4 bg-white">
+        <h5 class="mb-0 fw-bold text-slate-900">
+          <i class="fas fa-users me-2 text-slate-500"></i> Members ({{ memberships.count }})
+        </h5>
+        {% if is_creator and round.round_type == 'private' and not round.is_full %}
+          <a href="{% url 'merry_go_round:send_invitation' round.id %}" class="btn btn-sm btn-cyan">
+            <i class="fas fa-paper-plane me-1"></i> Invite
+          </a>
+        {% endif %}
+      </div>
+      <div class="card-body p-0 custom-scrollbar" style="height: 500px; overflow-y: auto;">
+        {% for membership in memberships %}
+          <div class="d-flex align-items-start p-4 border-bottom hover-bg">
+            <div class="avatar rounded-circle bg-cyan-100 text-cyan-800 d-flex align-items-center justify-content-center me-4" style="width: 40px; height: 40px; font-weight: bold;">
+              {{ membership.display_name|slice:":1"|upper }}
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="fw-bold text-slate-900">{{ membership.display_name }}</span>
+                {% if membership.user == round.creator %}
+                  <span class="badge bg-blue-100 text-blue-800 fs-9 rounded-2">Creator</span>
+                {% endif %}
+                {% if membership.user == user %}
+                  <span class="badge bg-emerald-100 text-emerald-800 fs-9 rounded-2">You</span>
+                {% endif %}
+                {% if round.payout_model == 'rotational' %}
+                  <span class="badge bg-amber-100 text-amber-800 fs-9 rounded-2">Cycle #{{ membership.payout_position }}</span>
+                {% endif %}
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="d-flex text-muted fs-9">
+                  <span><i class="fas fa-calendar me-1"></i> Joined {{ membership.join_date|date:"M d, Y" }}</span>
+                  <span class="mx-2">•</span>
+                  <span><i class="fas fa-star me-1"></i> Trust: {{ membership.trust_score_at_join }}</span>
+                </div>
+                <div class="text-end min-w-120">
+                  <div class="fw-bold text-slate-900">KES {{ membership.total_contributed|floatformat:2 }}</div>
+                  <div class="text-muted fs-9">{{ membership.contributions_made }} payments</div>
+                </div>
+              </div>
+            </div>
+            <div class="ms-4">
+              {% if membership.status == 'active' %}
+                <span class="badge bg-emerald-100 text-emerald-800 fs-9 rounded-2">Active</span>
+              {% elif membership.status == 'completed' %}
+                <span class="badge bg-slate-100 text-slate-800 fs-9 rounded-2">Completed</span>
+              {% elif membership.status == 'pending' %}
+                <span class="badge bg-amber-100 text-amber-800 fs-9 rounded-2">Pending</span>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="text-center py-5 text-muted">No members yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Updates -->
+  <div class="col-12 col-lg-4">
+    <div class="card rounded-4 shadow-sm h-100">
+      <div class="card-header border-0 py-3 px-4 bg-white">
+        <h5 class="mb-0 fw-bold text-slate-900">
+          <i class="fas fa-bullhorn me-2 text-slate-500"></i> Updates
+        </h5>
+      </div>
+      <!-- ✅ FIXED: Added unique class 'updates-list-container' -->
+      <div class="card-body p-0 custom-scrollbar updates-list-container" style="height: 500px; overflow-y: auto;">
+        {% if messages_list %}
+          {% for message in messages_list %}
+            <div class="p-4 border-bottom {% if message.is_pinned %}bg-cyan-50{% endif %}">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="d-flex align-items-center">
+                  <span class="fw-bold text-slate-900">{{ message.sender_display }}</span>
+                  {% if message.is_pinned %}
+                    <i class="fas fa-thumbtack text-cyan-500 ms-2 fs-9"></i>
+                  {% endif %}
+                </div>
+                <span class="text-muted fs-9">{{ message.created_at|timesince }} ago</span>
+              </div>
+              {% if message.subject %}
+                <div class="fw-bold text-slate-800 mb-1">{{ message.subject }}</div>
+              {% endif %}
+              <div class="text-slate-700 fs-9">{{ message.content }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5">
+            <i class="fas fa-inbox fs-1 mb-2"></i>
+            <span>No updates yet</span>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if is_member %}
+        <div class="card-footer bg-white border-0 p-3 sticky-bottom rounded-bottom-4">
+          <form method="post" action="{% url 'merry_go_round:post_message' round.id %}" id="post-message-form" data-round-id="{{ round.id }}">
+            {% csrf_token %}
+            <div class="input-group">
+              <textarea name="content" class="form-control border rounded-3" rows="2" placeholder="Post an update..." required></textarea>
+              <button type="submit" class="btn btn-cyan ms-2 rounded-3">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ===== TRANSACTIONS CARD ===== -->
+<div class="card rounded-4 shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center border-0 py-3 px-4 bg-white">
+    <h5 class="mb-0 fw-bold text-slate-900">
+      <i class="fas fa-exchange-alt me-2 text-slate-500"></i> Transactions
+    </h5>
+    <div class="nav nav-pills">
+      <button class="nav-link active rounded-3 fw-bold fs-9 px-3 py-2" data-bs-toggle="pill" data-bs-target="#contributions" type="button">My Contributions</button>
+      <button class="nav-link rounded-3 fw-bold fs-9 px-3 py-2 ms-2" data-bs-toggle="pill" data-bs-target="#payouts" type="button">Payout Schedule</button>
+    </div>
+  </div>
+  <div class="card-body p-0 custom-scrollbar" style="height: 600px; overflow-y: auto;">
+    <div class="tab-content p-4">
+      <!-- Contributions -->
+      <div class="tab-pane fade show active" id="contributions">
+        {% if user_contributions %}
+          {% for contribution in user_contributions %}
+            <div class="d-flex align-items-start p-3 border-bottom">
+              <div class="icon-circle me-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; 
+                {% if contribution.status == 'completed' %}background: #dcfce7; color: #16a34a;{% elif contribution.status == 'pending' %}background: #fef3c7; color: #d97706;{% elif contribution.status == 'missed' %}background: #fee2e2; color: #ef4444;{% endif %}">
+                {% if contribution.status == 'completed' %}
+                  <i class="fas fa-check-circle"></i>
+                {% elif contribution.status == 'pending' %}
+                  <i class="fas fa-clock"></i>
+                {% elif contribution.status == 'missed' %}
+                  <i class="fas fa-times-circle"></i>
+                {% endif %}
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="fw-bold text-slate-900">Cycle {{ contribution.cycle_number }}</div>
+                    <div class="text-muted fs-9 d-none d-md-block">Due: {{ contribution.due_date|date:"M d, Y" }}</div>
+                  </div>
+                  <div class="text-end">
+                    <div class="fw-bold text-slate-900">KES {{ contribution.amount|floatformat:2 }}</div>
+                    <div class="fs-9 {% if contribution.status == 'completed' %}text-success{% elif contribution.status == 'pending' %}text-warning{% elif contribution.status == 'missed' %}text-danger{% endif %}">
+                      {{ contribution.get_status_display|upper }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-muted fs-9 d-block d-md-none mt-1">Due: {{ contribution.due_date|date:"M d, Y" }}</div>
+                {% if contribution.status == 'completed' %}
+                  <div class="text-muted fs-9 mt-1">
+                    <i class="fas fa-calendar-check me-1"></i> Paid {{ contribution.payment_date|date:"M d, Y" }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5 text-muted">No contributions yet.</div>
+        {% endif %}
+      </div>
+
+      <!-- Payouts -->
+      <div class="tab-pane fade" id="payouts">
+        {% if payouts %}
+          {% for payout in payouts %}
+            <div class="d-flex align-items-start p-3 border-bottom {% if payout.recipient_membership.user == user %}bg-cyan-50{% endif %}">
+              <div class="icon-circle me-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; 
+                {% if payout.status == 'completed' %}background: #dcfce7; color: #16a34a;{% elif payout.status == 'scheduled' %}background: #f1f5f9; color: #64748b;{% endif %}">
+                {% if payout.status == 'completed' %}
+                  <i class="fas fa-check-circle"></i>
+                {% elif payout.status == 'scheduled' %}
+                  <i class="fas fa-calendar"></i>
+                {% endif %}
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="fw-bold text-slate-900">{{ payout.recipient_display }}</div>
+                    <div class="text-muted fs-9">Cycle #{{ payout.payout_cycle }}</div>
+                  </div>
+                  <div class="text-end">
+                    <div class="fw-bold text-slate-900">KES {{ payout.amount|floatformat:2 }}</div>
+                    <div class="fs-9 {% if payout.status == 'completed' %}text-success{% elif payout.status == 'scheduled' %}text-muted{% endif %}">
+                      {{ payout.get_status_display|upper }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-muted fs-9 ms-3">
+                <i class="fas fa-calendar me-1"></i> {{ payout.scheduled_date|date:"M d, Y" }}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5 text-muted">No payouts scheduled.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Start round
+    $('.start-round-btn').click(function() {
+        const roundId = $(this).data('round-id');
+        if (confirm('Start this round now? All members will be notified.')) {
+            $.ajax({
+                url: `/merry-go-round/round/${roundId}/start/`,
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                success: function(response) {
+                    if (response.success) location.reload();
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON?.error || 'Failed to start round');
+                }
+            });
+        }
+    });
+
+    // Delete round
+    $('.delete-round-btn').click(function() {
+        const roundId = $(this).data('round-id');
+        const roundName = $(this).data('round-name');
+        if (confirm(`Delete "${roundName}"?\n\nThis will release all locked funds.`)) {
+            $.ajax({
+                url: `/merry-go-round/round/${roundId}/delete/`,
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                success: function(response) {
+                    if (response.success) window.location.href = response.redirect_url;
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON?.error || 'Failed to delete round');
+                }
+            });
+        }
+    });
+
+    // ✅ FIXED: Target updates-list-container explicitly
+    $('#post-message-form').on('submit', function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        const roundId = $(this).data('round-id');
+
+        $.post(`/merry-go-round/round/${roundId}/message/`, formData)
+            .done(function(response) {
+                if (response.success) {
+                    const msg = response.message;
+                    const senderDisplay = msg.sender_display || "Anonymous";
+                    const content = msg.content;
+                    const createdAt = new Date(msg.created_at).toLocaleString();
+
+                    const newMessage = `
+                        <div class="p-4 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold text-slate-900">${senderDisplay}</span>
+                                </div>
+                                <span class="text-muted fs-9">${createdAt}</span>
+                            </div>
+                            <div class="text-slate-700 fs-9">${content}</div>
+                        </div>
+                    `;
+                    // ✅ Correct target
+                    $('.updates-list-container').prepend(newMessage);
+                    $('textarea[name="content"]').val('');
+                    // Optional: scroll to top
+                    $('.updates-list-container').scrollTop(0);
+                }
+            })
+            .fail(function() {
+                alert('Failed to post message');
+            });
+    });
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

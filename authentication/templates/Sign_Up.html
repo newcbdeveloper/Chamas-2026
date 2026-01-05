@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<body>
+    <div class="app-container">                
+        <main class="main-content">
+            <form id="signupForm" method="post" action="{% url 'Sign_up' %}">
+                {% csrf_token %}
+
+                <!-- Step 1: Basic Info -->
+                <div class="card signup-card" id="step1">
+                    <div class="logo-center">
+                        <img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="Chama Space">
+                    </div>
+                    <p class="card-instruction">Fill in the form to Create an Account</p>
+                    {% include '_messages.html' %}
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label for="nationalId">National ID</label>
+                        <input type="number" id="nationalId" name="nic_no" placeholder="Enter ID No." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="fname" placeholder="First Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lname" placeholder="Last Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                    </div>
+
+                    <span id="password-match"></span>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="termsCheckbox" required>
+                        <label for="termsCheckbox">I agree to <a target="_blank" href="{% url 'term_conditions' %}" class="accent-link">Terms and Conditions</a></label>
+                    </div>
+
+                    <!-- ✅ Critical: type="button" to prevent form submission -->
+                    <button type="button" id="proceedBtn" class="proceed-btn">Proceed</button>
+
+                    <div class="links">
+                        <p>Already have an account? <a href="{% url 'Login' %}"class="accent-link">Login</a></p>
+                    </div>
+                </div>
+
+                <!-- Step 2: Additional Info (hidden by default) -->
+                <div class="card signup-card hidden" id="step2">
+                    <div class="logo-center">
+                        <img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="Chama Space">
+                    </div>
+                    <p class="card-instruction">Tell us more about yourself</p>
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label for="sex">Sex</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone_no">Phone Number</label>
+                        <input type="number" id="phone_no" name="phone_no" placeholder="0700XXXXXX" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email (Optional)</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="how_find_us">How did you find ChamaSpace?</label>
+                        <select id="how_find_us" name="how_find_us" required>
+                            <option value="">Select</option>
+                            {% for find in How_did_you_finds %}
+                                <option value="{{ find.name }}">{{ find.name }}</option>
+                            {% endfor %}
+                            <option value="friend">Friend</option>
+                            <option value="social">Social Media</option>
+                            <option value="search">Search Engine</option>
+                            <option value="ad">Advertisement</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- ✅ This button IS type="submit" -->
+                    <button type="submit" id="signupBtn" class="primary-btn">Sign Up</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+</body>
+
+
+<!-- Password match check -->
+<script>
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const pass = document.getElementById('password').value;
+    const confirm = this.value;
+    const msg = document.getElementById('password-match');
+    if (pass && confirm) {
+        if (pass === confirm) {
+            msg.textContent = 'Passwords match';
+            msg.style.color = 'green';
+        } else {
+            msg.textContent = 'Passwords do not match';
+            msg.style.color = 'red';
+        }
+    }
+});
+</script>
+
+<!-- Step navigation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const proceedBtn = document.getElementById('proceedBtn');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const termsCheckbox = document.getElementById('termsCheckbox');
+
+    if (proceedBtn) {
+        proceedBtn.addEventListener('click', function() {
+            // Validate Step 1
+            const nic = document.getElementById('nationalId').value;
+            const fname = document.getElementById('firstName').value;
+            const lname = document.getElementById('lastName').value;
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirm_password').value;
+
+            if (!nic || !fname || !lname || !pass || !confirmPass) {
+                alert('Please fill all fields in Step 1.');
+                return;
+            }
+
+            if (pass !== confirmPass) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            if (!termsCheckbox.checked) {
+                alert('Please agree to the Terms and Conditions.');
+                return;
+            }
+
+            // ✅ Switch to Step 2
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+        });
+    }
+});
+</script>
+
+<style>
+.hidden {
+    display: none !important;
+}
+</style>
+
+
+<script>
+    var myInput = document.getElementById("fpassword");
+    var letter = document.getElementById("letter");
+    var capital = document.getElementById("capital");
+    var number = document.getElementById("number");
+    var length = document.getElementById("length");
+
+    // When the user clicks on the password field, show the message box
+    myInput.onfocus = function () {
+        document.getElementById("message").style.display = "block";
+    }
+
+    // When the user clicks outside of the password field, hide the message box
+    myInput.onblur = function () {
+        document.getElementById("message").style.display = "none";
+    }
+
+    // When the user starts to type something inside the password field
+    myInput.onkeyup = function () {
+        // Validate lowercase letters
+        var lowerCaseLetters = /[a-z]/g;
+        if (myInput.value.match(lowerCaseLetters)) {
+            letter.classList.remove("invalid");
+            letter.classList.add("valid");
+        } else {
+            letter.classList.remove("valid");
+            letter.classList.add("invalid");
+        }
+
+        // Validate capital letters
+        var upperCaseLetters = /[A-Z]/g;
+        if (myInput.value.match(upperCaseLetters)) {
+            capital.classList.remove("invalid");
+            capital.classList.add("valid");
+        } else {
+            capital.classList.remove("valid");
+            capital.classList.add("invalid");
+        }
+
+        // Validate numbers
+        var numbers = /[0-9]/g;
+        if (myInput.value.match(numbers)) {
+            number.classList.remove("invalid");
+            number.classList.add("valid");
+        } else {
+            number.classList.remove("valid");
+            number.classList.add("invalid");
+        }
+
+        // Validate length
+        if (myInput.value.length >= 8) {
+            length.classList.remove("invalid");
+            length.classList.add("valid");
+        } else {
+            length.classList.remove("valid");
+            length.classList.add("invalid");
+        }
+    }
+</script>
+
+
+{% endblock %}

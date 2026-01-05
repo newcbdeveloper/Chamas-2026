@@ -1,0 +1,1068 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/group_goal.css' %}">
+<style>
+    /* ========== CELEBRATION SYSTEM STYLES ========== */
+    .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+    }
+
+    .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        opacity: 0;
+    }
+
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    .confetti-piece.active {
+        animation: confetti-fall 3s ease-in forwards;
+    }
+
+    .milestone-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .milestone-modal-overlay.show {
+        opacity: 1;
+    }
+
+    .milestone-modal {
+        background: white;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+
+    .milestone-modal-overlay.show .milestone-modal {
+        transform: scale(1);
+    }
+
+    .milestone-header {
+        padding: 40px 20px;
+        text-align: center;
+        color: white;
+    }
+
+    .milestone-header.halfway {
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    }
+
+    .milestone-header.complete {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .milestone-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .milestone-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .milestone-message {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    .milestone-body {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .milestone-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    .milestone-btn {
+        background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .milestone-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+    }
+
+    .goal-completed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.8;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper modern-dashboard">
+
+    <!-- ========== CELEBRATION SYSTEM HTML ========== -->
+    <div id="confetti-container" class="confetti-container"></div>
+
+    <div id="milestone-modal" class="milestone-modal-overlay">
+        <div class="milestone-modal">
+            <div id="milestone-header" class="milestone-header">
+                <div id="milestone-icon" class="milestone-icon">🏆</div>
+                <div id="milestone-title" class="milestone-title"></div>
+                <div id="milestone-message" class="milestone-message"></div>
+            </div>
+            <div class="milestone-body">
+                <p id="milestone-subtitle" class="milestone-subtitle"></p>
+                <button class="milestone-btn" onclick="closeMilestoneModal()">
+                    Continue Saving 💪
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- ========== END CELEBRATION HTML ========== -->
+
+    <!-- Add Funds Modal -->
+    <div class="modal fade" id="add_funds" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="firstInnerHowmuch">
+                        <h4 class="popup_heading">How much do you want to save?</h4>
+                        <form id="add_amount_form" method="post" class="mt-25">
+                            {% csrf_token %}
+                            <label for="add_money">Add Money</label>
+                            <input type="number" name="add_money" id="add_money" placeholder="Enter Amount" class="mt-1"
+                                required>
+                            <p class="mt-4">This money will be added to your Goal</p>
+                            <button type="submit" class="btn popup_btn">Save</button>
+                        </form>
+                    </div>
+                    <div class="popupTwo" id="secondInnerHowmuch" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Success!</h4>
+                            <div class="text-center mt-3 mb-3">
+                                <img src="{% static 'images/success.png' %}" alt="">
+                            </div>
+                            <h4 class="popup_heading">You have successfully deposited funds to your {{goal_info.goal_name }} goal.</h4>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    <div class="popupTwo" id="thirdnnerHowmuch" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Sorry!</h4>
+                            <h4 class="popup_heading" style="color: red">Insufficient funds in your wallet. Please load
+                                balance first.</h4>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="exampleModalMemb" tabindex="-1" aria-labelledby="exampleModalMembLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="firstInnerInvato">
+                        <h4 class="popup_heading">Add a phone number for the recipient to join the "{{goal_info.goal_name }}" savings plan.</h4>
+                        <p class="mt-4">The member will receive an invitation to join this saving plan. The individual
+                            can accept or reject. Make sure that the individual is aware that you have invited them to
+                            this group saving goal.</p>
+                        <form method="post" id="send_invitation_form" class="mt-25">
+                            {% csrf_token %}
+                            <label for="receipt_nic">Phone Number</label>
+                            <input type="number" id="receipt_nic" placeholder="0712345678" class="mt-1 bg-pre" required>
+                            <button type="submit" class="btn popup_btn mt-4 invite_color">Invite</button>
+                        </form>
+                        <br>
+                        <input class="form-control" type="hidden" id="myInput" value="{{ goal_info.shareable_link }}">
+                        <button onclick="copyToClipboard()" class="btn btn-teal">Share with your friends</button>
+                    </div>
+                    <div class="popup_box popupTwo" id="secondInnerInvato" style="display: none">
+                        <h4 class="popup_heading">Success!</h4>
+                        <div class="text-center mt-3 mb-3">
+                            <img src="{% static 'images/success.png' %}" alt="">
+                        </div>
+                        <p>Invitation Sent!</p>
+                        <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                    </div>
+                    <div class="popup_box popupTwo" id="error_div" style="display: none">
+                        <h4 class="popup_heading">Error!</h4>
+                        <p>Apologies, we couldn't send the invitation. Please double-check if the entered phone number
+                            is correct.</p>
+                        <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Group Goal Modal -->
+    <div class="modal fade" id="delete_group_goal_confirm" tabindex="-1" aria-labelledby="delete_group_goal_confirm"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="delete_group_confirm_content">
+                        <h4 class="popup_heading mb-3" style="color: #dc3545;">Are you sure you want to delete your
+                            Group Goal: {{ goal_info.goal_name }}?</h4>
+                        <p class="mb-4">You can only delete this goal because the total saved amount is low/zero.</p>
+                        <form id="delete_form" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn popup_btn mt-4 white_btn"
+                                style="background-color: #dc3545; color: white;">Delete Goal Permanently</button>
+                        </form>
+                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <br>
+                    <div class="popupTwo" id="delete_success" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Success!</h4>
+                            <div class="text-center mt-3 mb-3">
+                                <img src="{% static 'images/success.png' %}" alt="">
+                            </div>
+                            <h4 class="popup_heading">Selected goal removed.</h4>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Request Modal -->
+    <div class="modal fade" id="withdrawal_request" tabindex="-1" aria-labelledby="withdrawal_request"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="withdrawal_request_firstinner">
+                        <h4 class="popup_heading">How much do you want to withdraw?</h4>
+                        <form class="mt-25" method="post" id="withdrawal_request_form">
+                            {% csrf_token %}
+                            <label for="withdraw_money">Withdraw Money</label>
+                            <input type="text" value="Kshs.{{ available_for_withdrawal|floatformat:2 }}"
+                                name="withdraw_money" id="withdraw_money" class="mt-1" readonly>
+
+                            {% if available_for_withdrawal > 0 %}
+                            {% if goal_info.saving_type == 'regular' %}
+                            <!-- ✅ REGULAR GOALS: Can always withdraw -->
+                            <p class="mt-4">This amount will be deducted from {{ goal_info.goal_name }}.</p>
+                            <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after
+                                    withdrawal.</small></p>
+                            <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+
+                            {% elif goal_info.saving_type == 'fixed' %}
+                            <!-- ✅ FIXED GOALS: Check if target reached OR end date passed -->
+                            {% if goal_info.achieved_amount >= goal_info.target_amount %}
+                            <p class="mt-4">🎉 <strong>Goal achieved!</strong> This amount will be deducted from {{goal_info.goal_name }}.</p>
+                            <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after
+                                    withdrawal.</small></p>
+                            <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+
+                            {% elif goal_info.end_date and goal_info.end_date <= today %} <p class="mt-4">📅 <strong>End
+                                    date reached!</strong> This amount will be deducted from {{ goal_info.goal_name }}.
+                                </p>
+                                <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after
+                                        withdrawal.</small></p>
+                                <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+
+                                {% else %}
+                                <br><br>
+                                <div class="alert alert-danger" role="alert">
+                                    <strong>❌ Cannot Withdraw Yet</strong><br>
+                                    Fixed goal withdrawal requires EITHER:<br>
+                                    1️⃣ Target amount reached (Current: KES {{ goal_info.achieved_amount|floatformat:2}} / Target: KES {{ goal_info.target_amount|floatformat:2 }})<br>
+                                    2️⃣ End date reached ({% if goal_info.end_date %}{{ goal_info.end_date }}{% else
+                                    %}No end date set{% endif %})
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% else %}
+                                <br><br>
+                                <p class="btn btn-warning text-dark">No funds available for withdrawal</p>
+                                {% endif %}
+                        </form>
+                    </div>
+                    <div class="popupTwo" id="withdrawal_success_popup" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Success!</h4>
+                            <div class="text-center mt-3 mb-3">
+                                <img src="{% static 'images/success.png' %}" alt="">
+                            </div>
+                            <h4 class="popup_heading">Your payment withdrawal request has been received.</h4>
+                            <p>We are processing the transaction, and you will receive a confirmation once it is
+                                successfully completed.</p>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Denied Modal -->
+    <div class="modal fade" id="withdrawal_request_denied" tabindex="-1" aria-labelledby="withdrawal_request_denied"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="delete_form_popup">
+                        <h4 class="popup_heading mb-3">Sorry! Only admin of this group can initiate withdrawal request.
+                        </h4>
+                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disable Group Popup -->
+    <div class="modal fade" id="disable_group_popup" tabindex="-1" aria-labelledby="disable_group_popup"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="delete_form_popup">
+                        <h4 class="popup_heading mb-3">Sorry! Withdrawals for this goal are disabled as the goal has
+                            already been completed.</h4>
+                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Goal Modal -->
+    <div class="modal fade" id="edit_goal" tabindex="-1" aria-labelledby="edit_goal" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 600px;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="edit_goal_popup">
+                        <h4 class="popup_heading">Edit Goal Title</h4>
+                        <form id="edit_goal_form" method="post" action="{% url 'goals:edit_group_goal' %}"
+                            class="mt-25">
+                            {% csrf_token %}
+                            <label for="goal_title">Goal Title</label>
+                            <input type="hidden" name="goal_id" value="{{ goal_info.id }}">
+                            <input type="text" name="goal_title" id="goal_title" value="{{ goal_info.goal_name }}"
+                                class="mt-1" required>
+                            <br><br>
+                            <button type="submit" class="btn popup_btn">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main role="main" class="main-content p-0">
+        <!-- Google Font: Outfit -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
+
+        <!-- Header -->
+        <div class="enhanced-header">
+            <div class="container ps-md-0">
+                <!-- Added ps-md-0 to align with left edge if needed, or keeping container fluid behavior -->
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10">
+                        <div class="mb-2">
+                            <a href="{% url 'goals:wekeza_dashboard' %}" class="back-link">
+                                <i class="fe fe-arrow-left"></i> Back to Goals
+                            </a>
+                        </div>
+                        <div class="user-greeting d-flex align-items-center gap-3">
+                            <h1 class="font-outfit text-dark">{{ goal_info.goal_name }}</h1>
+                            {% if goal_info.creator == request.user %}
+                            <a href="#" class="edit-icon-btn" data-bs-toggle="modal" data-bs-target="#edit_goal">
+                                <i class="fe fe-edit-2"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% if goal_info.end_date %}
+                        <div class="days-remaining">
+                            <span class="dot-indicator"></span> {{ goal_info.calculate_month_difference }} DAYS
+                            REMAINING
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container pt-4 pb-5">
+            <!-- Wallet Card - Updated Design -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-12 col-lg-10">
+                    <div class="wallet-card personal-wallet-card text-dark position-relative overflow-hidden bg-white">
+                        <div class="row mb-4">
+                            <!-- Total Saved -->
+                            <div class="col-12 col-md-6 mb-4 mb-md-0">
+                                <div class="wallet-label text-uppercase">Total Savings</div>
+                                <div class="wallet-amount text-dark">Kshs. {{ total_principal|floatformat:2 }}</div>
+                                <small class="text-muted text-uppercase">Group Contribution</small>
+                            </div>
+
+                            <!-- Interest Earned -->
+                            <div class="col-12 col-md-6 text-md-start">
+                                <div class="wallet-label text-uppercase">Interest Earned</div>
+                                <div class="wallet-amount text-teal">+ Kshs. {{ interest_earned|floatformat:2 }}</div>
+                                <small class="text-success bg-success-soft px-2 py-1 rounded">{{ interest_value }}%
+                                    APR</small>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-end">
+                            <!-- Available for Withdrawal -->
+                            <div class="col-12 col-md-6 mb-4 mb-md-0">
+                                <div class="wallet-label text-uppercase">Available for Withdrawal</div>
+                                <div class="wallet-amount text-teal">Kshs. {{ available_for_withdrawal|floatformat:2 }}
+                                </div>
+                                <small class="text-muted text-italic">Net of statutory tax deductions</small>
+                            </div>
+
+                            <!-- Progress Bar Section -->
+                            <div class="col-12 col-md-6">
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <div class="fw-bold fs-5">{{ goal_info.percentage|floatformat:0 }}% Complete</div>
+                                    <small class="text-uppercase fw-bold text-muted">Target: Kshs. {{ goal_info.target_amount|floatformat:0 }}</small>
+                                </div>
+                                <div class="progress"
+                                    style="height: 12px; border-radius: 10px; background-color: #f1f5f9;">
+                                    <div class="progress-bar bg-teal" role="progressbar"
+                                        style="width: {{ goal_info.percentage }}%; border-radius: 10px;"
+                                        aria-valuenow="{{ goal_info.percentage }}" aria-valuemin="0"
+                                        aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons Grid -->
+            <!-- Center the grid and constrain width for better look -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-12 col-lg-10">
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" {% if goal_info.is_active == 'Yes' %} data-bs-target="#add_funds" {% else %} data-bs-target="#disable_group_popup" {% endif %}>
+                            <div class="action-card bg-white">
+                                <div class="teal-icon">
+                                    <i class="fe fe-plus-circle fs-4"></i>
+                                </div>
+                                <div class="action-label">Add Funds</div>
+                            </div>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal"
+                            {% if goal_info.creator == request.user %}
+                                data-bs-target="#withdrawal_request"
+                            {% elif goal_info.is_active == 'No' %}
+                                data-bs-target="#disable_group_popup"
+                            {% else %}
+                                data-bs-target="#withdrawal_request_denied"
+                            {% endif %}>
+                            <div class="action-card bg-white">
+                                <div class="teal-icon">
+                                    <i class="fe fe-arrow-up-circle fs-4"></i>
+                                </div>
+                                <div class="action-label">Withdraw</div>
+                            </div>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" {% if goal_info.is_active == 'Yes' %} data-bs-target="#exampleModalMemb" {% else %} data-bs-target="#disable_group_popup" {% endif %}>
+                            <div class="action-card bg-white">
+                                <div class="teal-icon">
+                                    <i class="fe fe-users fs-4"></i>
+                                </div>
+                                <div class="action-label">Add Member</div>
+                            </div>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{% url 'goals:goal_statement' goal_info.id %}" download class="text-center text-decoration-none">
+                            <div class="action-card bg-white">
+                                <div class="teal-icon">
+                                    <i class="fe fe-download fs-4"></i>
+                                </div>
+                                <div class="action-label">Statement</div>
+                            </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Members & Activities -->
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10">
+                    <div class="row g-4">
+                        <!-- Members Column -->
+                        <div class="col-12 col-md-5">
+                            <div class="content-card bg-white p-0">
+                                <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 fw-bold">Group Members</h5>
+                                    <span class="badge bg-teal-light text-teal">{{ user_total_contributions|length}}</span>
+                                </div>
+                                <div class="scroll-container custom-scrollbar">
+                                    <div class="list-group list-group-flush">
+                                        {% for item in user_total_contributions %}
+                                        <div class="list-group-item border-0 py-3">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="avatar avatar-md">
+                                                        {% if item.profile and item.profile.picture %}
+                                                        <img src="{{ item.profile.picture.url }}"
+                                                            class="avatar-img rounded-circle" alt=""
+                                                            onerror="this.src='{% static 'images/default-avatar.png' %}'">
+                                                        {% else %}
+                                                        <div
+                                                            class="avatar-img rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold">
+                                                            {{ item.user__first_name|slice:":1"|upper }}
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">
+                                                            {{ item.user__first_name }} {{ item.user__last_name }}
+                                                            {% if item.user__username == goal_info.creator.username %}
+                                                            <span class="badge bg-teal-tiny ms-1">ADMIN</span>
+                                                            {% else %}
+                                                            <span class="badge bg-light text-muted ms-1">MEMBER</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        <small class="text-muted">{{ item.user__profile__phone}}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fw-bold text-teal">Kshs. {{item.total_amount|floatformat:2 }}</div>
+                                                    <small class="text-muted form-text-xs">CONTRIBUTED</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="text-center py-5">
+                                            <p class="text-muted">No members found.</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% if user_total_contributions|length > 5 %}
+                                <div class="p-2 border-top text-center">
+                                    <small class="text-muted">Scroll to view more</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Activities Column -->
+                        <div class="col-12 col-md-7">
+                            <div class="content-card bg-white p-0">
+                                <div class="p-3 border-bottom">
+                                    <h5 class="mb-0 fw-bold">Recent Activities</h5>
+                                </div>
+                                <div class="scroll-container custom-scrollbar">
+                                    <div class="list-group list-group-flush">
+                                        {% for item in group_activites %}
+                                        <div class="list-group-item border-0 py-3">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="activity-icon-wrapper">
+                                                    <i class="fe fe-info text-teal"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <!-- We can try to parse the content to highlight Key parts if needed, 
+                                                                 but strictly following variable rendering for now -->
+                                                    <div class="text-dark mb-1">{{ item.content|safe }}</div>
+                                                </div>
+                                                <div class="text-end" style="min-width: 120px;">
+                                                    <small class="text-muted text-uppercase form-text-xs">{{item.created_at|date:"M. d, Y, g:i a" }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="text-center py-5">
+                                            <p class="text-muted">No recent activities.</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="p-3 border-top text-center">
+                                    <a href="#"
+                                        class="text-decoration-none fw-bold text-uppercase text-muted form-text-xs">Load
+                                        More</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Links Redundant as per new design but keeping if user wants standard footer -->
+        </div>
+    </main>
+
+    <footer class="mbl_footer">
+        <div class="container">
+            <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                    <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                    <p>Home</p>
+                </a>
+                <a href="#" class="footer_button btn">
+                    <img src="{% static 'images/filter_active.png' %}" alt="">
+                    <p>Features</p>
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                    <p>Wallet</p>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                    <img src="{% static 'images/setting.png' %}" alt="">
+                    <p>Settings</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Coming Soon Modal Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('comingSoonModal');
+        const closeBtn = modal.querySelector('.close-btn');
+
+        function showComingSoon(e) {
+            e.preventDefault();
+            modal.classList.add('show');
+        }
+
+        function hideComingSoon() {
+            modal.classList.remove('show');
+        }
+
+        document.querySelectorAll('.coming-soon').forEach(tile => {
+            tile.addEventListener('click', showComingSoon);
+        });
+
+        closeBtn.addEventListener('click', hideComingSoon);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) hideComingSoon();
+        });
+    });
+
+    // Copy to Clipboard Function
+    function copyToClipboard() {
+        const copyText = document.getElementById("myInput").value;
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = copyText;
+        tempTextarea.setAttribute("readonly", "");
+        tempTextarea.style.position = "absolute";
+        tempTextarea.style.left = "-9999px";
+
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        tempTextarea.setSelectionRange(0, 99999);
+
+        try {
+            navigator.clipboard.writeText(copyText).then(function () {
+                alert("Link copied: " + copyText);
+            }).catch(function (err) {
+                console.error("Failed to copy text: ", err);
+            });
+        } catch (err) {
+            console.error("Clipboard API not supported: ", err);
+        } finally {
+            document.body.removeChild(tempTextarea);
+        }
+    }
+</script>
+
+<!-- Load jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+
+<!-- jQuery Scripts -->
+<script>
+    // ===================================
+    // ADD FUNDS TO GROUP GOAL
+    // ===================================
+    $('#add_amount_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Add funds to group goal submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:add_funds_to_group_goal' %}",
+            data: {
+                goal_id: {{ goal_info.id }},
+        amount: $('#add_money').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+            },
+        success: function (response) {
+            if (response.success === '1') {
+                console.log("Inside success response:", response.success)
+                $('#firstInnerHowmuch').hide();
+                $('#secondInnerHowmuch').show();
+                setTimeout(function () {
+                    window.location.reload();
+                }, 4000);
+            } else {
+                $('#firstInnerHowmuch').hide();
+                $('#thirdnnerHowmuch').show();
+                setTimeout(function () {
+                    window.location.href = '/load_money/load_money';
+                }, 4000);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ Add funds error:", error);
+            console.error("Status:", xhr.status);
+            console.error("Response:", xhr.responseText);
+            alert("Connection error. Please try again.");
+        }
+        });
+    });
+
+    // ===================================
+    // SEND INVITATION
+    // ===================================
+    $('#send_invitation_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Send invitation submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:send_invitations' %}",
+            data: {
+                goal_id: {{ goal_info.id }},
+        nic: $('#receipt_nic').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+            },
+        success: function (response) {
+            if (response.success === '1') {
+                console.log("Inside success response:", response.success)
+                $('#firstInnerInvato').hide();
+                $('#secondInnerInvato').show();
+                setTimeout(function () {
+                    window.location.reload();
+                }, 4000);
+            } else {
+                $('#firstInnerInvato').hide();
+                $('#error_div').show();
+                setTimeout(function () {
+                    window.location.reload();
+                }, 4000);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ Invitation error:", error);
+            alert("Failed to send invitation. Please try again.");
+        }
+        });
+    });
+
+    // ===================================
+    // WITHDRAWAL FROM GROUP GOAL
+    // ===================================
+    $('#withdrawal_request_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Group goal withdrawal submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:withdraw_money_group_goal' %}",
+            data: {
+                goal_id: {{ goal_info.id }},
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+            },
+        success: function (response) {
+            if (response.success === '1') {
+                console.log("Inside success response:", response.success)
+                $('#withdrawal_request_firstinner').hide();
+                $('#withdrawal_success_popup').show();
+                setTimeout(function () {
+                    window.location.reload();
+                }, 4000);
+            } else {
+                alert(response.message || "Withdrawal failed");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ Withdrawal error:", error);
+            console.error("Status:", xhr.status);
+            console.error("Response:", xhr.responseText);
+            alert("Connection error. Please try again.");
+        }
+        });
+    });
+
+    // ===================================
+    // DELETE GROUP GOAL
+    // ===================================
+    $('#delete_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Delete group goal submitted');
+
+        if (!confirm("Are you sure you want to delete this group goal? This action cannot be undone.")) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:delete_group_goal' %}",
+            data: {
+                goal_id: {{ goal_info.id }},
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+        },
+        success: function (response) {
+            if (response.success === '1') {
+                console.log("Inside success response:", response.success)
+                $('#delete_group_confirm_content').hide();
+                $('#delete_success').show();
+                setTimeout(function () {
+                    window.location.href = "{% url 'goals:wekeza_dashboard' %}";
+                }, 2000); // ✅ Reduced timeout for better UX
+            } else {
+                alert("Failed to delete group goal");
+                // ✅ FIXED: Redirect to dashboard instead of reloading
+                window.location.href = "{% url 'goals:wekeza_dashboard' %}";
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ Delete error:", error);
+            alert("Connection error. Please try again.");
+            // ✅ ADDED: Redirect to dashboard on error too
+            window.location.href = "{% url 'goals:wekeza_dashboard' %}";
+        }
+    });
+});
+</script>
+
+<!-- ========== CELEBRATION SYSTEM JAVASCRIPT ========== -->
+<script>
+    // Confetti Animation
+    function createConfetti() {
+        const container = document.getElementById('confetti-container');
+        if (!container) return;
+
+        const colors = ['#0d9488', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+        const confettiCount = 50;
+
+        for (let i = 0; i < confettiCount; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti-piece';
+
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const left = Math.random() * 100;
+            const delay = Math.random() * 0.5;
+            const duration = 2 + Math.random() * 2;
+
+            confetti.style.left = left + '%';
+            confetti.style.backgroundColor = color;
+            confetti.style.animationDelay = delay + 's';
+            confetti.style.animationDuration = duration + 's';
+
+            container.appendChild(confetti);
+
+            setTimeout(() => {
+                confetti.classList.add('active');
+            }, 10);
+
+            setTimeout(() => {
+                confetti.remove();
+            }, (duration + delay) * 1000);
+        }
+    }
+
+    function triggerConfetti() {
+        createConfetti();
+        setTimeout(createConfetti, 500);
+        setTimeout(createConfetti, 1000);
+    }
+
+    function showMilestoneModal(type, data) {
+        const modal = document.getElementById('milestone-modal');
+        const header = document.getElementById('milestone-header');
+        const icon = document.getElementById('milestone-icon');
+        const title = document.getElementById('milestone-title');
+        const message = document.getElementById('milestone-message');
+        const subtitle = document.getElementById('milestone-subtitle');
+
+        if (!modal) return;
+
+        if (type === 'halfway') {
+            header.className = 'milestone-header halfway';
+            icon.textContent = '🎉';
+            title.textContent = 'Halfway There!';
+            message.textContent = "You're doing amazing! You've reached 50% of your goal.";
+            subtitle.textContent = "Consistency is the key to success. Keep up the great work!";
+        } else if (type === 'seventy-five') {  // ✅ NEW: Add specific handler for 75%
+            header.className = 'milestone-header halfway';
+            icon.textContent = '🌟';
+            title.textContent = '75% Complete!';
+            message.textContent = "You're almost there! Just a little more to go!";
+            subtitle.textContent = "The finish line is in sight. Keep pushing forward!";
+        } else if (type === 'complete') {
+            header.className = 'milestone-header complete';
+            icon.textContent = '🏆';
+            title.textContent = 'Goal Achieved!';
+            message.textContent = "Congratulations! You've reached your target!";
+            subtitle.textContent = "Your dedication has paid off. You can withdraw anytime!";
+        }
+
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        setTimeout(triggerConfetti, 300);
+    }
+
+    function closeMilestoneModal() {
+        const modal = document.getElementById('milestone-modal');
+        if (!modal) return;
+
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    // Goal Completion Detection
+    document.addEventListener('DOMContentLoaded', function () {
+        const goalCompleted = {{ goal_info.percentage }} >= 100;
+
+    // Show confetti for completed goals
+    if (goalCompleted) {
+        setTimeout(triggerConfetti, 500);
+
+        const header = document.querySelector('.user-greeting h1');
+        if (header && !header.querySelector('.goal-completed-badge')) {
+            const badge = document.createElement('span');
+            badge.className = 'goal-completed-badge';
+            badge.innerHTML = '✓ Goal Achieved!';
+            badge.style.marginLeft = '15px';
+            badge.style.fontSize = '14px';
+            header.appendChild(badge);
+        }
+    }
+
+    // Show 50% milestone from Django context
+    {% if show_50_milestone %}
+    setTimeout(() => {
+        showMilestoneModal('halfway', {});
+    }, 1000);
+    {% endif %}
+
+    // Show 75% milestone from Django context
+    {% if show_75_milestone %}
+    setTimeout(() => {
+        showMilestoneModal('seventy-five', {});
+    }, 1000);
+    {% endif %}
+
+    // Close modal on overlay click
+    const modal = document.getElementById('milestone-modal');
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                closeMilestoneModal();
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

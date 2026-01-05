@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Alert</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .alert.danger {
+            background-color: #f8d7da;
+            border-left-color: #e74c3c;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Budget Alert</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello {{ user.username }},</p>
+        
+        <p>You have {{ alerts|length }} budget alert{{ alerts|length|pluralize }} that need your attention:</p>
+        
+        {% for alert in alerts %}
+            <div class="alert {% if alert.type == 'danger' %}danger{% endif %}">
+                <strong>{{ alert.budget.category.icon }} {{ alert.budget.category.name }}</strong><br>
+                {{ alert.message }}<br>
+                <small>{{ alert.percentage|floatformat:1 }}% of budget used</small>
+            </div>
+        {% endfor %}
+        
+        <p>
+            <a href="http://{{ request.get_host }}/expense-tracker/budgets/" class="button">
+                View Budgets
+            </a>
+        </p>
+        
+        <p>Keep track of your spending to stay within your budget limits!</p>
+    </div>
+    
+    <div class="footer">
+        <p>You're receiving this email because you have budget alerts enabled in your preferences.</p>
+        <p>To change your notification settings, visit your <a href="http://{{ request.get_host }}/expense-tracker/preferences/">preferences page</a>.</p>
+        <p>&copy; 2024 ChamaSpace - Expense Tracker</p>
+    </div>
+</body>
+</html>

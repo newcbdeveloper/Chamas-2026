@@ -1,0 +1,405 @@
+.body-div {
+    border-radius: 12px;
+    border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: #FFF;
+    margin: 5px;
+    /* MD - Drop Shadow */
+    box-shadow: 0px 10px 20px 0px rgba(148, 163, 184, 0.20);
+    display: flex;
+    padding: 16px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+h5 {
+    color: var(--light-type-high, #070A13);
+
+    /* Public Sans/Display xs/Medium */
+    font-family: sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px;
+}
+
+.div-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+
+.div-header h6 {
+    color: var(--Primary-500, #2291A5);
+    text-align: left;
+
+    /* Public Sans/Text sm/Medium */
+    font-family: sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.input-sect {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+}
+
+.mb-3 {
+    border-radius: 8px;
+    /* border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20)); */
+    background: var(--White, #FFF);
+    display: flex;
+    padding: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+}
+
+.mb-3 label {
+    color: var(--Primary-500, #2291A5);
+    text-align: center;
+
+    /* Public Sans/Text xs/Medium */
+    font-family: sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 18px;
+    /* 150% */
+}
+
+.mb-3 input {
+    opacity: 0.6;
+    color: #000;
+    text-align: flex-start;
+
+    /* Public Sans/Text xs/Regular */
+    font-family: sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 18px;
+}
+
+.mb-3 select {
+    width: 100%;
+    border: 1px solid var(--color-default);
+
+    /* Add any other styles you need for the select element */
+}
+
+.desc-area {
+    width: 100%;
+    align-self: stretch;
+}
+
+.btn-primary {
+    border-radius: 8px;
+    background: var(--Primary-500, #2291A5);
+    display: flex;
+    padding: 12px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    color: var(--White, #FFF);
+    text-align: center;
+
+    /* Public Sans/Text sm/Semibold */
+    font-family: sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.btn-primary:hover {
+    background: var(--Primary-500, #2291A5);
+
+
+}
+
+.expense-single {
+    border-radius: 8px;
+    border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: var(--light-surface-tertiary, #F1F5F9);
+    display: flex;
+    padding: 12px;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+}
+
+
+.expense-cube {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    flex: 1 0 0;
+}
+
+.expense-title {
+    color: var(--Primary-900, #030F11);
+    font-family: sans-serif;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    /* 180% */
+}
+
+.expense-value {
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+    border-radius: 10px;
+    border: 0.5px solid var(--light, rgba(0, 0, 0, 0.20));
+    background: var(--light-surface-secondary, #F8FAFC);
+    color: #000;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    /* 180% */
+    opacity: 0.4;
+}
+
+/* Expense History Beautiful Card Styles */
+.expense-history-beautiful-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(44, 62, 80, 0.07);
+    padding: 18px 14px;
+    margin-bottom: 14px;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.expense-history-beautiful-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.expense-history-beautiful-label {
+    font-size: 13px;
+    color: #7b8a99;
+    font-weight: 500;
+    min-width: 90px;
+    margin-right: 8px;
+    margin-bottom: 4px;
+    flex: 1 1 40%;
+}
+
+.expense-history-beautiful-value {
+    font-size: 15px;
+    color: #222b45;
+    font-weight: 600;
+    margin-bottom: 4px;
+    flex: 1 1 50%;
+    text-align: right;
+}
+
+.create-expense-card {
+    margin-top: 24px;
+}
+
+/* Mobile tabs */
+.mobile-tabs {
+    background: white;
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    margin-left: 0;
+    position: relative;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.mobile-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+/* Mobile create expense button styling */
+.create-expense-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: #2291A5;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 16px;
+    box-shadow: 0 4px 12px rgba(34, 145, 165, 0.3);
+}
+
+.create-expense-btn:hover {
+    background: #1e7a8c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(34, 145, 165, 0.4);
+}
+
+.create-expense-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(34, 145, 165, 0.3);
+}
+
+.create-expense-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Tab content */
+.modern-expenses .tab-content {
+    display: none;
+}
+.modern-expenses .tab-content.active {
+    display: block !important;
+}
+
+/* Mobile form styling */
+.mobile-create-form .form-row-split {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.mobile-create-form .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-create-form .form-group label {
+    color: #2291A5;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.mobile-create-form .form-input {
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+.mobile-create-form .form-input:focus {
+    outline: none;
+    border-color: #2291A5;
+    box-shadow: 0 0 0 3px rgba(34, 145, 165, 0.1);
+}
+
+.mobile-create-form .form-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Mobile alert box styling */
+.mobile-alert-box {
+    margin-bottom: 16px;
+}
+
+.mobile-alert-box .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mobile-alert-box .alert-success {
+    background-color: #d1fae5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.mobile-alert-box .alert-danger {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 16px 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #9ca3af;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.tab-btn:hover {
+    color: #2291A5;
+    background: rgba(34, 145, 165, 0.05);
+}
+
+.tab-btn.active {
+    color: #2291A5;
+    border-bottom-color: #2291A5;
+    background: rgba(34, 145, 165, 0.05);
+}
+
+/* Override base template styles */
+.modern-expenses .home-section {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+.modern-expenses .block-body {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+/* Override any container margins */
+.modern-expenses .container,
+.modern-expenses .container-fluid {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}

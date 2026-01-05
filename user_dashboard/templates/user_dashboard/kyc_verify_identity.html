@@ -1,0 +1,80 @@
+{% extends 'user_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}<title>Verify Identity - ChamaSpace</title>{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 700px;">
+    <!-- Progress Bar -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between mb-2">
+            <span class="small fw-bold text-primary">Step 1 of 4</span>
+            <span class="small text-muted">Verify Identity</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-primary" style="width: 25%;"></div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="fw-bold mb-4">Verify Your Identity</h2>
+            
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Please confirm your ID information is correct. You can update it if needed.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Document Type *</label>
+                    <select name="document_type" class="form-select form-select-lg" required>
+                        <option value="">Select document type</option>
+                        <option value="national_id" {% if kyc_profile.document_type == 'national_id' %}selected{% endif %}>
+                            National ID
+                        </option>
+                        <option value="passport" {% if kyc_profile.document_type == 'passport' %}selected{% endif %}>
+                            Passport
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">ID Number *</label>
+                    <input 
+                        type="text" 
+                        name="declared_national_id" 
+                        class="form-control form-control-lg" 
+                        value="{{ kyc_profile.declared_national_id }}"
+                        placeholder="Enter your ID or Passport number"
+                        required
+                    >
+                    <small class="form-text text-muted">
+                        Enter the exact number as it appears on your document
+                    </small>
+                </div>
+
+                {% if kyc_profile.id_correction_count > 0 %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    You have corrected your ID {{ kyc_profile.id_correction_count }} time(s). 
+                    Please ensure this is accurate before proceeding.
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                        Next: Upload Documents
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <a href="{% url 'user_dashboard:kyc:dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

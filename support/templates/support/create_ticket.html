@@ -1,0 +1,185 @@
+{% extends 'support/base_support.html' %}
+{% load static %}
+
+{% block page_title %}Create Support Ticket{% endblock %}
+{% block page_subtitle %}Tell us how we can help you{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'support:my_tickets' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Back to Tickets
+</a>
+{% endblock %}
+
+{% block support_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Help Info -->
+        <div class="alert alert-info mb-4">
+            <div class="d-flex">
+                <i class="fas fa-info-circle fa-2x me-3"></i>
+                <div>
+                    <h5 class="alert-heading mb-2">Before Creating a Ticket</h5>
+                    <ul class="mb-0">
+                        <li>Provide as much detail as possible about your issue</li>
+                        <li>Include transaction references if applicable</li>
+                        <li>Attach screenshots if they help explain the problem</li>
+                        <li>Never share your PIN, password, or OTP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Ticket Form -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-ticket-alt me-2"></i>New Support Ticket</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="createTicketForm">
+                    {% csrf_token %}
+                    
+                    <!-- Category -->
+                    <div class="mb-4">
+                        <label for="id_category" class="form-label fw-bold">
+                            Issue Category <span class="text-danger">*</span>
+                        </label>
+                        {{ form.category }}
+                        <small class="form-text text-muted">
+                            Select the category that best describes your issue
+                        </small>
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="mb-4">
+                        <label for="id_subject" class="form-label fw-bold">
+                            Subject <span class="text-danger">*</span>
+                        </label>
+                        {{ form.subject }}
+                        <small class="form-text text-muted">
+                            Brief description of your issue (e.g., "Cannot withdraw to M-Pesa")
+                        </small>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="mb-4">
+                        <label for="id_message" class="form-label fw-bold">
+                            Description <span class="text-danger">*</span>
+                        </label>
+                        {{ form.message }}
+                        <small class="form-text text-muted">
+                            Please describe your issue in detail. Include:
+                            <ul class="mb-0 mt-1">
+                                <li>What you were trying to do</li>
+                                <li>What happened instead</li>
+                                <li>Any error messages you saw</li>
+                                <li>Transaction references (if applicable)</li>
+                            </ul>
+                        </small>
+                    </div>
+
+                    <!-- Attachment -->
+                    <div class="mb-4">
+                        <label for="id_attachment" class="form-label fw-bold">
+                            Attachment (Optional)
+                        </label>
+                        {{ form.attachment }}
+                        <small class="form-text text-muted">
+                            Upload a screenshot or document (max 5MB). 
+                            Allowed: .jpg, .jpeg, .png, .pdf, .txt, .doc, .docx
+                        </small>
+                        <div id="attachmentPreview" class="mt-2"></div>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div class="alert alert-warning">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <strong>Security Notice:</strong> Never share your PIN, password, OTP, or CVV. 
+                        Our support team will never ask for these details.
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Create Ticket
+                        </button>
+                        <a href="{% url 'support:my_tickets' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block support_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('createTicketForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const attachmentInput = document.getElementById('id_attachment');
+    const attachmentPreview = document.getElementById('attachmentPreview');
+    
+    // Attachment preview
+    if (attachmentInput) {
+        attachmentInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
+                const fileName = file.name;
+                
+                attachmentPreview.innerHTML = `
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-file me-2"></i>
+                        <div>
+                            <strong>${fileName}</strong> (${fileSize} MB)
+                        </div>
+                    </div>
+                `;
+                
+                // Check file size
+                if (file.size > 5242880) {
+                    attachmentPreview.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            File size exceeds 5MB limit. Please choose a smaller file.
+                        </div>
+                    `;
+                    attachmentInput.value = '';
+                }
+            } else {
+                attachmentPreview.innerHTML = '';
+            }
+        });
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Ticket...';
+    });
+    
+    // Category-based tips
+    const categorySelect = document.getElementById('id_category');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            const tips = {
+                'wallet': 'Please include your wallet balance and any recent transaction references.',
+                'deposits': 'Include the M-Pesa transaction code and amount.',
+                'withdrawals': 'Include the withdrawal amount and destination phone number.',
+                'kyc': 'Describe which document was rejected and why.',
+                'mgr': 'Include the round name and contribution details.',
+                'goals': 'Include the goal name and the issue you\'re experiencing.',
+                'suspicious': 'This will be treated as urgent. Provide as much detail as possible.',
+            };
+            
+            const selectedTip = tips[this.value];
+            if (selectedTip) {
+                console.log('Tip for ' + this.value + ': ' + selectedTip);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

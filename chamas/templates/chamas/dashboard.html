@@ -1,0 +1,919 @@
+{%extends 'chamas/base.html'%}{% load humanize %}
+{%load static%}
+
+{%block head%}
+<title>Dashboard</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/members.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/dashboard.css'%}?v=4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{%endblock%}
+
+{% block body %}
+<div class="modern-dashboard">
+<script>
+    // Add admin class to body if user is admin
+    {% if is_admin %}
+        document.body.classList.add('user-is-admin');
+        document.documentElement.classList.add('user-is-admin');
+    {% endif %}
+</script>
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Mobile View: Navigation Menu -->
+        <div class="navigation-menu d-block d-lg-none">
+            <!-- Total Contributions Card -->
+            <div class="total-cash-card brand-card">
+                <div class="cash-info">
+                    <p class="cash-label">Total Contributions</p>
+                    <h1 class="breakdown-value">Ksh {{total_contributions|intcomma}}</h1>
+                    <div class="growth-indicator">
+                        <i class='bx bx-trending-up'></i>
+                        <span>100%</span>
+                    </div>
+                    <div class="cash-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Available Cash:</span>
+                            <span class="breakdown-value">Ksh{{total_savings|intcomma}}</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Total Loans:</span>
+                            <span class="breakdown-value">Ksh{{total_loans|intcomma}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="doughnutChartMobile" width="120" height="120"></canvas>
+                </div>
+            </div>
+
+            <a href="{% url 'chamas:contributions' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bx-sort bx-rotate-90'></i>
+                </div>
+                <span class="nav-label">Contributions</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+
+            <a href="{% url 'chamas:chama-loans' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bxs-donate-heart'></i>
+                </div>
+                <span class="nav-label">Loans</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+
+            <a href="{% url 'chamas:chama-expenses' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bx-folder'></i>
+                </div>
+                <span class="nav-label">Expenses</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+
+            <a href="{% url 'chamas:chama-fines' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bx-file'></i>
+                </div>
+                <span class="nav-label">Fines</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+
+            <a href="{% url 'chamas:members' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bx-user'></i>
+                </div>
+                <span class="nav-label">Members</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+
+            <a href="{% url 'chamas:reports' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bxs-report'></i>
+                </div>
+                <span class="nav-label">Reports</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+            <a href="{% url 'chamas:finances' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bx-money'></i>
+                </div>
+                <span class="nav-label">Finances</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+
+            <a href="{% url 'chamas:notifications' chama.id %}" class="nav-item">
+                <div class="nav-icon">
+                    <i class='bx bx-bell'></i>
+                </div>
+                <span class="nav-label">Manage Notifications</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+            
+            <a href="{% url 'bot:bot-records' chama.id %}" class="nav-item admin">
+                <div class="nav-icon">
+                    <i class='bx bx-bot'></i>
+                </div>
+                <span class="nav-label">Bot Management</span>
+                <i class='bx bx-chevron-right nav-arrow'></i>
+            </a>
+        </div>
+
+        <!-- Mobile Documents Section -->
+        <div class="mobile-documents-section d-block d-lg-none" style="margin: 0;">
+            <div class="mobile-documents-card brand-card">
+                <div class="mobile-documents-header">
+                    <h3 class="mobile-documents-title text-brand-primary">Documents</h3>
+                    <button class="btn btn-primary btn-sm admin add-document-btn-admin" onclick="openUploadModal()">
+                        <i class='bx bx-plus'></i> Add
+                    </button>
+                </div>
+                <div class="mobile-documents-content">
+                    {% if documents %}
+                        {% for document in documents %}
+                        <div class="mobile-document-item">
+                            <div class="mobile-document-info">
+                                <div class="mobile-document-icon">
+                                    <i class='bx {{document.get_file_icon}}'></i>
+                                </div>
+                                <div class="mobile-document-details">
+                                    <h4 class="mobile-document-name">{{document.name}}</h4>
+                                    <div class="mobile-document-meta">
+                                        <span class="mobile-type-badge type-{{document.get_file_type}}">{{document.get_file_type|upper}}</span>
+                                        <span class="mobile-document-size">{{document.get_formatted_size}}</span>
+                                        <span class="mobile-document-date">{{document.upload_date|date:"M d, Y"}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mobile-document-actions">
+                                <a href="{% url 'chamas:download-document' chama.id document.id %}" 
+                                   class="mobile-btn-action mobile-btn-download" 
+                                   title="Download">
+                                    <i class='bx bx-download'></i>
+                                </a>
+                                <button class="mobile-btn-action mobile-btn-delete admin delete-document-btn-admin" 
+                                        onclick="deleteDocument({{document.id}}, '{{document.name}}')"
+                                        title="Delete">
+                                    <i class='bx bx-trash'></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Mobile Pagination -->
+                        {% if documents.has_other_pages %}
+                        <div class="mobile-pagination-container">
+                            <nav aria-label="Documents pagination">
+                                <ul class="mobile-pagination">
+                                    {% if documents.has_previous %}
+                                        <li class="mobile-page-item">
+                                            <a class="mobile-page-link" href="?page={{ documents.previous_page_number }}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in documents.paginator.page_range %}
+                                        {% if documents.number == num %}
+                                            <li class="mobile-page-item active">
+                                                <span class="mobile-page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > documents.number|add:'-2' and num < documents.number|add:'2' %}
+                                            <li class="mobile-page-item">
+                                                <a class="mobile-page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if documents.has_next %}
+                                        <li class="mobile-page-item">
+                                            <a class="mobile-page-link" href="?page={{ documents.next_page_number }}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                        {% endif %}
+                        
+                    {% else %}
+                        <div class="mobile-empty-state">
+                            <i class="bx bx-file-blank mobile-empty-icon"></i>
+                            <p class="mobile-empty-message">No documents uploaded yet</p>
+                            <button class="btn btn-primary btn-sm admin add-document-btn-admin" onclick="openUploadModal()">
+                                <i class='bx bx-plus'></i> Add Document
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop View: Dashboard Stats and Charts -->
+        <div class="desktop-dashboard d-none d-lg-block">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <h1 class="dashboard-title text-brand-primary">Dashboard Overview</h1>
+                    <p class="dashboard-subtitle">Monitor your chama's financial health and performance</p>
+                </div>
+            
+            </div>
+
+            <!-- Key Metrics Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card brand-card">
+                    <div class="metric-header">
+                        <div class="metric-icon bg-brand-primary">
+                            <i class='bx bx-credit-card'></i>
+                        </div>
+                        <div class="metric-trend positive">
+                            <i class='bx bx-trending-up'></i>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value text-brand-primary">Ksh {{total_contributions|intcomma}}</h3>
+                        <p class="metric-label">Total Contributions</p>
+                        <p class="metric-description">All member contributions</p>
+                    </div>
+                </div>
+
+                <div class="metric-card brand-card">
+                    <div class="metric-header">
+                        <div class="metric-icon" style="background-color: #10b981;">
+                            <i class='bx bx-group'></i>
+                        </div>
+                        <div class="metric-trend positive">
+                            <i class='bx bx-trending-up'></i>
+                            <span>5%</span>
+                        </div>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value">{{chama.member.count}}</h3>
+                        <p class="metric-label">Active Members</p>
+                        <p class="metric-description">Total group membership</p>
+                    </div>
+                </div>
+
+                <div class="metric-card brand-card">
+                    <div class="metric-header">
+                        <div class="metric-icon" style="background-color: #f59e0b;">
+                            <i class='bx bx-credit-card'></i>
+                        </div>
+                        <div class="metric-trend neutral">
+                            <i class='bx bx-minus'></i>
+                            <span>0%</span>
+                        </div>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value">Ksh {{total_loans|intcomma}}</h3>
+                        <p class="metric-label">Total Loans</p>
+                        <p class="metric-description">Outstanding loan amount</p>
+                    </div>
+                </div>
+
+                <div class="metric-card brand-card">
+                    <div class="metric-header">
+                        <div class="metric-icon" style="background-color: #ef4444;">
+                            <i class='bx bx-receipt'></i>
+                        </div>
+                        <div class="metric-trend negative">
+                            <i class='bx bx-trending-down'></i>
+                            <span>-2%</span>
+                        </div>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value">Ksh {{total_fines|intcomma}}</h3>
+                        <p class="metric-label">Total Fines</p>
+                        <p class="metric-description">Collected penalties</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-grid">
+                    <!-- Financial Overview Chart -->
+                    <div class="chart-card brand-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title text-brand-primary">Financial Overview</h3>
+                            <p class="chart-subtitle">Distribution of group funds</p>
+                        </div>
+                        <div class="chart-content">
+                            <canvas id="financialOverviewChart" width="300" height="300"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: var(--brand-primary);"></span>
+                                <span class="legend-label">Contributions</span>
+                                <span class="legend-value">Ksh {{total_contributions|intcomma}}</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #10b981;"></span>
+                                <span class="legend-label">Available Cash</span>
+                                <span class="legend-value">Ksh {{total_savings|intcomma}}</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #f59e0b;"></span>
+                                <span class="legend-label">Loans</span>
+                                <span class="legend-value">Ksh {{total_loans|intcomma}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Trends Chart -->
+                    <div class="chart-card brand-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title text-brand-primary">Monthly Trends</h3>
+                            <p class="chart-subtitle">Contributions and loans over time</p>
+                        </div>
+                        <div class="chart-content">
+                            <canvas id="monthlyTrendsChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Section -->
+            <div class="documents-row">
+                <!-- Documents Section -->
+                <div class="documents-section" id="documents-mobile">
+                    <div class="documents-card brand-card">
+                        <div class="documents-header">
+                            <h3 class="documents-title text-brand-primary">Documents</h3>
+                            <div class="documents-actions">
+                                <button class="btn btn-primary admin add-document-btn-admin" onclick="openUploadModal()">
+                                    <i class='bx bx-plus'></i> Add Document
+                                </button>
+                            </div>
+                        </div>
+                    <div class="documents-content">
+                        <div class="documents-table-container">
+                            {% if documents %}
+                            <table class="documents-table">
+                                <thead>
+                                    <tr>
+                                        <th>Document</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th>Date Uploaded</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for document in documents %}
+                                    <tr class="document-row">
+                                        <td class="document-info-cell">
+                                            <div class="document-item-info">
+                                                <div class="document-icon">
+                                                    <i class='bx {{document.get_file_icon}}'></i>
+                                                </div>
+                                                <div class="document-details">
+                                                    <h4 class="document-name">{{document.name}}</h4>
+                                                    <p class="document-filename">{{document.file.name|cut:"documents/"}}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="document-type">
+                                            <span class="type-badge type-{{document.get_file_type}}">{{document.get_file_type|upper}}</span>
+                                        </td>
+                                        <td class="document-size">{{document.get_formatted_size}}</td>
+                                        <td class="document-date">{{document.upload_date|date:"M d, Y"}}</td>
+                                        <td class="document-actions">
+                                            <div class="action-buttons">
+                                                <a href="{% url 'chamas:download-document' chama.id document.id %}" 
+                                                   class="btn-document-action btn-download" 
+                                                   title="Download">
+                                                    <i class='bx bx-download'></i>
+                                                </a>
+                                                <button class="btn-document-action btn-delete admin delete-document-btn-admin" 
+                                                        onclick="deleteDocument({{document.id}}, '{{document.name}}')"
+                                                        title="Delete">
+                                                    <i class='bx bx-trash'></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            <!-- Pagination -->
+                            {% if documents.has_other_pages %}
+                            <div class="pagination-container">
+                                <nav aria-label="Documents pagination">
+                                    <ul class="pagination">
+                                        {% if documents.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ documents.previous_page_number }}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        
+                                        {% for num in documents.paginator.page_range %}
+                                            {% if documents.number == num %}
+                                                <li class="page-item active">
+                                                    <span class="page-link">{{ num }}</span>
+                                                </li>
+                                            {% elif num > documents.number|add:'-3' and num < documents.number|add:'3' %}
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if documents.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ documents.next_page_number }}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                            {% endif %}
+                            
+                            {% else %}
+                            <div class="empty-state">
+                                <i class="bx bx-file-blank empty-state-icon"></i>
+                                <p class="empty-state-message">No documents uploaded yet</p>
+                                <p class="empty-state-description">Upload your first document to get started</p>
+                                <button class="btn btn-primary admin add-document-btn-admin" onclick="openUploadModal()">
+                                    <i class='bx bx-plus'></i> Add Document
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+
+            <!-- Close documents-row -->
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data from Django context
+    const totalContributions = {{ total_contributions|default:0 }};
+    const totalLoans = {{ total_loans|default:0 }};
+    const totalSavings = {{ total_savings|default:0 }};
+    const availableCash = Math.max(0, totalSavings - totalLoans);
+    
+    // Monthly data from Django
+    const contributionsData = {{ contributions_data|safe }};
+    const loansData = {{ loans_data|safe }};
+    
+    // Brand colors
+    const brandPrimary = '#2191a5';
+    const brandSuccess = '#10b981';
+    const brandWarning = '#f59e0b';
+    const brandError = '#ef4444';
+
+    // Mobile Doughnut Chart
+    const ctxMobile = document.getElementById('doughnutChartMobile');
+    if (ctxMobile) {
+        new Chart(ctxMobile, {
+            type: 'doughnut',
+            data: {
+                labels: ['Contributions', 'Loans', 'Available'],
+                datasets: [{
+                    data: [totalContributions, totalLoans, availableCash],
+                    backgroundColor: [brandPrimary, brandWarning, brandSuccess],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Desktop Financial Overview Chart
+    const ctxFinancial = document.getElementById('financialOverviewChart');
+    if (ctxFinancial) {
+        new Chart(ctxFinancial, {
+            type: 'doughnut',
+            data: {
+                labels: ['Contributions', 'Available Cash', 'Loans'],
+                datasets: [{
+                    data: [totalContributions, availableCash, totalLoans],
+                    backgroundColor: [brandPrimary, brandSuccess, brandWarning],
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Desktop Monthly Trends Chart with real data
+    const ctxTrends = document.getElementById('monthlyTrendsChart');
+    if (ctxTrends) {
+        const months = Object.keys(contributionsData);
+        const contributionValues = Object.values(contributionsData);
+        const loanValues = Object.values(loansData);
+        
+        new Chart(ctxTrends, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Contributions',
+                        data: contributionValues,
+                        borderColor: brandPrimary,
+                        backgroundColor: brandPrimary + '20',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Loans',
+                        data: loanValues,
+                        borderColor: brandWarning,
+                        backgroundColor: brandWarning + '20',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Ksh ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 8
+                    }
+                }
+            }
+        });
+    }
+});
+
+// Ensure DOM is loaded before accessing elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Fixed mobile navigation functions with null checks
+    window.openNav = function() {
+        const sidenav = document.getElementById("mySidenav");
+        const overlay = document.querySelector(".mobile-overlay");
+        const body = document.body;
+        
+        if (sidenav) {
+            // Force display and visibility first
+            sidenav.style.display = "block";
+            sidenav.style.visibility = "visible";
+            sidenav.style.zIndex = "2000";
+            
+            // Add open class for additional styling
+            sidenav.classList.add("open");
+            
+            // Set width to trigger animation
+            sidenav.style.width = "280px";
+        } else {
+            console.error("Sidebar element #mySidenav not found");
+            return;
+        }
+        
+        if (overlay) {
+            overlay.style.display = "block";
+            overlay.style.visibility = "visible";
+            overlay.style.opacity = "1";
+            overlay.classList.add("active");
+        }
+        
+        // Add class to body to prevent scrolling
+        if (body) {
+            body.classList.add("sidebar-open");
+        }
+        
+        // Add touch/click event to close on outside click
+        setTimeout(() => {
+            document.addEventListener('click', outsideClickHandler);
+        }, 100);
+    };
+
+    window.closeNav = function() {
+        const sidenav = document.getElementById("mySidenav");
+        const overlay = document.querySelector(".mobile-overlay");
+        const body = document.body;
+        
+        if (sidenav) {
+            // Remove open class
+            sidenav.classList.remove("open");
+            
+            // Set width to 0 to trigger close animation
+            sidenav.style.width = "0";
+            
+            // Hide after animation completes
+            setTimeout(() => {
+                sidenav.style.display = "none";
+                sidenav.style.visibility = "hidden";
+            }, 300);
+        } else {
+            console.error("Sidebar element #mySidenav not found");
+            return;
+        }
+        
+        if (overlay) {
+            // Remove active class
+            overlay.classList.remove("active");
+            overlay.style.opacity = "0";
+            
+            setTimeout(() => {
+                overlay.style.display = "none";
+                overlay.style.visibility = "hidden";
+            }, 300);
+        }
+        
+        // Remove class from body
+        if (body) {
+            body.classList.remove("sidebar-open");
+        }
+        
+        // Remove event listener
+        document.removeEventListener('click', outsideClickHandler);
+    };
+
+    function outsideClickHandler(event) {
+        const sidenav = document.getElementById("mySidenav");
+        const menuBtn = document.querySelector('.menu-btn');
+        
+        // Check if click is outside sidebar and not on menu button
+        if (sidenav && menuBtn && !sidenav.contains(event.target) && !menuBtn.contains(event.target)) {
+            closeNav();
+        }
+    }
+
+    // Close sidebar on window resize if moving to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeNav();
+        }
+    });
+});
+
+// Document management functions
+
+function openUploadModal() {
+    const modal = document.getElementById('uploadDocumentModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+}
+
+function closeUploadModal() {
+    const modal = document.getElementById('uploadDocumentModal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    document.getElementById('uploadForm').reset();
+    document.getElementById('uploadStatus').innerHTML = '';
+    document.getElementById('fileInfo').innerHTML = '';
+}
+
+function handleFileSelect(input) {
+    const fileInfo = document.getElementById('fileInfo');
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const fileSize = (file.size / 1024 / 1024).toFixed(2); // Size in MB
+        const fileType = file.name.split('.').pop().toLowerCase();
+        
+        // Check file type
+        const allowedTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'jpg', 'jpeg', 'png'];
+        if (!allowedTypes.includes(fileType)) {
+            fileInfo.innerHTML = `<div class="alert alert-danger">File type .${fileType} not allowed</div>`;
+            input.value = '';
+            return;
+        }
+        
+        // Check file size (10MB limit)
+        if (file.size > 10 * 1024 * 1024) {
+            fileInfo.innerHTML = `<div class="alert alert-danger">File size exceeds 10MB limit</div>`;
+            input.value = '';
+            return;
+        }
+        
+        fileInfo.innerHTML = `
+            <div class="file-preview">
+                <div class="file-icon">
+                    <i class='bx ${getFileIcon(fileType)}'></i>
+                </div>
+                <div class="file-details">
+                    <strong>${file.name}</strong><br>
+                    <small>${fileSize} MB • ${fileType.toUpperCase()}</small>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function getFileIcon(fileType) {
+    switch(fileType.toLowerCase()) {
+        case 'pdf': return 'bx-file-pdf';
+        case 'xls':
+        case 'xlsx':
+        case 'csv': return 'bx-spreadsheet';
+        case 'doc':
+        case 'docx': return 'bx-file-doc';
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif': return 'bx-image';
+        default: return 'bx-file-blank';
+    }
+}
+
+function uploadDocument() {
+    const form = document.getElementById('uploadForm');
+    const formData = new FormData(form);
+    const statusDiv = document.getElementById('uploadStatus');
+    const submitBtn = document.querySelector('#uploadForm button[type="submit"]');
+    
+    // Validate form
+    const fileInput = document.getElementById('documentFile');
+    const nameInput = document.getElementById('documentName');
+    
+    if (!fileInput.files.length) {
+        statusDiv.innerHTML = '<div class="alert alert-danger">Please select a file</div>';
+        return;
+    }
+    
+    if (!nameInput.value.trim()) {
+        statusDiv.innerHTML = '<div class="alert alert-danger">Please enter a document name</div>';
+        return;
+    }
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Uploading...';
+    
+    statusDiv.innerHTML = '<div class="alert alert-info">Uploading document...</div>';
+    
+    fetch('{% url "chamas:upload-document" chama.id %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message) {
+            statusDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            setTimeout(() => {
+                closeUploadModal();
+                location.reload(); // Refresh to show new document
+            }, 1500);
+        } else {
+            statusDiv.innerHTML = `<div class="alert alert-danger">${data.error || 'Upload failed'}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Upload error:', error);
+        statusDiv.innerHTML = `<div class="alert alert-danger">Error uploading document: ${error.message}</div>`;
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bx bx-upload"></i> Upload Document';
+    });
+}
+
+function deleteDocument(documentId, documentName) {
+    if (confirm(`Are you sure you want to delete "${documentName}"? This action cannot be undone.`)) {
+        fetch(`{% url "chamas:delete-document" chama.id 0 %}`.replace('0', documentId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                location.reload(); // Refresh to update document list
+            } else {
+                alert(data.error || 'Failed to delete document');
+            }
+        })
+        .catch(error => {
+            alert('Error deleting document');
+        });
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('uploadDocumentModal');
+    if (event.target === modal) {
+        closeUploadModal();
+    }
+});
+
+// Ensure modal is hidden on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('uploadDocumentModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        
+        // Double check that modal stays hidden
+        setTimeout(function() {
+            modal.style.display = 'none';
+        }, 100);
+    }
+});
+</script>
+
+<!-- Upload Document Modal -->
+<div id="uploadDocumentModal" class="modal-overlay" style="display: none !important;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Upload Document</h3>
+            <span class="modal-close" onclick="closeUploadModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="uploadForm" onsubmit="event.preventDefault(); uploadDocument();">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="documentName">Document Name:</label>
+                    <input type="text" id="documentName" name="documentName" class="form-control" 
+                           placeholder="Enter document name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentFile">Select File:</label>
+                    <input type="file" id="documentFile" name="documentFile" class="form-control" 
+                           onchange="handleFileSelect(this)" required>
+                    <small class="form-text text-muted">
+                        Allowed types: PDF, DOC, DOCX, XLS, XLSX, CSV, TXT, JPG, PNG (Max: 10MB)
+                    </small>
+                </div>
+                
+                <div id="fileInfo"></div>
+                <div id="uploadStatus"></div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-upload"></i> Upload Document
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

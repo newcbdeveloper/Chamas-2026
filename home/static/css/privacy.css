@@ -1,0 +1,126 @@
+/* ===== PRIVACY POLICY PAGE STYLES ===== */
+
+.privacy-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  line-height: 1.7;
+  color: #272556;
+  background-color: #ffffff;
+}
+
+.privacy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(34, 145, 165, 0.2);
+}
+
+.privacy-logo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2291a5;
+  text-decoration: none;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-outline-sm {
+  padding: 0.5rem 1.25rem;
+  background: transparent;
+  color: #2291a5;
+  border: 2px solid #2291a5;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-sm:hover {
+  background-color: #2291a5;
+  color: white;
+}
+
+.privacy-content h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #272556;
+  text-align: center;
+}
+
+.privacy-content h2 {
+  font-size: 1.25rem;
+  margin: 1.5rem 0 0.75rem;
+  color: #272556;
+}
+
+.privacy-content p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #565578;
+}
+
+.privacy-content a {
+  color: #2291a5;
+  text-decoration: none;
+}
+
+.privacy-content a:hover {
+  text-decoration: underline;
+}
+
+.privacy-footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(34, 145, 165, 0.1);
+}
+
+.btn-home {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 2rem;
+  background-color: #2291a5;
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.btn-home:hover {
+  background-color: #1a7a8a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .privacy-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .auth-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .privacy-container {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  .privacy-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .privacy-content h2 {
+    font-size: 1.15rem;
+  }
+}

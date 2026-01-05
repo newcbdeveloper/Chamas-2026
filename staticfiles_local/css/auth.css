@@ -1,0 +1,311 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #5c9aa9;
+}
+
+/* App container */
+.app-container {
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #5c9aa9;
+
+}
+
+/* Header styles */
+.header {
+    background-color: #5c9aa9;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 60px;
+}
+
+.menu-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 25px;
+    height: 20px;
+    padding: 0;
+}
+
+.menu-button span {
+    height: 3px;
+    width: 100%;
+    background-color: #333;
+    border-radius: 2px;
+}
+
+/* Main content styles */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #5c9aa9;
+    overflow-y: auto;
+}
+
+.card {
+    background-color: white;
+    border-radius: 25px;
+    padding: 25px 20px;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.logo-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.logo-center img {
+    height: 100%;
+}
+
+.card-instruction {
+    text-align: center;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background-color: white;
+}
+
+input::placeholder {
+    color: #aaa;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #aaa;
+    pointer-events: none;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 30px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+.checkbox-label {
+    display: inline;
+    font-size: 14px;
+}
+
+/* Button styles */
+.get-code-btn {
+    background-color: white;
+    color: #5c9aa9;
+    border: 1px solid #5c9aa9;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.get-code-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.proceed-btn {
+    width: auto;
+    background-color: white;
+    color: #5c9aa9;
+    border: 1px solid #5c9aa9;
+    border-radius: 10px;
+    padding: 10px 30px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 10px 0;
+    transition: background-color 0.2s;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.proceed-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.primary-btn {
+    width: 100%;
+    background-color: #2d2a54;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    transition: background-color 0.2s;
+}
+
+.primary-btn:hover {
+    background-color: #1f1d3a;
+}
+
+/* Links styles */
+.links {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.forgot-password {
+    display: block;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.forgot-password:hover {
+    color: #5c9aa9;
+}
+
+.signup-text, .login-text {
+    font-size: 14px;
+    color: #555;
+}
+
+.accent-link {
+    color: #5c9aa9;
+    text-decoration: none;
+}
+
+.accent-link:hover {
+    text-decoration: underline;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+    .app-container {
+        max-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        padding: 20px 15px;
+    }
+}
+
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 450px;
+    }
+    
+    .card {
+        padding: 30px 25px;
+    }
+}
+/* ───────────────────────────────────────
+   Password Update Page — Overrides
+   ─────────────────────────────────────── */
+
+.password-update-card {
+    padding: 30px 20px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.validation-message {
+    font-size: 14px;
+    min-height: 18px;
+    margin-top: 5px;
+    display: none;
+}
+
+.validation-message.success {
+    color: #28a745; /* Bootstrap green */
+}
+
+.validation-message.error {
+    color: #dc3545; /* Bootstrap red */
+}

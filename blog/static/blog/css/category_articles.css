@@ -1,0 +1,303 @@
+/* ===== BLOG CATEGORY ARTICLES STYLES - CHAMASPACE BRANDED ===== */
+
+:root {
+  --brand-blue: #2291a5;
+  --brand-blue-dark: #1a7a8a;
+  --brand-blue-light: #e8f4f7;
+  --accent-gold: #d4a574;
+  --muted: #565578;
+  --muted-light: #f0f0f0;
+  --text-dark: #272556;
+  --border-light: #e0e0e0;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 32px rgba(34, 145, 165, 0.18);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem 1rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .articles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+    padding: 2rem 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .articles-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    padding: 2rem 2rem;
+  }
+}
+
+/* Enhanced card styling with better shadow, border, and hover effect */
+.article-card {
+  background: white;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* More engaging hover state with elevated shadow and subtle scale */
+.article-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand-blue);
+}
+
+/* Replaced padding-top percentage hack with modern aspect-ratio property for cleaner, more maintainable code */
+.article-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark));
+  overflow: hidden;
+  display: block;
+  flex-shrink: 0;
+}
+
+.article-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+/* Subtle zoom on image hover for better interactivity */
+.article-card:hover .article-image img {
+  transform: scale(1.04);
+}
+
+/* Improved content padding and spacing with better flex layout */
+.article-content {
+  padding: 1.75rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Enhanced metadata styling with better visual hierarchy */
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--muted-light);
+  letter-spacing: 0.3px;
+}
+
+.article-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+/* Improved icon styling with brand color */
+.article-meta i {
+  color: var(--brand-blue);
+  font-size: 0.85rem;
+}
+
+/* Better title styling with improved font weight and line height */
+.article-title {
+  font-size: 1.35rem;
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  letter-spacing: -0.3px;
+}
+
+.article-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.article-title a:hover {
+  color: var(--brand-blue);
+}
+
+/* Improved excerpt with better line height and color */
+.article-excerpt {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  letter-spacing: 0.2px;
+}
+
+/* Elevated Read More button with better styling and hover effect */
+.read-more {
+  color: white;
+  background: var(--brand-blue);
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-sm);
+  width: fit-content;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  letter-spacing: 0.4px;
+}
+
+.read-more:hover {
+  background: var(--brand-blue-dark);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(34, 145, 165, 0.3);
+}
+
+.read-more i {
+  transition: transform 0.3s ease;
+}
+
+.read-more:hover i {
+  transform: translateX(3px);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  grid-column: 1 / -1;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: var(--border-light);
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  color: var(--muted);
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* Pagination */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pagination a,
+.pagination span {
+  padding: 0.65rem 1rem;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 600;
+  min-width: 44px;
+  text-align: center;
+  transition: all 0.25s ease;
+  font-size: 0.9rem;
+}
+
+.pagination a:hover {
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
+  background: var(--brand-blue-light);
+}
+
+.pagination .current {
+  background: var(--brand-blue);
+  color: white;
+  border-color: var(--brand-blue);
+  font-weight: 700;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .articles-grid {
+    gap: 1.75rem;
+    padding: 1.5rem 0.75rem;
+  }
+
+  .article-content {
+    padding: 1.5rem;
+    gap: 0.85rem;
+  }
+
+  .article-title {
+    font-size: 1.2rem;
+  }
+
+  .article-excerpt {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .article-meta {
+    font-size: 0.75rem;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .articles-grid {
+    gap: 1.5rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .article-content {
+    padding: 1.25rem;
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+  }
+
+  .read-more {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - ChamaSpace</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2291a5 0%, #1a7a8a 100%);
+            padding: 2rem;
+        }
+        
+        .login-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #272556;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2291a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-form">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #272556;">Sign In to ChamaSpace</h2>
+            
+            <form>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="margin-bottom: 1rem;">
+                    Sign In
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1rem;">
+                Don't have an account? 
+                <a href="signup.html" style="color: #2291a5; text-decoration: none;">Create one</a>
+            </p>
+            
+            <p style="text-align: center; margin-top: 1rem;">
+                <a href="index.html" style="color: #565578; text-decoration: none;">← Back to Home</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+
+
+
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Add Number
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+
+      <main role="main" class="main-content">
+
+        <div class="container-fluid">
+           <section class="wallet-banner">
+                <div class="container">
+                    <nav class="page_nav mob_nav show_on_mobile">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+                            <li class="">
+                                <img src="{% static 'images/Notifications.png' %}" alt="">
+                            </li>
+                            <li class="">
+
+                                <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+
+                                    <img src="{% static 'images/menu.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="c-o-b-e-dwrapper">
+                        <div class="wallet-content">
+                            <h5 class="h-heding">
+                                Load your money to Chamabora
+                            </h5>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+          <div class="row justify-content-center">
+            <div class="col-6">
+
+
+              <form action="{% url 'load_money' %}" method="post">
+              {% csrf_token %}
+
+
+                <div class="form-group">
+                  <label for="phone_no_registered_with_mpesa">Phone No regitered with Mpesa</label>
+
+
+
+                            <input  type="text" class="form-control" name="phone"  value="{{ phone_number }}" id="phone_no_registered_with_mpesa" disabled>
+
+                </div>
+
+                     <div class="form-group">
+                  <label for="amount">Amount</label>
+
+                    <input type="number" name="amount" id="amount" class="form-control">
+
+                </div>
+                  {% if request.user.username == '33332222' %}
+
+                <div class="form-row">
+                  <div class="col-md-6 text-right">
+                    <button type="reset" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+                  {% else %}
+                    <div class="form-row">
+                  <div class="col-md-6 text-right">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+                  {% endif %}
+              </form>
+            </div> <!-- .col-12 -->
+          </div> <!-- .row -->
+        <footer class="mbl_footer">
+                <div class="container">
+                    <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                        <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                            <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                            <p>Home</p>
+                        </a>
+                        <a href="#" class="footer_button btn">
+                            <img src="{% static 'images/filter_active.png' %}" alt="">
+                            <p>Features</p>
+                        </a>
+                        <a href="" class="footer_button btn coming_soon">
+                            <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                            <p>Account</p>
+                        </a>
+                        <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                            <img src="{% static 'images/setting.png' %}" alt="">
+                            <p>Settings</p>
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div> <!-- .container-fluid -->
+
+        <!-- .container-fluid -->
+        <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="list-group list-group-flush my-n3">
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>Your next contribution for Chama AA09gg is on Nov 27th </strong></small>
+                        <div class="my-0 text-muted small">Please pay load money before the date.</div>
+                        <small class="badge badge-pill badge-light text-muted">1m ago</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>You qualify to join another chama</strong></small>
+                        <div class="my-0 text-muted small">You can be in more than two chamas at the same time</div>
+                        <small class="badge badge-pill badge-light text-muted">42m ago</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>Notifications have been sent</strong></small>
+                        <div class="my-0 text-muted small">Fusce dapibus, tellus ac cursus commodo</div>
+                        <small class="badge badge-pill badge-light text-muted">30m ago</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <small><strong>Link was attached to menu</strong></small>
+                        <div class="my-0 text-muted small">New layout has been attached to the menu</div>
+                        <small class="badge badge-pill badge-light text-muted">1h ago</small>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--
+        <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body px-5">
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-success justify-content-center">
+                      <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Control area</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Activity</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Droplet</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Upload</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Users</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Settings</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+-->
+      </main>
+    </div>
+
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+{% endblock %}

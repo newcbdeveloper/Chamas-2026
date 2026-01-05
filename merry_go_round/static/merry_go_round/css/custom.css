@@ -1,0 +1,103 @@
+/* custom.css - Custom styles for Merry-Go-Round App */
+
+/* Global Variables for Theme Consistency */
+:root {
+    --color-primary: #2191a5;
+  --color-primary-light: #2ba6bd;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #06b6d4;
+    --text-muted: #6c757d;
+    --transition-speed: 0.3s;
+}
+
+/* General Enhancements */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+}
+
+.card {
+    transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
+    border-radius: 0.5rem;
+}
+
+.card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Notifications Page Specific */
+.list-group-item {
+    transition: background var(--transition-speed) ease;
+}
+
+.list-group-item:hover {
+    background-color: #f0f0f0 !important; /* Slight hover for better UX */
+}
+
+.badge {
+    padding: 0.4em 0.8em;
+    border-radius: 1rem;
+    font-weight: 500;
+}
+
+/* Dashboard Specific */
+.wallet-card {
+    background: linear-gradient(135deg, #007bff, #0056b3); /* Modern gradient */
+    color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.metric-card {
+    border-left: 4px solid var(--primary-color);
+    transition: border-color var(--transition-speed) ease;
+}
+
+.metric-card:hover {
+    border-left-color: var(--success-color);
+}
+
+/* Invitation Review Page Specific */
+.alert {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-check-input:checked {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+/* Responsiveness Tweaks */
+@media (max-width: 576px) { /* Extra small devices */
+    h2, h3, h4 {
+        font-size: 1.2rem; /* Smaller headings for mobile */
+    }
+    .btn {
+        width: 100%; /* Full-width buttons for touch ease */
+        margin-bottom: 0.5rem;
+    }
+    .list-group-item {
+        padding: 1rem 0.75rem; /* More touch-friendly padding */
+    }
+}
+
+@media (min-width: 768px) { /* Medium devices and up */
+    .row.g-4 {
+        gap: 1.5rem !important; /* Better spacing on tablets */
+    }
+}
+
+/* Accessibility Improvements */
+a:hover {
+    text-decoration: underline; /* Better for keyboard navigation */
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

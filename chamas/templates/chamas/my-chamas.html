@@ -1,0 +1,242 @@
+{% extends 'chamas/chamas_base.html' %}
+{% load static %}
+
+{% block title %}My Chamas{% endblock %}
+
+{% block extra_css %}
+<style>
+.chama-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.chama-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.chama-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.chama-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.chama-role {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.role-admin {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.role-member {
+    background-color: #3498db;
+    color: white;
+}
+
+.role-treasurer {
+    background-color: #f39c12;
+    color: white;
+}
+
+.chama-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.chama-detail {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.chama-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.chama-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: white;
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+.empty-state img {
+    max-width: 200px;
+    opacity: 0.6;
+    margin-bottom: 1rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.chamas-count {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .chama-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .chama-details {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .chama-actions {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">My Chamas</h1>
+        <p class="chamas-count">
+            {% if chamas_count == 0 %}
+                You are not currently a member of any chamas
+            {% elif chamas_count == 1 %}
+                You are a member of 1 chama
+            {% else %}
+                You are a member of {{ chamas_count }} chamas
+            {% endif %}
+        </p>
+    </div>
+
+    {% if user_chamas %}
+        <div class="chamas-list">
+            {% for item in user_chamas %}
+            <div class="chama-card">
+                <div class="chama-header">
+                    <h3 class="chama-name">{{ item.chama.name }}</h3>
+                    <span class="chama-role role-{{ item.role|lower }}">{{ item.role }}</span>
+                </div>
+                
+                <div class="chama-details">
+                    <div class="chama-detail">
+                        <span class="detail-label">Chama Type</span>
+                        <span class="detail-value">{{ item.chama.chama_type.name|default:"General" }}</span>
+                    </div>
+                    <div class="chama-detail">
+                        <span class="detail-label">Member Since</span>
+                        <span class="detail-value">{{ item.member_since|date:"M Y" }}</span>
+                    </div>
+                    <div class="chama-detail">
+                        <span class="detail-label">Location</span>
+                        <span class="detail-value">{{ item.chama.location|default:"Not specified" }}</span>
+                    </div>
+                    <div class="chama-detail">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">Active Member</span>
+                    </div>
+                </div>
+                
+                <div class="chama-actions">
+                    <a href="{% url 'chamas:chama-dashboard' item.chama.id %}" class="chama-btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="{% url 'chamas:members' item.chama.id %}" class="chama-btn btn-secondary">
+                        <i class="fas fa-users"></i> Members
+                    </a>
+                    {% if item.is_admin %}
+                    <a href="{% url 'chamas:contributions' item.chama.id %}" class="chama-btn btn-secondary">
+                        <i class="fas fa-money-bill-wave"></i> Manage
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-users" style="font-size: 4rem; color: #bdc3c7; margin-bottom: 1rem;"></i>
+            <h3>No Chamas Yet</h3>
+            <p class="text-muted">You haven't joined any chamas yet. Start by creating your own chama or ask to be added to an existing one.</p>
+            <a href="{% url 'chamas:new-chama-form' %}" class="chama-btn btn-primary" style="margin-top: 1rem;">
+                <i class="fas fa-plus"></i> Create Your First Chama
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any interactive functionality here
+    console.log('My Chamas page loaded with {{ chamas_count }} chama(s)');
+});
+</script>
+{% endblock %}

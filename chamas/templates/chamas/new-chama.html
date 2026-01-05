@@ -1,0 +1,497 @@
+{%extends 'chamas/chamas_base.html'%}
+{%load static%}
+
+{%block head%}
+<title>Create New Chama</title>
+<link rel="stylesheet" href="{%static 'chamas/new-chama.css'%}">
+
+{%endblock%}
+
+
+{%block body%}
+
+<div class="row">
+    <div class="col-md-8 form-section">
+        <div class="header-section">
+            <h3 class="new-chama-sect-header">Create New Group </h3>
+        </div>
+        <div class="" id="alertCluster">
+
+        </div>
+        <div class="form-container">
+            <form id="createChamaForm" class="new-chama-form">
+                {% csrf_token %}
+                
+                <!-- Name input - full width -->
+                <div class="form-row">
+                    <div class="input-box full-width">
+                        <label for="name">Name <span style="color: red;">*</span></label>
+                        <input type="text" name="name" id="name" placeholder="Enter chama name" required>
+                    </div>
+                </div>
+
+                <!-- Date and Type row - two columns -->
+                <div class="form-row two-columns">
+                    <div class="input-box">
+                        <label for="date">Start date <span style="color: red;">*</span></label>
+                        <input type="date" name="date" id="date" required>
+                    </div>
+                    
+                    <div class="input-box select-box">
+                        <label for="type">Group Type <span style="color: red;">*</span></label>
+                        <select class="form-select text-capitalize" name="type" id="type" required>
+                            <option value="">Choose type...</option>
+                            {%for type in types%}
+                            <option value="{{type.id}}">{{type.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Add Members button - full width -->
+                <div class="form-row">
+                    <div class="add-members-button" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="resetMemberForm()">
+                        <div class="button-content">
+                            <i class='bx bx-user-plus'></i>
+                            <span class="button-title">Add Members</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Members list -->
+                <div class="form-row">
+                    <div class="members-section">
+                        <h5 class="members-title">Selected Members</h5>
+                        <div class="member-list" id="memberList">
+                            <div class="member-single" id="emptyMessage">
+                               <div class="alert alert-warning">You have not selected any members yet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <div class="form-row">
+                    <div class="add-button" id="createChamaBtn">
+                        <p class="create-chama-text">Create Chama</p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding members (enhanced) -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel" style="color: #2291a5">
+                    Add Member to Group
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMemberForm">
+                    <div class="mb-3">
+                        <label for="memberName" class="form-label">Name <span style="color: red;">*</span></label>
+                        <input type="text" name="name" id="memberName" placeholder="Eg John Doe" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="memberMobile" class="form-label">Mobile <span style="color: red;">*</span></label>
+                        <input type="text" name="mobile" id="memberMobile" placeholder="Eg +2547XXXXXXXX" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="memberEmail" class="form-label">Email <span style="color: red;">*</span></label>
+                        <input type="email" name="email" id="memberEmail" placeholder="Eg example@email.com" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="memberIdNumber" class="form-label">ID Number</label>
+                        <input type="text" name="id_number" id="memberIdNumber" placeholder="Eg 12XXXXXXXX" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="memberRole" class="form-label">Role <span style="color: red;">*</span></label>
+                        <select name="role" id="memberRole" class="form-select" required>
+                            <option value="">Select role...</option>
+                            {% for role in roles %}
+                            <option value="{{role.id}}">{{role.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addMemberBtn">Add Member</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let temporaryMembers = [];
+let memberCounter = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const dateInput = document.getElementById('date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+    
+    // Add member functionality
+    document.getElementById('addMemberBtn').addEventListener('click', function() {
+        addMemberToList();
+    });
+    
+    // Create chama functionality
+    document.getElementById('createChamaBtn').addEventListener('click', function() {
+        createChama();
+    });
+    
+    // Form submit handler for modal
+    document.getElementById('addMemberForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addMemberToList();
+    });
+    
+    // Reset form when modal is closed
+    document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function() {
+        resetMemberForm();
+    });
+    
+    // Simple select dropdown fix
+    const memberRoleSelect = document.getElementById('memberRole');
+    if (memberRoleSelect) {
+        // Just add a simple change listener for debugging
+        memberRoleSelect.addEventListener('change', function(e) {
+            console.log('Role selected:', this.value, this.options[this.selectedIndex].text);
+        });
+    }
+});
+
+function addMemberToList() {
+    const form = document.getElementById('addMemberForm');
+    const formData = new FormData(form);
+    const editingId = form.dataset.editingId;
+    
+    const name = formData.get('name').trim();
+    const mobile = formData.get('mobile').trim();
+    const email = formData.get('email').trim();
+    const idNumber = formData.get('id_number').trim();
+    const roleId = formData.get('role');
+    
+    // Get role name
+    const roleSelect = document.getElementById('memberRole');
+    const roleName = roleSelect.options[roleSelect.selectedIndex].text;
+    
+    // Validation
+    if (!name || !mobile || !email || !roleId) {
+        showAlert('Please fill in all required fields', 'danger');
+        return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showAlert('Please enter a valid email address', 'danger');
+        return;
+    }
+    
+    // Phone number validation and formatting
+    let formattedMobile = mobile.trim();
+    if (formattedMobile) {
+        // Remove any spaces or dashes
+        formattedMobile = formattedMobile.replace(/[\s-]/g, '');
+        
+        // Basic validation for Kenyan phone numbers
+        if (!/^(\+254|254|0)?[17]\d{8}$/.test(formattedMobile)) {
+            showAlert('Please enter a valid Kenyan mobile number (e.g., 0712345678 or +254712345678)', 'danger');
+            return;
+        }
+        
+        // Format to international format
+        if (formattedMobile.startsWith('0')) {
+            formattedMobile = '+254' + formattedMobile.slice(1);
+        } else if (formattedMobile.startsWith('254') && !formattedMobile.startsWith('+')) {
+            formattedMobile = '+' + formattedMobile;
+        } else if (!formattedMobile.startsWith('+254')) {
+            formattedMobile = '+254' + formattedMobile;
+        }
+    }
+    
+    // Check for duplicates (excluding the member being edited)
+    const isDuplicate = temporaryMembers.some(member => 
+        member.id !== editingId && (
+            member.email.toLowerCase() === email.toLowerCase() || 
+            member.mobile === formattedMobile
+        )
+    );
+    
+    if (isDuplicate) {
+        showAlert('A member with this email or mobile number already exists', 'danger');
+        return;
+    }
+    
+    if (editingId) {
+        // Update existing member
+        const memberIndex = temporaryMembers.findIndex(m => m.id === editingId);
+        if (memberIndex !== -1) {
+            temporaryMembers[memberIndex] = {
+                id: editingId,
+                name: name,
+                mobile: formattedMobile,
+                email: email,
+                id_number: idNumber,
+                role_id: roleId,
+                role_name: roleName
+            };
+            showAlert(`${name}'s details updated successfully`, 'success');
+        }
+    } else {
+        // Add new member to temporary members list
+        const member = {
+            id: 'temp_' + (++memberCounter),
+            name: name,
+            mobile: formattedMobile,
+            email: email,
+            id_number: idNumber,
+            role_id: roleId,
+            role_name: roleName
+        };
+        
+        temporaryMembers.push(member);
+        showAlert(`${name} added to the member list`, 'success');
+    }
+    
+    updateMembersList();
+    
+    // Clear form and close modal
+    resetMemberForm();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    modal.hide();
+}
+
+function updateMembersList() {
+    const memberList = document.getElementById('memberList');
+    const emptyMessage = document.getElementById('emptyMessage');
+    
+    if (temporaryMembers.length === 0) {
+        emptyMessage.style.display = 'block';
+        // Clear any existing table or header
+        const existingItems = memberList.querySelectorAll('.member-count-header, .members-table');
+        existingItems.forEach(item => item.remove());
+        return;
+    }
+    
+    emptyMessage.style.display = 'none';
+    
+    // Clear existing items
+    const existingItems = memberList.querySelectorAll('.member-count-header, .members-table');
+    existingItems.forEach(item => item.remove());
+    
+    // Add member count header
+    const memberCountHeader = document.createElement('div');
+    memberCountHeader.className = 'member-count-header';
+    memberCountHeader.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted fw-medium">${temporaryMembers.length} member(s) selected</small>
+            <button class="btn btn-sm btn-outline-secondary" onclick="clearAllMembers()" title="Clear all members">
+                <i class="bx bx-trash-alt"></i> Clear All
+            </button>
+        </div>
+    `;
+    memberList.appendChild(memberCountHeader);
+    
+    // Create table
+    const table = document.createElement('table');
+    table.className = 'members-table';
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+    
+    const tbody = table.querySelector('tbody');
+    
+    // Add member rows
+    temporaryMembers.forEach((member, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${member.name}</strong></td>
+            <td>${member.mobile}</td>
+            <td>${member.email}</td>
+            <td><span class="badge bg-primary">${member.role_name}</span></td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn-action btn-edit" onclick="editMember('${member.id}')" title="Edit member">
+                        <i class="bx bx-edit-alt"></i>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="removeMember('${member.id}')" title="Remove member">
+                        <i class="bx bx-trash-alt"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    memberList.appendChild(table);
+}
+
+function removeMember(memberId) {
+    temporaryMembers = temporaryMembers.filter(member => member.id !== memberId);
+    updateMembersList();
+    showAlert('Member removed from the list', 'info');
+}
+
+function clearAllMembers() {
+    if (confirm('Are you sure you want to clear all selected members?')) {
+        temporaryMembers = [];
+        updateMembersList();
+        showAlert('All members cleared from the list', 'info');
+    }
+}
+
+function editMember(memberId) {
+    const member = temporaryMembers.find(m => m.id === memberId);
+    if (!member) return;
+    
+    // Pre-fill the modal with member data
+    document.getElementById('memberName').value = member.name;
+    document.getElementById('memberEmail').value = member.email;
+    document.getElementById('memberMobile').value = member.mobile;
+    document.getElementById('memberIdNumber').value = member.id_number || '';
+    document.getElementById('memberRole').value = member.role_id;
+    
+    // Store the member ID being edited
+    document.getElementById('addMemberForm').dataset.editingId = memberId;
+    
+    // Change modal title and button text
+    document.getElementById('exampleModalLabel').textContent = 'Edit Member';
+    document.getElementById('addMemberBtn').textContent = 'Update Member';
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+    modal.show();
+}
+
+function resetMemberForm() {
+    // Reset form
+    document.getElementById('addMemberForm').reset();
+    delete document.getElementById('addMemberForm').dataset.editingId;
+    
+    // Reset modal title and button text
+    document.getElementById('exampleModalLabel').textContent = 'Add Member to Group';
+    document.getElementById('addMemberBtn').textContent = 'Add Member';
+}
+
+function createChama() {
+    const form = document.getElementById('createChamaForm');
+    const formData = new FormData(form);
+    
+    const name = formData.get('name').trim();
+    const date = formData.get('date');
+    const type = formData.get('type');
+    
+    // Validation
+    if (!name || !date || !type) {
+        showAlert('Please fill in all required fields', 'danger');
+        return;
+    }
+    
+    // Optional: Warn if no members are added
+    if (temporaryMembers.length === 0) {
+        if (!confirm('You are about to create a chama with no additional members. Only you will be added as the admin. Do you want to continue?')) {
+            return;
+        }
+    }
+    
+    // Prepare data
+    const data = {
+        name: name,
+        date: date,
+        type: type,
+        members: temporaryMembers
+    };
+    
+    // Show loading state
+    const createBtn = document.getElementById('createChamaBtn');
+    const originalText = createBtn.querySelector('.create-chama-text').textContent;
+    createBtn.querySelector('.create-chama-text').textContent = 'Creating...';
+    createBtn.style.pointerEvents = 'none';
+    
+    // Submit chama creation
+    fetch("{% url 'chamas:new-chama' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showAlert(data.message, 'success');
+            // Reset form and redirect
+            setTimeout(() => {
+                window.location.href = "{% url 'chamas:your-chamas' %}";
+            }, 2000);
+        } else {
+            showAlert(data.message || 'An error occurred while creating the chama', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('An error occurred while creating the chama', 'danger');
+    })
+    .finally(() => {
+        // Reset button state
+        createBtn.querySelector('.create-chama-text').textContent = originalText;
+        createBtn.style.pointerEvents = 'auto';
+    });
+}
+
+function showAlert(message, type) {
+    const alertCluster = document.getElementById('alertCluster');
+    
+    // Remove existing alerts
+    alertCluster.innerHTML = '';
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    alertCluster.appendChild(alert);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.remove();
+        }
+    }, 5000);
+    
+    // Scroll to top to show alert
+    alertCluster.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+  const el = document.querySelector(".mobile-chama-row");
+  if (el) el.remove();
+});
+
+</script>
+{%endblock%}

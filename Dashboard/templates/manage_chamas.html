@@ -1,0 +1,274 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Manage Chamas
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+
+      <main role="main" class="main-content">
+       <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-12 ">
+                <h5 style="text-decoration:#00a65a">{% include '_messages.html' %}</h5>
+
+              <div class="row align-items-center my-4">
+                <div class="col">
+                  <h2 class="h5 page-title">Account Summary</h2>
+                </div>
+              </div>
+
+              <div class="mb-2 align-items-center">
+                <div class="card shadow mb-4">
+                  <div class="card-body">
+                    <div class="row mt-1 align-items-center">
+                      <div class="col-6 col-lg-2 text-left pl-4">
+                        <p class="mb-1 small text-muted">Account Balance</p>
+                        <span class="h3">KES {{ user_wallet.available_for_withdraw}}</span>
+                      </div>
+
+                               <div class="col-6 col-lg-2 text-center py-4">
+                        <p class="mb-1 small text-muted">Your Active Chamas</p>
+                        <span class="h3">{{user_active_chamas|length}}</span>
+                      </div>
+
+                      <div class="col-6 col-lg-2 text-center py-4">
+                        <p class="mb-1 small text-muted">Your Pending Chamas</p>
+                        <span class="h3">{{user_pending_chamas|length}}</span>
+                      </div>
+
+                      <div class="col-6 col-lg-2 text-center py-4 mb-2">
+                        <p class="mb-1 small text-muted">Your Total Chamas Contribution</p>
+                        <span class="h3">KES {{Total_contribution}}</span><br />
+                      </div>
+
+                      <div class="col-6 col-lg-2 text-center py-4">
+                        <p class="mb-1 small text-muted">Withdrawals</p>
+                        <span class="h3">KSH 0,00</span>
+                      </div>
+
+                      <div class="col-6 col-lg-2 text-center py-4">
+                        <p class="mb-1 small text-muted">Fines</p>
+                        <span class="h3">KSH 0,00</span>
+                      </div>
+                    </div>
+                  </div> <!-- .card-body -->
+                </div> <!-- .card -->
+              </div>
+
+              <hr class="my-4">
+              <div class="row align-items-center my-4">
+                <div class="col">
+                  <h2 class="h5 page-title">Manage your Money.</h2>
+                  <p class="lead text-muted">Choose what to do with your finances.</p>
+                </div>
+              </div>
+
+              <h5 class="mb-2 mt-4">Load Money to your Account</h5>
+            {% if request.user.username == '33332222' %}
+
+              <p>Deposit using MPesa.</p>
+                    <a  href="#" class="btn btn-primary">
+
+                       Load your Money
+                    </a>
+            {% else %}
+            <p>Deposit using MPesa.</p>
+                    <a  href="{% url 'load_money' %}" class="btn btn-primary">
+
+                       Load your Money
+                    </a>
+            {% endif %}
+
+
+
+
+                <hr class="my-4">
+
+                <h5 class="mb-2 mt-4">Transact </h5>
+                <p class="mb-4">Choose Where to direct your money:</p>
+                  <form action="{% url 'paypal' %}" method="post">
+                      {% csrf_token %}
+                                       <div class="form-group">
+                  <label for="send-to-active_chama">Send to Active Chamas</label>
+                  <select id="send-to-active_chama" name="user_active_chamas" class="form-control">
+                    <option  value="Select">Select your chama</option>
+                    {% for chamas in user_active_chamas %}
+                                    <option  value="{{ chamas.name }}">{{ chamas.name }}</option>
+                                {% endfor %}
+                  </select>
+                </div>
+
+
+
+
+
+                  {% if request.user.username == '33332222' %}
+
+                <div class="form-row">
+                  <div class="col-md-6 text-right">
+                    <button type="reset" class="btn btn-primary">Pay via your Wallet</button>
+                  </div>
+                    {% else %}
+                       <div class="form-row">
+                  <div class="col-md-6 text-right">
+                    <button type="submit" class="btn btn-primary">Pay via your Wallet</button>
+                  </div>
+                    {% endif %}
+
+<!--                     <div class="col-md-6 text-right">-->
+<!--                    <button type="button" class="btn btn-primary">Pay via MPesa</button>-->
+<!--                  </div>-->
+                </div>
+                      </form>
+
+
+              <form>
+                <hr class="my-4">
+                <h5 class="mb-2 mt-4">Pay Fine </h5>
+                <p class="mb-4">If you have a fine, pay it here</p>
+
+                <div class="form-group">
+                  <label for="send-to-chama">Select Chama</label>
+                  <select id="" class="form-control">
+                    <option value="male">CHAMA0001</option>
+                    <option value="female">CHAMA0002</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="send-to-chama">Select Offense</label>
+                  <select id="" class="form-control">
+                    <option value="male">Late Contribution</option>
+                    <option value="female">Negligence</option>
+                  </select>
+                </div>
+
+
+                <div class="form-group">
+                  <label for="contribution-amount">Enter Ammount</label>
+                  <input type="text" id="ammount" class="form-control">
+                </div>
+                  {% if request.user.username == '33332222' %}
+
+                <div class="form-row">
+                  <div class="col-md-6 text-right">
+                    <button type="reset" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+                  {% else %}
+                       <div class="form-row">
+                  <div class="col-md-6 text-right">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+              {% endif %}
+              </form>
+
+            </div> <!-- .col-12 -->
+          </div> <!-- .row -->
+        </div>
+
+        <!-- .container-fluid -->
+        <div id="abc" class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  {% for i in user_notifications %}
+                <div class="list-group list-group-flush my-n3">
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+
+                      <div class="col">
+
+                        <small><strong>{{i.notification_title}} </strong></small>
+                        <div class="my-0 text-muted small">{{i.notification_body}}</div>
+                        <small class="badge badge-pill badge-light text-muted">{{i.created_at}}</small>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                </div>
+                  {% endfor %}
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--
+        <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body px-5">
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-success justify-content-center">
+                      <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Control area</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Activity</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Droplet</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Upload</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Users</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Settings</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+-->
+      </main>
+    </div>
+
+{% endblock %}

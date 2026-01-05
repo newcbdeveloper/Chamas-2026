@@ -1,0 +1,107 @@
+/* ==================== Date Selector Styles ==================== */
+.date-selector-container .card {
+  background: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-gray-100);
+  transition: all 0.2s ease;
+}
+
+.date-selector-container .card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-gray-200);
+}
+
+.date-selector-container .card-body {
+  padding: 0.5rem;
+}
+
+/* Date Picker Input */
+.date-selector-container input[type="date"] {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-gray-300);
+  background-color: var(--color-white);
+  color: var(--color-gray-800);
+  max-width: 160px;
+  min-width: 120px;
+  text-align: center;
+}
+
+.date-selector-container input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(40%) opacity(70%);
+}
+
+/* Buttons */
+.date-selector-container .btn {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.8125rem;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.15s ease;
+}
+
+.date-selector-container .btn.btn-outline-primary {
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.date-selector-container .btn.btn-outline-primary:hover {
+  background-color: var(--color-primary-light) !important;
+  color: white !important;
+}
+
+.date-selector-container .btn.active {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+/* Date Header */
+.date-selector-container .date-display {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gray-800);
+  margin: 0;
+}
+
+/* Spacing */
+.date-selector-container .me-2 { margin-right: 0.5rem !important; }
+.date-selector-container .ms-2 { margin-left: 0.5rem !important; }
+
+/* ==================== Responsive Mobile Adjustments ==================== */
+@media (max-width: 768px) {
+  .date-selector-container .card-body {
+    padding: 0.375rem;
+  }
+
+  .date-selector-container input[type="date"] {
+    font-size: 0.8125rem;
+    padding: 0.25rem 0.4rem;
+    max-width: 130px;
+  }
+
+  .date-selector-container .btn {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .date-selector-container .btn i {
+    font-size: 0.875rem;
+  }
+
+  /* Stack on very small screens */
+  @media (max-width: 480px) {
+    .date-selector-container .row > [class*="col-"] {
+      flex: 0 0 100%;
+      max-width: 100%;
+      margin-bottom: 8px;
+    }
+    .date-selector-container .text-end,
+    .date-selector-container .text-center {
+      text-align: center !important;
+    }
+    .date-selector-container .date-display {
+      font-size: 0.95rem;
+    }
+  }
+}

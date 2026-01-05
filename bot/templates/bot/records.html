@@ -1,0 +1,1082 @@
+{% extends 'chamas/base.html' %}
+{% load static humanize %}
+
+{% block head %}
+<title>Bot Records</title>
+<link rel="stylesheet" href="{% static 'chamas/contribution.css' %}">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="modern-bot-records">
+  <!-- Mobile View -->
+  <div class="mobile-bot-records d-block d-lg-none">
+    <div id="alert-success" class="alert alert-success d-none" role="alert"></div>
+    <div id="alert-danger" class="alert alert-danger d-none" role="alert"></div>
+
+    <!-- Mobile Tabs -->
+    <div class="mobile-tabs">
+      <button class="tab-btn active" data-tab="contributions">Contributions</button>
+      <button class="tab-btn" data-tab="fines">Fines</button>
+      <button class="tab-btn" data-tab="loans">Loans</button>
+      <button class="tab-btn" data-tab="members">Members</button>
+    </div>
+
+    <!-- Contributions Tab Content -->
+    <div class="tab-content active" id="tab-contributions">
+      <div class="mobile-records-list">
+        {% for contribution in contributions %}
+        <div class="record-beautiful-card">
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Date</div>
+            <div class="record-beautiful-value">{{ contribution.date_created|date:'d/m/Y' }}</div>
+            <div class="record-beautiful-label">Member</div>
+            <div class="record-beautiful-value">{{ contribution.submitted_member }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Contribution Name</div>
+            <div class="record-beautiful-value">{{ contribution.retrieved_contribution.name }}</div>
+            <div class="record-beautiful-label">Amount</div>
+            <div class="record-beautiful-value">Ksh {{ contribution.amount_paid|intcomma }}</div>
+          </div>
+          <div class="record-actions">
+            <button class="btn btn-sm record-view-btn" data-bs-toggle="modal"
+              data-bs-target="#modal-contribution" data-id="{{ contribution.id }}"
+              data-date="{{ contribution.date_created }}" data-member="{{ contribution.submitted_member }}"
+              data-name="{{ contribution.retrieved_contribution.name }}" data-amount="{{ contribution.amount_paid }}">
+              View Details
+            </button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-records">
+          <i class='bx bx-inbox'></i>
+          <p>No contributions found</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Fines Tab Content -->
+    <div class="tab-content" id="tab-fines">
+      <div class="mobile-records-list">
+        {% for fine in fines %}
+        <div class="record-beautiful-card">
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Date</div>
+            <div class="record-beautiful-value">{{ fine.date_created|date:'d/m/Y' }}</div>
+            <div class="record-beautiful-label">Member</div>
+            <div class="record-beautiful-value">{{ fine.member }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Fine Type</div>
+            <div class="record-beautiful-value">{{ fine.edited_fine.fine_type.name }}</div>
+            <div class="record-beautiful-label">Amount Paid</div>
+            <div class="record-beautiful-value">Ksh {{ fine.amount_paid|intcomma }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Balance</div>
+            <div class="record-beautiful-value">Ksh {{ fine.edited_fine.fine_balance|intcomma }}</div>
+            <div class="record-beautiful-label"></div>
+            <div class="record-beautiful-value"></div>
+          </div>
+          <div class="record-actions">
+            <button class="btn btn-sm record-view-btn" data-bs-toggle="modal"
+              data-bs-target="#modal-fine" data-id="{{ fine.id }}" data-date="{{ fine.date_created }}"
+              data-member="{{ fine.member }}" data-type="{{ fine.edited_fine.fine_type.name }}"
+              data-paid="{{ fine.amount_paid }}" data-balance="{{ fine.edited_fine.fine_balance }}">
+              View Details
+            </button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-records">
+          <i class='bx bx-inbox'></i>
+          <p>No fines found</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Loans Tab Content -->
+    <div class="tab-content" id="tab-loans">
+      <div class="mobile-records-list">
+        {% for loan in loans %}
+        <div class="record-beautiful-card">
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Date</div>
+            <div class="record-beautiful-value">{{ loan.date_created|date:'d/m/Y' }}</div>
+            <div class="record-beautiful-label">Member</div>
+            <div class="record-beautiful-value">{{ loan.member }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Loan Type</div>
+            <div class="record-beautiful-value">{{ loan.updated_loan.type.name }}</div>
+            <div class="record-beautiful-label">Amount Paid</div>
+            <div class="record-beautiful-value">Ksh {{ loan.amount_paid|intcomma }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Balance</div>
+            <div class="record-beautiful-value">Ksh {{ loan.updated_loan.balance|intcomma }}</div>
+            <div class="record-beautiful-label"></div>
+            <div class="record-beautiful-value"></div>
+          </div>
+          <div class="record-actions">
+            <button class="btn btn-sm record-view-btn" data-bs-toggle="modal"
+              data-bs-target="#modal-loan" data-id="{{ loan.id }}" data-date="{{ loan.date_created }}"
+              data-member="{{ loan.member }}" data-type="{{ loan.updated_loan.type.name }}"
+              data-paid="{{ loan.amount_paid }}" data-balance="{{ loan.updated_loan.balance }}">
+              View Details
+            </button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-records">
+          <i class='bx bx-inbox'></i>
+          <p>No loans found</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Members Tab Content -->
+    <div class="tab-content" id="tab-members">
+      <div class="mobile-records-list">
+        {% for member in members %}
+        <div class="record-beautiful-card">
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Date</div>
+            <div class="record-beautiful-value">{{ member.date_created|date:'d/m/Y' }}</div>
+            <div class="record-beautiful-label">Name</div>
+            <div class="record-beautiful-value">{{ member.name }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">ID</div>
+            <div class="record-beautiful-value">{{ member.id_number }}</div>
+            <div class="record-beautiful-label">Chama</div>
+            <div class="record-beautiful-value">{{ member.chama_name }}</div>
+          </div>
+          <div class="record-beautiful-row">
+            <div class="record-beautiful-label">Role</div>
+            <div class="record-beautiful-value">{{ member.role }}</div>
+            <div class="record-beautiful-label"></div>
+            <div class="record-beautiful-value"></div>
+          </div>
+          <div class="record-actions">
+            <button class="btn btn-sm record-view-btn" data-bs-toggle="modal"
+              data-bs-target="#modal-member" data-id="{{ member.id }}" 
+              data-name="{{ member.name }}" data-idnum="{{ member.id_number }}">
+              View Details
+            </button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-records">
+          <i class='bx bx-inbox'></i>
+          <p>No members found</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop View -->
+  <div class="desktop-bot-records d-none d-lg-block">
+    <div class="text-capitalize">
+      <div class="row contribution-details">
+        <div id="alert-success-desktop" class="alert alert-success d-none" role="alert"></div>
+        <div id="alert-danger-desktop" class="alert alert-danger d-none" role="alert"></div>
+
+        <!-- Button group to switch tables -->
+        <div class="btn-group mb-3" role="group" aria-label="Record types">
+          <button type="button" class="btn" id="btn-contributions"
+            style="background-color:#2191a5; color:white;">Contributions</button>
+          <button type="button" class="btn" id="btn-fines" style="background-color:#2191a5; color:white;">Fines</button>
+          <button type="button" class="btn" id="btn-loans" style="background-color:#2191a5; color:white;">Loans</button>
+          <button type="button" class="btn" id="btn-members" style="background-color:#2191a5; color:white;">Members</button>
+        </div>
+
+    <!-- Contributions Table -->
+    <div class="table-responsive" id="table-contributions">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Member</th>
+            <th>Contribution Name</th>
+            <th>Amount</th>
+            <th class="admin">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for contribution in contributions %}
+          <tr>
+            <td>{{ contribution.date_created }}</td>
+            <td>{{ contribution.submitted_member }}</td>
+            <td>{{ contribution.retrieved_contribution.name }}</td>
+            <td>Ksh {{ contribution.amount_paid | intcomma }}</td>
+            <td class="admin">
+              <button class="btn btn-sm" style="background-color:#2191a5; color:white;" data-bs-toggle="modal"
+                data-bs-target="#modal-contribution" data-id="{{ contribution.id }}"
+                data-date="{{ contribution.date_created }}" data-member="{{ contribution.submitted_member }}"
+                data-name="{{ contribution.retrieved_contribution.name }}" data-amount="{{ contribution.amount_paid }}">
+                View
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Fines Table -->
+    <div class="table-responsive d-none" id="table-fines">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Member</th>
+            <th>Fine Type</th>
+            <th>Amount Paid</th>
+            <th>Balance</th>
+            <th class="admin">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fine in fines %}
+          <tr>
+            <td>{{ fine.date_created }}</td>
+            <td>{{ fine.member }}</td>
+            <td>{{ fine.edited_fine.fine_type.name }}</td>
+            <td>Ksh {{ fine.amount_paid | intcomma }}</td>
+            <td>Ksh {{ fine.edited_fine.fine_balance | intcomma }}</td>
+            <td class="admin">
+              <button class="btn btn-sm" style="background-color:#2191a5; color:white;" data-bs-toggle="modal"
+                data-bs-target="#modal-fine" data-id="{{ fine.id }}" data-date="{{ fine.date_created }}"
+                data-member="{{ fine.member }}" data-type="{{ fine.edited_fine.fine_type.name }}"
+                data-paid="{{ fine.amount_paid }}" data-balance="{{ fine.edited_fine.fine_balance }}">
+                View
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Loans Table -->
+    <div class="table-responsive d-none" id="table-loans">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Member</th>
+            <th>Loan Type</th>
+            <th>Amount Paid</th>
+            <th>Balance</th>
+            <th class="admin">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in loans %}
+          <tr>
+            <td>{{ loan.date_created }}</td>
+            <td>{{ loan.member }}</td>
+            <td>{{ loan.updated_loan.type.name }}</td>
+            <td>Ksh {{ loan.amount_paid | intcomma }}</td>
+            <td>Ksh {{ loan.updated_loan.balance | intcomma }}</td>
+            <td class="admin">
+              <button class="btn btn-sm" style="background-color:#2191a5; color:white;" data-bs-toggle="modal"
+                data-bs-target="#modal-loan" data-id="{{ loan.id }}" data-date="{{ loan.date_created }}"
+                data-member="{{ loan.member }}" data-type="{{ loan.updated_loan.type.name }}"
+                data-paid="{{ loan.amount_paid }}" data-balance="{{ loan.updated_loan.balance }}">
+                View
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-responsive d-none" id="table-members">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>ID</th>
+            <th>chama</th>
+            <th>Role</th>
+            <th class="admin">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in members %}
+          <tr>
+            <td>{{ member.date_created }}</td>
+            <td>{{ member.name }}</td>
+            <td>{{ member.id_number }}</td>
+            <td>{{ member.chama_name }}</td>
+            <td>{{ member.role }}</td>
+           <td> <button class="btn btn-sm" style="background-color:#2191a5;color:white;"
+            data-bs-toggle="modal" data-bs-target="#modal-member"
+            data-id="{{ member.id }}" 
+            data-name="{{ member.name }}" 
+            data-idnum="{{ member.id_number }}">
+      View
+    </button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<!-- Contribution Modal -->
+<div class="modal fade" id="modal-contribution" tabindex="-1" aria-labelledby="modalContributionLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="form-contribution">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalContributionLabel">Contribution Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control" id="contrib-date" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Member</label>
+          <input type="text" class="form-control" id="contrib-member" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contribution Name</label>
+          <input type="text" class="form-control" id="contrib-name" readonly>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Amount Paid</label>
+          <input type="text"  class="form-control" id="contrib-amount">
+        </div>
+        <input type="hidden" id="contrib-id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        <button type="button" class="btn btn-danger" id="contribution-reject-button">Reject</button>
+        <button type="submit" class="btn" style="background-color:#2191a5; color:white;">Approve</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Fine Modal -->
+<div class="modal fade" id="modal-fine" tabindex="-1" aria-labelledby="modalFineLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="form-fine">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalFineLabel">Fine Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control" id="fine-date" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Member</label>
+          <input type="text" class="form-control" id="fine-member" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Fine Type</label>
+          <input type="text" class="form-control" id="fine-type" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Amount Paid</label>
+          <input type="text" class="form-control" id="fine-paid">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Balance</label>
+          <input type="text" class="form-control" id="fine-balance">
+        </div>
+        <input type="hidden" id="fine-id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        <button type="button" class="btn btn-danger" id="fine-reject-button">Reject</button>
+
+        <button type="submit" class="btn" style="background-color:#2191a5; color:white;">Approve</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Loan Modal -->
+<div class="modal fade" id="modal-loan" tabindex="-1" aria-labelledby="modalLoanLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="form-loan">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLoanLabel">Loan Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control" id="loan-date" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Member</label>
+          <input type="text" class="form-control" id="loan-member" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Loan Type</label>
+          <input type="text" class="form-control" id="loan-type" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Amount Paid</label>
+          <input type="text" class="form-control" id="loan-paid">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Balance</label>
+          <input type="text" class="form-control" id="loan-balance">
+        </div>
+        <input type="hidden" id="loan-id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="loan-reject-button">Reject</button>
+
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+
+        <button type="submit" class="btn" style="background-color:#2191a5; color:white;">Approve</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Member Modal -->
+<div class="modal fade" id="modal-member" tabindex="-1" aria-labelledby="modalMemberLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="form-member">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMemberLabel">Member Approval</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Name</label>
+          <input type="text" id="member-name" class="form-control" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">ID Number</label>
+          <input type="text" id="member-idnum" class="form-control" readonly>
+        </div>
+        <input type="hidden" id="member-bot-id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        <button type="button" class="btn btn-danger" id="member-reject-button">Reject</button>
+
+        <button type="submit" class="btn" style="background-color:#2191a5; color:white;">Approve</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // Desktop table switching
+    function showTable(type) {
+      $('#table-contributions, #table-fines, #table-loans, #table-members').addClass('d-none');
+      $('#btn-contributions, #btn-fines, #btn-loans, #btn-members').css({ 'opacity': '0.6' });
+      $('#table-' + type).removeClass('d-none');
+      $('#btn-' + type).css({ 'opacity': '1' });
+    }
+
+    $('#btn-contributions').click(() => showTable('contributions'));
+    $('#btn-fines').click(() => showTable('fines'));
+    $('#btn-loans').click(() => showTable('loans'));
+    $('#btn-members').click(() => showTable('members'));
+    showTable('contributions');
+
+    // Mobile tab switching
+    function showMobileTab(tabName) {
+      $('.tab-content').removeClass('active');
+      $('.tab-btn').removeClass('active');
+      $('#tab-' + tabName).addClass('active');
+      $('[data-tab="' + tabName + '"]').addClass('active');
+    }
+
+    $('.tab-btn').click(function() {
+      const tabName = $(this).data('tab');
+      showMobileTab(tabName);
+    });
+
+    function populateModal(modalId, dataMap) {
+      const modal = $(modalId);
+      for (const key in dataMap) {
+        modal.find('#' + key).val(dataMap[key]);
+      }
+    }
+
+    $('#modal-contribution').on('show.bs.modal', function (event) {
+      const btn = $(event.relatedTarget);
+      populateModal('#modal-contribution', {
+        'contrib-id': btn.data('id'),
+        'contrib-date': btn.data('date'),
+        'contrib-member': btn.data('member'),
+        'contrib-name': btn.data('name'),
+        'contrib-amount': btn.data('amount'),
+        'cylce-name': ''
+      });
+    });
+
+    $('#modal-fine').on('show.bs.modal', function (event) {
+      const btn = $(event.relatedTarget);
+      populateModal('#modal-fine', {
+        'fine-id': btn.data('id'),
+        'fine-date': btn.data('date'),
+        'fine-member': btn.data('member'),
+        'fine-type': btn.data('type'),
+        'fine-paid': btn.data('paid'),
+        'fine-balance': btn.data('balance')
+      });
+    });
+
+    $('#modal-loan').on('show.bs.modal', function (event) {
+      const btn = $(event.relatedTarget);
+      populateModal('#modal-loan', {
+        'loan-id': btn.data('id'),
+        'loan-date': btn.data('date'),
+        'loan-member': btn.data('member'),
+        'loan-type': btn.data('type'),
+        'loan-paid': btn.data('paid'),
+        'loan-balance': btn.data('balance')
+      });
+    });
+
+    $('#modal-member').on('show.bs.modal', function (event) {
+      const btn = $(event.relatedTarget);
+      populateModal('#modal-member', {
+        'member-bot-id': btn.data('id'),
+        'member-name':   btn.data('name'),
+        'member-idnum':  btn.data('idnum')
+      });
+      // clear any alerts under bot records
+      $('#alert-success, #alert-danger').addClass('d-none');
+    });
+
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('form-contribution');
+    const modalEl = document.getElementById('modal-contribution');
+    const successEl = document.getElementById('alert-success');
+    const dangerEl = document.getElementById('alert-danger');
+    const chamaId = localStorage.getItem('groupId');
+
+    function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === name) cookieValue = decodeURIComponent(v);
+      });
+      return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // hide both alerts
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+
+      // show a temporary processing message
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('contrib-id').value;
+      const amount = document.getElementById('contrib-amount').value;
+      fetch(`/bot/contributions/approve/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          record_id: recordId,
+          amount:amount
+        })
+      })
+        .then(response => response.json().then(data => ({ status: response.status, data })))
+        .then(({ status, data }) => {
+          // hide processing
+          successEl.classList.add('d-none');
+
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ Contribution approved successfully';
+            successEl.classList.remove('d-none');
+            // hide modal
+            let bsModal = bootstrap.Modal.getInstance(modalEl);
+            if (!bsModal) bsModal = new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to approve: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+        });
+    });
+  });
+</script>
+<script>
+  // Vanilla JS handler for Fine modal form
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('form-fine');
+    const successEl = document.getElementById('alert-success');
+    const dangerEl = document.getElementById('alert-danger');
+    const modalEl = document.getElementById('modal-fine');
+    const chamaId = localStorage.getItem('groupId');
+
+    function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === name) cookieValue = decodeURIComponent(v);
+      });
+      return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      // hide previous alerts
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+      // show processing in success alert
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('fine-id').value;
+      // send payload
+      fetch(`/bot/fines/approve/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ record_id: recordId })
+      })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(({ status, data }) => {
+          // hide processing
+          successEl.classList.add('d-none');
+
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ Fine approved successfully';
+            successEl.classList.remove('d-none');
+            let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to approve: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+        });
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('form-loan');
+    const successEl = document.getElementById('alert-success');
+    const dangerEl = document.getElementById('alert-danger');
+    const modalEl = document.getElementById('modal-loan');
+    const chamaId = localStorage.getItem('groupId');
+
+    function getCookie(name) {
+      let value = null;
+      document.cookie.split(';').forEach(c => {
+        const [k, v] = c.trim().split('=');
+        if (k === name) value = decodeURIComponent(v);
+      });
+      return value;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('loan-id').value;
+
+      fetch(`/bot/loans/approve/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ record_id: recordId })
+      })
+        .then(resp => resp.json().then(data => ({ status: resp.status, data })))
+        .then(({ status, data }) => {
+          successEl.classList.add('d-none');
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ Loan approved successfully';
+            successEl.classList.remove('d-none');
+            let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to approve: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+        });
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form       = document.getElementById('form-member');
+    const successEl  = document.getElementById('alert-success');
+    const dangerEl   = document.getElementById('alert-danger');
+    const modalEl    = document.getElementById('modal-member');
+    const chamaId    = localStorage.getItem('groupId');
+  
+    // CSRF helper
+    function getCookie(name) {
+      let value = null;
+      document.cookie.split(';').forEach(c => {
+        const [k, v] = c.trim().split('=');
+        if (k === name) value = decodeURIComponent(v);
+      });
+      return value;
+    }
+    const csrfToken = getCookie('csrftoken');
+  
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+  
+      // hide any previous alerts
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+  
+      // show processing message
+      successEl.textContent = 'Processing…';
+      successEl.classList.remove('d-none');
+  
+      const recordId = document.getElementById('member-bot-id').value;
+  
+      fetch(`/bot/members/approve/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken':  csrfToken
+        },
+        body: JSON.stringify({ record_id: recordId })
+      })
+      .then(resp => resp.json().then(data => ({ status: resp.status, data })))
+      .then(({ status, data }) => {
+        // hide processing
+        successEl.classList.add('d-none');
+  
+        if (status >= 200 && status < 300 && !data.error) {
+          successEl.textContent = '✅ Member approved successfully';
+          successEl.classList.remove('d-none');
+          let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+          bsModal.hide();
+        } else {
+          const err = data.error || data.details || 'Unknown error';
+          dangerEl.textContent = `❌ Failed to approve: ${err}`;
+          dangerEl.classList.remove('d-none');
+        }
+      })
+      .catch(() => {
+        successEl.classList.add('d-none');
+        dangerEl.textContent = '❌ Network error, please try again';
+        dangerEl.classList.remove('d-none');
+      });
+    });
+  });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const btn = document.getElementById('fine-reject-button');
+      const successEl = document.getElementById('alert-success');
+      const dangerEl = document.getElementById('alert-danger');
+      const modalEl = document.getElementById('modal-fine');
+
+      const chamaId = localStorage.getItem('groupId');
+
+      function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === name) cookieValue = decodeURIComponent(v);
+      });
+      return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('fine-id').value;
+
+      fetch(`/bot/fines/reject/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({record_id: recordId })
+      })
+      .then(res => res.json().then(data => ({status: res.status,data})))
+      .then(({status,data}) => {
+        successEl.classList.add('d-none');
+
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ Fine flagged successfully';
+            successEl.classList.remove('d-none');
+            let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to flag: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+
+      });
+    });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const btn = document.getElementById('loan-reject-button');
+      const successEl = document.getElementById('alert-success');
+      const dangerEl = document.getElementById('alert-danger');
+      const modalEl = document.getElementById('modal-loan');
+
+      const chamaId = localStorage.getItem('groupId');
+
+      function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === name) cookieValue = decodeURIComponent(v);
+      });
+      return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('loan-id').value;
+
+      fetch(`/bot/loans/reject/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({record_id: recordId })
+      })
+      .then(res => res.json().then(data => ({status: res.status,data})))
+      .then(({status,data}) => {
+        successEl.classList.add('d-none');
+
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ Loan flagged successfully';
+            successEl.classList.remove('d-none');
+            let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to flag: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+
+      });
+    });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const btn = document.getElementById('member-reject-button');
+      const successEl = document.getElementById('alert-success');
+      const dangerEl = document.getElementById('alert-danger');
+      const modalEl = document.getElementById('modal-member');
+
+      const chamaId = localStorage.getItem('groupId');
+
+      function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === name) cookieValue = decodeURIComponent(v);
+      });
+      return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('member-bot-id').value;
+
+      fetch(`/bot/members/reject/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({member_id: recordId })
+      })
+      .then(res => res.json().then(data => ({status: res.status,data})))
+      .then(({status,data}) => {
+        successEl.classList.add('d-none');
+
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ member flagged successfully';
+            successEl.classList.remove('d-none');
+            let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to flag: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+
+      });
+    });
+    });
+  </script>
+   <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const btn = document.getElementById('contribution-reject-button');
+      const successEl = document.getElementById('alert-success');
+      const dangerEl = document.getElementById('alert-danger');
+      const modalEl = document.getElementById('modal-contribution');
+
+      const chamaId = localStorage.getItem('groupId');
+
+      function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === name) cookieValue = decodeURIComponent(v);
+      });
+      return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+
+      successEl.classList.add('d-none');
+      dangerEl.classList.add('d-none');
+
+      successEl.textContent = 'Processing...';
+      successEl.classList.remove('d-none');
+
+      const recordId = document.getElementById('contrib-id').value;
+
+      fetch(`/bot/contributions/reject/${chamaId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({record_id: recordId })
+      })
+      .then(res => res.json().then(data => ({status: res.status,data})))
+      .then(({status,data}) => {
+        successEl.classList.add('d-none');
+
+          if (status >= 200 && status < 300 && !data.error) {
+            successEl.textContent = '✅ Contribution flagged successfully';
+            successEl.classList.remove('d-none');
+            let bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.hide();
+          } else {
+            const err = data.error || data.details || 'Unknown error';
+            dangerEl.textContent = `❌ Failed to flag: ${err}`;
+            dangerEl.classList.remove('d-none');
+          }
+        })
+        .catch(() => {
+          successEl.classList.add('d-none');
+          dangerEl.textContent = '❌ Network error, please try again';
+          dangerEl.classList.remove('d-none');
+
+      });
+    });
+    });
+  </script>
+{% endblock %}

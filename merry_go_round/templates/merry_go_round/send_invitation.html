@@ -1,0 +1,759 @@
+<!-- merry_go_round/templates/merry_go_round/send_invitation.html -->
+
+{% extends 'merry_go_round/base.html' %}
+{% load static humanize %}
+
+{% block title %}Send Invitations - {{ round.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verified-user-card {
+        animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .invitation-list-item {
+        transition: all 0.2s ease;
+    }
+    
+    .invitation-list-item:hover {
+        background-color: #f9fafb;
+    }
+    
+    .social-share-btn {
+        transition: transform 0.2s ease;
+    }
+    
+    .social-share-btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-11">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'merry_go_round:round_detail' round.id %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Round
+            </a>
+        </div>
+
+        <!-- Header Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-1">
+                    <i class="fas fa-user-plus me-2 text-primary"></i>
+                    Invite Members to {{ round.name }}
+                </h2>
+                <p class="text-muted mb-0">
+                    The round needs <strong>{{ members_needed }} more member{{ members_needed|pluralize }}</strong> to start.
+                </p>
+                <div class="mt-3">
+                    <span class="badge bg-primary me-2">Members: {{ round.current_members }}/{{ round.max_members }}</span>
+                    <span class="badge bg-info">{{ round.get_payout_model_display }}</span>
+                </div>
+            </div>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row g-4">
+            <!-- Section 1: Smart Member Lookup -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0">
+                            <i class="fas fa-search me-2 text-primary"></i>
+                            1. Find & Invite Members
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Lookup Type Toggle -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Search by</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="lookup_type" id="lookup_national_id" value="national_id" checked>
+                                <label class="btn btn-outline-primary" for="lookup_national_id">National ID</label>
+                                
+                                <input type="radio" class="btn-check" name="lookup_type" id="lookup_phone" value="phone">
+                                <label class="btn btn-outline-primary" for="lookup_phone">Phone Number</label>
+                            </div>
+                        </div>
+
+                        <!-- Lookup Input -->
+                        <div class="mb-3">
+                            <label for="lookup_value" class="form-label fw-bold">
+                                <span id="lookup_label">National ID Number</span>
+                            </label>
+                            <div class="input-group">
+                                <input 
+                                    type="text" 
+                                    id="lookup_value" 
+                                    class="form-control" 
+                                    placeholder="e.g., 12345678"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="btn_lookup" 
+                                    class="btn btn-primary"
+                                >
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <small class="form-text text-muted" id="lookup_help">
+                                Enter the National ID to search for ChamaSpace members
+                            </small>
+                        </div>
+
+                        <!-- Verified User Card (Hidden by default) -->
+                        <div id="verified_user_card" class="d-none mb-3">
+                            <div class="alert alert-success border-success verified-user-card">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-center" 
+                                             style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;"
+                                             id="user_avatar">
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <i class="fas fa-check-circle text-success"></i>
+                                            <strong id="user_name" class="text-dark"></strong>
+                                        </div>
+                                        <p class="mb-2 small text-muted" id="user_phone"></p>
+                                        <div class="d-flex gap-3 small">
+                                            <span class="text-muted">
+                                                Trust Score: <strong class="text-success" id="user_trust_score"></strong>
+                                            </span>
+                                            <span class="text-muted">
+                                                Rounds: <strong id="user_completed_rounds"></strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-primary" id="btn_add_to_list">
+                                        <i class="fas fa-plus me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Invitation List -->
+                        <div id="invitation_list_container" class="d-none mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0 fw-bold">
+                                    Invitation List (<span id="invitation_count">0</span>)
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-outline-danger" id="btn_clear_list">
+                                    <i class="fas fa-trash"></i> Clear All
+                                </button>
+                            </div>
+                            <div id="invitation_list" class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
+                                <!-- Invitation list items will be added here dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Personal Message -->
+                        <div class="mb-3">
+                            <label for="invitation_message" class="form-label fw-bold">
+                                Personal Message (Optional)
+                            </label>
+                            <textarea 
+                                id="invitation_message" 
+                                class="form-control" 
+                                rows="3" 
+                                placeholder="Add a personal message to your invitation..."
+                            ></textarea>
+                        </div>
+
+                        <!-- Send Button -->
+                        <button 
+                            type="button" 
+                            id="btn_send_invitations" 
+                            class="btn btn-primary w-100"
+                            disabled
+                        >
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Send <span id="send_count">0</span> Invitation<span id="send_plural">s</span>
+                        </button>
+
+                        <!-- Info Alert -->
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <small>
+                                Recipients will receive <strong>in-app notifications</strong> and <strong>SMS alerts</strong>.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Shareable Link -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0">
+                            <i class="fas fa-share-alt me-2 text-primary"></i>
+                            2. Share Invitation Link
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Direct Link -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Direct Invitation Link</label>
+                            <div class="input-group">
+                                <input 
+                                    type="text" 
+                                    id="invitation_link" 
+                                    class="form-control bg-light" 
+                                    value="{{ invitation_link }}" 
+                                    readonly
+                                >
+                                <button 
+                                    class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    id="btn_copy_link"
+                                >
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <div id="copy_success" class="small text-success mt-2 d-none">
+                                <i class="fas fa-check-circle"></i> Link copied to clipboard!
+                            </div>
+                            <small class="form-text text-muted">
+                                Anyone with this link can request to join the round
+                            </small>
+                        </div>
+
+                        <!-- Social Sharing -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Share to Social Media</h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-success w-100 social-share-btn" 
+                                        onclick="shareToSocial('whatsapp')"
+                                    >
+                                        <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger w-100 social-share-btn" 
+                                        onclick="shareToSocial('gmail')"
+                                    >
+                                        <i class="fas fa-envelope me-2"></i>Gmail
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-primary w-100 social-share-btn" 
+                                        onclick="shareToSocial('facebook')"
+                                    >
+                                        <i class="fab fa-facebook me-2"></i>Facebook
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-info w-100 social-share-btn text-white" 
+                                        onclick="shareToSocial('twitter')"
+                                    >
+                                        <i class="fab fa-twitter me-2"></i>Twitter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Round Details Preview -->
+                        <div class="card bg-light border">
+                            <div class="card-body">
+                                <h6 class="text-uppercase text-muted small mb-3">
+                                    What invitees will see
+                                </h6>
+                                <div class="row g-2 small">
+                                    <div class="col-6">
+                                        <div class="text-muted">Round Name:</div>
+                                        <div class="fw-bold">{{ round.name }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-muted">Contribution:</div>
+                                        <div class="fw-bold">KES {{ round.contribution_amount|floatformat:0|intcomma }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-muted">Frequency:</div>
+                                        <div class="fw-bold">{{ round.get_frequency_display }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-muted">Members:</div>
+                                        <div class="fw-bold">{{ round.current_members }}/{{ round.max_members }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="text-muted">Payout Model:</div>
+                                        <div class="fw-bold">{{ round.get_payout_model_display }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Invitations -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Pending Invitations ({{ pending_invitations|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if pending_invitations %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Contact</th>
+                                <th>Sent</th>
+                                <th>Status</th>
+                                <th>Expires</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invitation in pending_invitations %}
+                            <tr>
+                                <td>
+                                    {% if invitation.invitee_national_id %}
+                                        <span class="badge bg-secondary">ID: {{ invitation.invitee_national_id }}</span>
+                                    {% elif invitation.invitee_email %}
+                                        <i class="fas fa-envelope me-1"></i>{{ invitation.invitee_email }}
+                                    {% elif invitation.invitee_phone %}
+                                        <i class="fas fa-phone me-1"></i>{{ invitation.invitee_phone }}
+                                    {% else %}
+                                        <i class="fas fa-link me-1"></i>Via Link
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ invitation.sent_at|date:"M d, H:i" }}</small>
+                                    {% if invitation.days_ago > 0 %}
+                                        <br><small class="text-muted">({{ invitation.days_ago }} day{{ invitation.days_ago|pluralize }} ago)</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        {% if invitation.notification_sent %}
+                                            <small class="text-success">
+                                                <i class="fas fa-check-circle"></i> Notification
+                                            </small>
+                                        {% endif %}
+                                        {% if invitation.sms_sent %}
+                                            <small class="text-success">
+                                                <i class="fas fa-check-circle"></i> SMS
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning text-dark">
+                                        {{ invitation.expires_at|date:"M d" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        {% if invitation.needs_reminder %}
+                                        <button 
+                                            class="btn btn-outline-primary"
+                                            onclick="resendInvitation('{{ invitation.id }}')"
+                                            title="Send reminder"
+                                        >
+                                            <i class="fas fa-redo"></i>
+                                        </button>
+                                        {% endif %}
+                                        <button 
+                                            class="btn btn-outline-danger"
+                                            onclick="cancelInvitation('{{ invitation.id }}')"
+                                            title="Cancel invitation"
+                                        >
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted p-4 mb-0">
+                    No invitations are currently pending.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global state
+let verifiedUser = null;
+let invitationList = [];
+
+$(document).ready(function() {
+    initializeLookupTypeToggle();
+    initializeLookup();
+    initializeInvitationList();
+    initializeCopyLink();
+});
+
+// Initialize lookup type toggle
+function initializeLookupTypeToggle() {
+    $('input[name="lookup_type"]').on('change', function() {
+        const lookupType = $(this).val();
+        
+        if (lookupType === 'national_id') {
+            $('#lookup_label').text('National ID Number');
+            $('#lookup_value').attr('placeholder', 'e.g., 12345678');
+            $('#lookup_help').text('Enter the National ID to search for ChamaSpace members');
+        } else {
+            $('#lookup_label').text('Phone Number');
+            $('#lookup_value').attr('placeholder', 'e.g., +254712345678');
+            $('#lookup_help').text('Enter phone number with country code (+254)');
+        }
+        
+        // Clear previous lookup
+        $('#lookup_value').val('');
+        hideVerifiedUser();
+    });
+}
+
+// Initialize member lookup
+function initializeLookup() {
+    $('#lookup_value').on('keypress', function(e) {
+        if (e.which === 13) {
+            $('#btn_lookup').click();
+        }
+    });
+    
+    $('#btn_lookup').on('click', function() {
+        const lookupType = $('input[name="lookup_type"]:checked').val();
+        const lookupValue = $('#lookup_value').val().trim();
+        
+        if (!lookupValue) {
+            showError('Please enter a value to search');
+            return;
+        }
+        
+        performLookup(lookupType, lookupValue);
+    });
+    
+    $('#btn_add_to_list').on('click', function() {
+        if (verifiedUser) {
+            addToInvitationList(verifiedUser);
+            hideVerifiedUser();
+            $('#lookup_value').val('').focus();
+        }
+    });
+}
+
+// Perform member lookup via AJAX
+function performLookup(lookupType, lookupValue) {
+    const $btn = $('#btn_lookup');
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+    
+    $.ajax({
+        url: '{% url "merry_go_round:api_lookup_member" %}',
+        method: 'POST',
+        data: {
+            lookup_type: lookupType,
+            lookup_value: lookupValue,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                verifiedUser = response.member;
+                displayVerifiedUser(verifiedUser);
+            } else {
+                showError('Member not found in ChamaSpace');
+                hideVerifiedUser();
+            }
+        },
+        error: function(xhr) {
+            const error = xhr.responseJSON?.error || 'Lookup failed';
+            showError(error);
+            hideVerifiedUser();
+        },
+        complete: function() {
+            $btn.prop('disabled', false).html('<i class="fas fa-search"></i>');
+        }
+    });
+}
+
+// Display verified user
+function displayVerifiedUser(user) {
+    $('#user_avatar').text(user.avatar);
+    $('#user_name').text(user.name);
+    $('#user_phone').text(user.phone);
+    $('#user_trust_score').text(user.trust_score);
+    $('#user_completed_rounds').text(user.completed_rounds);
+    $('#verified_user_card').removeClass('d-none');
+}
+
+// Hide verified user card
+function hideVerifiedUser() {
+    $('#verified_user_card').addClass('d-none');
+    verifiedUser = null;
+}
+
+// FIXED: Add user to invitation list with lookup_type preserved
+function addToInvitationList(user) {
+    // Check if already in list
+    if (invitationList.find(u => u.lookup_value === user.lookup_value)) {
+        showError('This member is already in your invitation list');
+        return;
+    }
+    
+    // CRITICAL: Preserve the lookup_type from the search
+    const lookupType = $('input[name="lookup_type"]:checked').val();
+    user.lookup_type = lookupType;  // Add this field!
+    
+    invitationList.push(user);
+    updateInvitationList();
+    updateSendButton();
+    
+    console.log('✅ Added to list:', user);  // Debug log
+}
+
+// Remove user from invitation list
+function removeFromInvitationList(lookupValue) {
+    invitationList = invitationList.filter(u => u.lookup_value !== lookupValue);
+    updateInvitationList();
+    updateSendButton();
+}
+
+// Update invitation list display
+function updateInvitationList() {
+    const $container = $('#invitation_list_container');
+    const $list = $('#invitation_list');
+    
+    if (invitationList.length === 0) {
+        $container.addClass('d-none');
+        return;
+    }
+    
+    $container.removeClass('d-none');
+    $('#invitation_count').text(invitationList.length);
+    
+    $list.empty();
+    
+    invitationList.forEach(user => {
+        const $item = $(`
+            <div class="invitation-list-item d-flex align-items-center gap-2 p-2 mb-2 border rounded">
+                <div class="flex-shrink-0">
+                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                         style="width: 35px; height: 35px; font-size: 0.8rem; font-weight: bold;">
+                        ${user.avatar}
+                    </div>
+                </div>
+                <div class="flex-grow-1 min-width-0">
+                    <div class="fw-bold small text-truncate">${user.name}</div>
+                    <div class="text-muted small text-truncate">${user.phone}</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFromInvitationList('${user.lookup_value}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `);
+        
+        $list.append($item);
+    });
+}
+
+// Initialize invitation list actions
+function initializeInvitationList() {
+    $('#btn_clear_list').on('click', function() {
+        if (confirm('Clear all members from invitation list?')) {
+            invitationList = [];
+            updateInvitationList();
+            updateSendButton();
+        }
+    });
+    
+    $('#btn_send_invitations').on('click', function() {
+        sendBatchInvitations();
+    });
+}
+
+// Update send button state
+function updateSendButton() {
+    const $btn = $('#btn_send_invitations');
+    const count = invitationList.length;
+    
+    if (count === 0) {
+        $btn.prop('disabled', true);
+    } else {
+        $btn.prop('disabled', false);
+    }
+    
+    $('#send_count').text(count);
+    $('#send_plural').text(count === 1 ? '' : 's');
+}
+
+// FIXED: Send batch invitations with proper data structure
+function sendBatchInvitations() {
+    if (invitationList.length === 0) {
+        showError('Please add members to the invitation list first');
+        return;
+    }
+    
+    const message = $('#invitation_message').val();
+    
+    // CRITICAL: Ensure each item has lookup_type
+    const invitationData = invitationList.map(user => ({
+        lookup_type: user.lookup_type || 'national_id',  // Must be 'national_id' or 'phone'
+        lookup_value: user.lookup_value,
+        user_id: user.user_id,
+        name: user.name,
+        phone: user.phone
+    }));
+    
+    console.log('📧 Sending invitations:', invitationData);  // Debug log
+    
+    const $btn = $('#btn_send_invitations');
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Sending...');
+    
+    $.ajax({
+        url: '{% url "merry_go_round:api_send_batch_invitations" round.id %}',
+        method: 'POST',
+        data: {
+            invitation_data: JSON.stringify(invitationData),
+            message: message,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+            console.log('✅ Response:', response);  // Debug log
+            
+            if (response.success) {
+                const results = response.results;
+                
+                let message = '';
+                if (results.successful > 0) {
+                    message += `✅ Successfully sent ${results.successful} invitation(s)!\n`;
+                }
+                
+                if (results.failed > 0) {
+                    message += `\n⚠️ ${results.failed} invitation(s) failed:\n${results.errors.join('\n')}`;
+                }
+                
+                alert(message);
+                
+                if (results.successful > 0) {
+                    // Clear the list
+                    invitationList = [];
+                    updateInvitationList();
+                    updateSendButton();
+                    $('#invitation_message').val('');
+                    
+                    // Reload page to show new pending invitations
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                }
+            }
+        },
+        error: function(xhr) {
+            console.error('❌ Error:', xhr);  // Debug log
+            const error = xhr.responseJSON?.error || 'Failed to send invitations';
+            showError(error);
+            $btn.prop('disabled', false);
+            updateSendButton();
+        }
+    });
+}
+
+// Initialize copy link
+function initializeCopyLink() {
+    $('#btn_copy_link').on('click', function() {
+        const link = $('#invitation_link').val();
+        
+        navigator.clipboard.writeText(link).then(() => {
+            $('#copy_success').removeClass('d-none');
+            
+            setTimeout(() => {
+                $('#copy_success').addClass('d-none');
+            }, 3000);
+        });
+    });
+}
+
+// Social sharing
+function shareToSocial(platform) {
+    const link = '{{ invitation_link }}';
+    const roundName = '{{ round.name }}';
+    const amount = '{{ round.contribution_amount|floatformat:0 }}';
+    const frequency = '{{ round.get_frequency_display|lower }}';
+    
+    const text = `Join my savings round "${roundName}" on ChamaSpace! Contribute KES ${amount} ${frequency} and earn interest. ${link}`;
+    
+    let url;
+    switch(platform) {
+        case 'whatsapp':
+            url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            break;
+        case 'facebook':
+            url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+            break;
+        case 'twitter':
+            url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            break;
+        case 'gmail':
+            url = `mailto:?subject=Join my savings round&body=${encodeURIComponent(text)}`;
+            break;
+    }
+    
+    window.open(url, '_blank');
+}
+
+// Utility functions
+function showError(message) {
+    // You can use Bootstrap toast or alert here
+    alert(message);
+}
+
+function showSuccess(message) {
+    // You can use Bootstrap toast or alert here
+    alert(message);
+}
+
+// Resend invitation
+function resendInvitation(invitationId) {
+    if (confirm('Send reminder for this invitation?')) {
+        // TODO: Implement resend functionality
+        console.log('Resending invitation:', invitationId);
+    }
+}
+
+// Cancel invitation
+function cancelInvitation(invitationId) {
+    if (confirm('Cancel this invitation? This action cannot be undone.')) {
+        // TODO: Implement cancel functionality
+        console.log('Canceling invitation:', invitationId);
+    }
+}
+</script>
+{% endblock %}

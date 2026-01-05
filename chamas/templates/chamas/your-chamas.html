@@ -1,0 +1,101 @@
+{%extends 'chamas/chamas_base.html'%}
+{%load static%}
+
+{%block head%}
+<title>Your Chamas</title>
+<link rel="stylesheet" href="{%static 'chamas/your-chamas.css'%}">
+{%endblock%}
+
+
+{%block body%}
+
+<div class="row">
+    <div class="col-md-8 your-chamas">
+        <div class="header-section">
+            <h3 class="your-chamas-sect-header">Select Group</h3>
+        </div>
+
+        <div class="sub-div">
+            <div class="left-side-items">
+                <p><i class="fa-solid fa-users"></i> Chama Groups</p>
+            </div>
+
+            <div class="group-list">
+
+                {% for chama in chama_list %}
+                <div class="chama-item-container">
+                    <a href="{% url 'chamas:chama-dashboard' chama.id %}" class="chama-link" data-chama-id="{{ chama.id }}">
+                        <div class="group-list-item">
+                            <div class="group-details-main">
+                                <div class="group-details">
+                                    <h5 class="heading">{{ chama.name }}</h5>
+                                    <p>{{ chama.member_count }} member(s)</p>
+                                </div>
+                                {% if chama.is_admin %}
+                                    <button class="indicator">admin</button>
+                                {% endif %}
+                            </div>
+                            <!-- Your SVG goes here -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path
+                                    d="M17.5 7.50001V2.50001M17.5 2.50001H12.5M17.5 2.50001L10 10M8.33333 2.5H6.5C5.09987 2.5 4.3998 2.5 3.86503 2.77248C3.39462 3.01217 3.01217 3.39462 2.77248 3.86503C2.5 4.3998 2.5 5.09987 2.5 6.5V13.5C2.5 14.9002 2.5 15.6002 2.77248 16.135C3.01217 16.6054 3.39462 16.9878 3.86503 17.2275C4.3998 17.5 5.09987 17.5 6.5 17.5H13.5C14.9002 17.5 15.6002 17.5 16.135 17.2275C16.6054 16.9878 16.9878 16.6054 17.2275 16.135C17.5 15.6002 17.5 14.9002 17.5 13.5V11.6667"
+                                    stroke="#2291A5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="chama-item-container mx-auto">
+                    <h6 class="mx-auto">You have no chama groups</h6>
+                </div>
+            {% endfor %}
+               
+
+          
+            </div>
+        </div>
+        <div class="new-chama-button" id="new-chama-button">
+            <div class="button-content">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 12C10.6569 12 12 10.6569 12 9C12 7.34315 10.6569 6 9 6C7.34315 6 6 7.34315 6 9C6 10.6569 7.34315 12 9 12Z" stroke="#2291A5" stroke-linecap="round"/>
+                    <path d="M12.2679 9.00001C12.5332 8.54064 12.97 8.20544 13.4824 8.06816C13.9947 7.93087 14.5406 8.00274 15 8.26796C15.4594 8.53318 15.7946 8.97001 15.9319 9.48237C16.0691 9.99473 15.9973 10.5406 15.7321 11C15.4668 11.4594 15.03 11.7946 14.5176 11.9319C14.0053 12.0691 13.4594 11.9973 13 11.7321C12.5406 11.4668 12.2054 11.03 12.0681 10.5176C11.9309 10.0053 12.0027 9.45938 12.2679 9.00001Z" stroke="#2291A5"/>
+                    <path d="M12.8834 14.9912C16.4549 14.9912 17.4753 17.5424 17.7668 19.0001C17.8751 19.5416 17.4357 19.9912 16.8834 19.9912H12.8834H8.88341M9.00001 15.0001C12.5715 15.0001 13.5919 17.5513 13.8834 19.009C13.9917 19.5505 13.5523 20.0001 13 20.0001H9.00002H5.00001C4.44773 20.0001 4.0083 19.5505 4.1166 19.009C4.40811 17.5513 5.42847 15.0001 9.00001 15.0001Z" stroke="#2291A5" stroke-linecap="round"/>
+                    <path d="M19 3V7" stroke="#2291A5" stroke-linecap="round"/>
+                    <path d="M21 5H17" stroke="#2291A5" stroke-linecap="round"/>
+                  </svg>
+                  <p>Create new Chama</p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var chamaLinks = document.querySelectorAll('.chama-link');
+
+        chamaLinks.forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                
+                var chamaId = link.getAttribute('data-chama-id');
+
+                localStorage.setItem('groupId', chamaId);
+
+                window.location.href = link.getAttribute('href');
+            });
+        });
+
+
+        var newChamaButton = document.getElementById('new-chama-button')
+        newChamaButton.addEventListener('click',function(event){
+            event.preventDefault();
+            window.location.href = `{%url 'chamas:new-chama-form'%}`;
+        })
+
+        
+
+    });
+</script>
+
+{%endblock%}

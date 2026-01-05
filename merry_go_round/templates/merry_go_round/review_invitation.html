@@ -1,0 +1,189 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+{% block title %}Review Invitation{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Invitation Card -->
+            <div class="card shadow-lg border-0">
+                <!-- Header -->
+                <div class="card-header bg-primary text-white py-4">
+                    <div class="text-center">
+                        <i class="fas fa-envelope-open-text fa-3x mb-3"></i>
+                        <h3 class="mb-1">You're Invited!</h3>
+                        <p class="mb-0 opacity-75">Review the details below and decide</p>
+                    </div>
+                </div>
+                
+                <!-- Body -->
+                <div class="card-body p-4">
+                    <!-- Inviter Info -->
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center text-primary fw-bold mb-2" 
+                             style="width: 64px; height: 64px; font-size: 1.5rem;">
+                            {{ inviter_name|slice:":1" }}
+                        </div>
+                        <h5 class="mb-1">{{ inviter_name }}</h5>
+                        <p class="text-muted small">invited you to join</p>
+                    </div>
+                    
+                    <!-- Round Details -->
+                    <div class="bg-light rounded p-4 mb-4">
+                        <h4 class="mb-3 text-center">{{ round.name }}</h4>
+                        
+                        {% if round.description %}
+                        <p class="text-muted text-center mb-4">{{ round.description }}</p>
+                        {% endif %}
+                        
+                        <!-- Key Info Grid -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-coins text-warning me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Contribution</small>
+                                        <strong>KES {{ round.contribution_amount|floatformat:0 }}</strong>
+                                        <span class="text-muted">/ {{ round.get_frequency_display }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-users text-info me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Members</small>
+                                        <strong>{{ round.current_members }} / {{ round.max_members }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-alt text-success me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Duration</small>
+                                        <strong>{{ round.max_members }} Cycles</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Min Trust Score</small>
+                                        <strong>{{ round.min_trust_score }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Financial Breakdown -->
+                        <div class="border-top pt-3">
+                            <h6 class="text-uppercase text-muted small mb-3">💰 Financial Summary</h6>
+                            <div class="row g-2 small">
+                                <div class="col-6 text-muted">First Contribution Required:</div>
+                                <div class="col-6 text-end fw-bold">KES {{ first_contribution|floatformat:0 }}</div>
+                                
+                                <div class="col-6 text-muted">Total Commitment:</div>
+                                <div class="col-6 text-end fw-bold">KES {{ total_commitment|floatformat:0 }}</div>
+                                
+                                <div class="col-6 text-success">Projected Interest (after tax):</div>
+                                <div class="col-6 text-end fw-bold text-success">+ KES {{ projected_interest|floatformat:0 }}</div>
+                                
+                                <div class="col-12"><hr class="my-2"></div>
+                                
+                                <div class="col-6 text-primary fw-bold">Expected Return:</div>
+                                <div class="col-6 text-end fw-bold text-primary fs-5">KES {{ total_return|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Message -->
+                    {% if invitation.message %}
+                    <div class="alert alert-info mb-4">
+                        <strong><i class="fas fa-comment me-2"></i>Personal Message:</strong>
+                        <p class="mb-0 mt-2">{{ invitation.message }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Expiry Warning -->
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Expires:</strong> {{ invitation.expires_at|date:"F d, Y \a\t H:i" }}
+                    </div>
+                    
+                    <!-- Decision Form -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <!-- Terms Checkbox -->
+                        <div class="form-check mb-4 p-3 bg-light rounded">
+                            <input class="form-check-input" type="checkbox" name="agree_to_terms" id="agree_to_terms" required>
+                            <label class="form-check-label" for="agree_to_terms">
+                                I agree to contribute on time and understand that:
+                                <ul class="mt-2 mb-0 small">
+                                    <li>I must maintain KES {{ first_contribution|floatformat:0 }} in my MGR wallet for the first contribution</li>
+                                    <li>Contributions are auto-processed on due dates</li>
+                                    <li>Missing payments affects my trust score</li>
+                                    <li>Interest is earned on contributions in escrow</li>
+                                </ul>
+                            </label>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button type="submit" name="action" value="accept" 
+                                        class="btn btn-success btn-lg w-100"
+                                        id="accept-btn">
+                                    <i class="fas fa-check-circle me-2"></i>Accept & Join
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" name="action" value="decline" 
+                                        class="btn btn-outline-danger btn-lg w-100"
+                                        onclick="return confirm('Are you sure you want to decline this invitation?')">
+                                    <i class="fas fa-times-circle me-2"></i>Decline
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Additional Info -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>What happens next?</strong><br>
+                            If you accept, KES {{ first_contribution|floatformat:0 }} will be reserved in your MGR wallet. 
+                            You can top up your wallet anytime from your main ChamaSpace wallet. The round starts when 
+                            all {{ round.max_members }} members join.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Link -->
+            <div class="text-center mt-3">
+                <a href="{% url 'merry_go_round:dashboard' %}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enable accept button only when terms are checked
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('agree_to_terms');
+    const acceptBtn = document.getElementById('accept-btn');
+    
+    checkbox.addEventListener('change', function() {
+        acceptBtn.disabled = !this.checked;
+    });
+    
+    // Initially disable accept button
+    acceptBtn.disabled = !checkbox.checked;
+});
+</script>
+{% endblock %}

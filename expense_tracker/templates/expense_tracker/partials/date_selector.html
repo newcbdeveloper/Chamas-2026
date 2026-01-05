@@ -1,0 +1,78 @@
+<div class="date-selector-container mb-4">
+    <div class="card">
+        <div class="card-body py-2">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        {% load expense_filters %}
+                        {% with prev_date=selected_date|date:"Y-m-d" %}
+                        <a href="#" class="btn btn-sm btn-outline-primary me-2" id="prev-day-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        {% endwith %}
+                        <input type="date" 
+                               id="date-picker" 
+                               class="form-control form-control-sm" 
+                               value="{{ selected_date|date:'Y-m-d' }}"
+                               onchange="window.location.href='?date=' + this.value">
+                        <a href="?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-sm btn-outline-primary ms-2" id="next-day-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h5 class="date-display mb-0">{{ selected_date|date:"l, F j, Y" }}
+                    </h5>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group btn-group-sm">
+                        <a href="?date={{ today|date:'Y-m-d' }}" 
+                           class="btn btn-outline-primary {% if selected_date == today %}active{% endif %}">
+                            <i class="fas fa-calendar-day me-1"></i>Today
+                        </a>
+                        <a href="?date=" id="yesterday-btn"
+                           class="btn btn-outline-primary">
+                            Yesterday
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Helper function to update the arrow buttons based on the current date input value
+    function updateArrowLinks() {
+        // Get the date from the picker (which holds the currently selected date)
+        const selectedDate = new Date(document.getElementById('date-picker').value);
+
+        const prevDay = new Date(selectedDate);
+        prevDay.setDate(prevDay.getDate() - 1);
+        document.getElementById('prev-day-btn').href = '?date=' + prevDay.toISOString().split('T')[0];
+
+        const nextDay = new Date(selectedDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        document.getElementById('next-day-btn').href = '?date=' + nextDay.toISOString().split('T')[0];
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Set Yesterday Button Link
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        document.getElementById('yesterday-btn').href = '?date=' + yesterdayStr;
+
+        // 2. Initialize Arrow Button Links based on the Django-set input value
+        updateArrowLinks();
+        
+        // 3. Update Arrow Button Links on Date Picker Change (before navigation)
+        document.getElementById('date-picker').addEventListener('change', function() {
+            // Update the arrows to point to the correct next/previous day of the newly selected date
+            updateArrowLinks();
+            
+            // The onchange="window.location.href..." in the HTML handles the navigation
+        });
+    });
+</script>

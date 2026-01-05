@@ -1,0 +1,31 @@
+<div class="modal-body">
+
+   {% load static %}
+
+    <div class="popupTwo" id="secondInnerHowmuch">
+
+        <div class="popup_box">
+            <h4 class="popup_heading">
+                Success!
+
+            </h4>
+
+
+            <div class="text-center mt-3 mb-3">
+                <img src="{% static 'images/success.png' %}" alt="">
+            </div>
+            {% for message in messages %}
+                <div
+                        {% if message.tags %} class="alert alert alert-{{ message.tags }}" {% endif %}>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <button class="btn popup_btn"
+                    data-bs-dismiss="modal">
+                Close
+            </button>
+        </div>
+    </div>
+</div>

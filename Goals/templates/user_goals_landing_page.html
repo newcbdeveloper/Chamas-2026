@@ -1,0 +1,228 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Dashboard
+{% endblock %}
+{% block content %}
+
+<div class="wrapper">
+        <main role="main" class="main-content p-0">
+            <div class="page_header pt-3">
+                <div class="container">
+                    <nav class="page_nav mob_nav show_on_mobile">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+                            <li class="">
+                                <img src="{% static 'images/Notifications.png' %}" alt="">
+                            </li>
+                            <li class="">
+                                <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+                                    <img src="{% static 'images/menu.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="company_box d-flex flex-row justify-content-start align-items-center pt-0 mt-0">
+                        <div class="company_image">
+                            {% if user_profile.picture %}
+                            <img src="{{ user_profile.picture.url }}" alt="">
+                            {% else %}
+                                <img src="{% static 'assets/avatars/face-1.png' %}" alt="">
+                            {% endif %}
+                        </div>
+                        <div class="company_content">
+                            <h6>
+                                Good Morning <br>
+                                <b>{{ user_profile.owner.first_name }} &nbsp; {{ user_profile.owner.last_name }}</b>
+                            </h6>
+                        </div>
+                    </div>
+
+                    <!--circule slider-->
+                    <div class="circle_slider">
+                        <div class="swiper-container">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="account_balnce">
+                                        <h4>Account Balance</h4>
+                                        <p>
+                                            <span>KES</span>
+                                            68,000.00
+                                        </p>
+                                        <a href="#" class="btn you_button">Your account</a>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="account_balnce">
+                                        <h4>Account Balance</h4>
+                                        <p>
+                                            <span>KES</span>
+                                            68,000.00
+                                        </p>
+                                        <a href="#" class="btn you_button">Your account</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="chazem_section">
+                <div class="container">
+                    <div class="chazem_row d-flex flex-row justify-content-between align-items-center">
+                        <!-- Chamaz -->
+                        <div class="chazem_col">
+                            <a href="/chamas-bookeeping/chamas/" class="accunt_round">
+                                <img src="{% static 'images/account_balance.png' %}" alt="">
+                            </a>
+                            <div class="account_content">
+                                <a href="/chamas-bookeeping/chamas/">
+                                    <h5>Chamaz</h5>
+                                    <p>Invest in Chamas</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Wekeza Goals -->
+                        <div class="chazem_col">
+                            <a href="{% url 'user_dashboard:home' %}" class="accunt_round">
+                                <img src="{% static 'images/wakiza.png' %}" alt="">
+                            </a>
+                            <div class="account_content">
+                                <a href="{% url 'user_dashboard:home' %}">
+                                    <h5>Wekeza Goals</h5>
+                                    <p>Save towards a Goal</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Kopesha -->
+                        <div class="chazem_col">
+                            <div class="accunt_round coming_soon">
+                                <img src="{% static 'images/kopesha.png' %}" alt="">
+                            </div>
+                            <div class="account_content">
+                                <h5>Kopesha</h5>
+                                <p>Peer to peer</p>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Expense Tracker -->
+                        <div class="chazem_col">
+                            <a href="{% url 'expense_tracker:dashboard' %}" class="accunt_round" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <img src="{% static 'images/wallet_alt_fill.png' %}" alt="" style="filter: brightness(0) invert(1);">
+                            </a>
+                            <div class="account_content">
+                                <a href="{% url 'expense_tracker:dashboard' %}">
+                                    <h5>Expense Tracker</h5>
+                                    <p>Track your spending</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="mbl_footer">
+                <div class="container">
+                    <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                        <button class="footer_button btn active">
+                            <img class="homer_white" src="{% static 'images/Home_duotone.png' %}" alt="">
+                            <p>Home</p>
+                        </button>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/filter.png' %}" alt="">
+                            <p>Features</p>
+                        </button>
+                        <a href="{% url 'expense_tracker:dashboard' %}" class="footer_button btn">
+                            <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                            <p>Expenses</p>
+                        </a>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/setting.png' %}" alt="">
+                            <p>Settings</p>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+
+            <!-- Notifications Modal -->
+            <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog"
+                aria-labelledby="defaultModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="list-group list-group-flush my-n3">
+                                <div class="list-group-item bg-transparent">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <small><strong>Your next contribution for Chama AA09gg is on Nov 27th</strong></small>
+                                            <div class="my-0 text-muted small">Please pay load money before the date.</div>
+                                            <small class="badge badge-pill badge-light text-muted">1m ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<!-- Coming Soon Modal -->
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <h2>Coming Soon!</h2>
+    <p>We're busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+{% endblock %}

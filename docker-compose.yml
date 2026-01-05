@@ -1,0 +1,49 @@
+version: '3.10'
+
+services:
+  chamaspace_app:
+    image: chamaspace_app
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+    restart: always
+    volumes:
+       - chama_db:/db.sqlite3
+       - ./static:/app/static
+    command: >
+      sh -c " 
+          python manage.py makemigrations --merge &&
+          python manage.py migrate &&
+          python manage.py create_superuser &&
+          python manage.py collectstatic --noinput &&
+          gunicorn Chamabora.wsgi:application --bind 0.0.0.0:8000
+        "
+    # depends_on:
+      # - sqlite
+      # - caddy
+
+  # sqlite:
+  #   image: keinos/sqlite3:latest
+  #   container_name: sqlite_container
+  #   volumes:
+  #     - chama_db 
+  #   command: sqlite3 /db.sqlite3  
+
+
+  caddy:
+    image: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data:/data
+      - ./config:/config
+    depends_on:
+      - chamaspace_app
+    restart: always
+
+volumes:
+  chama_db:
+

@@ -1,0 +1,380 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Welcome Header -->
+<div class="mb-4">
+    <h2 class="h3 mb-1 text-slate-900">Welcome back, {{ user.first_name|default:user.username }}! 👋</h2>
+    <p class="text-muted">Here's what's happening with your savings circles today.</p>
+</div>
+
+<!-- Wallet Hero Card (Redesigned) -->
+<div class="wallet-card mb-4">
+    <div class="row align-items-center relative z-2">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="wallet-label mb-0"><i class="fas fa-wallet me-2"></i>Total Balance</div>
+                <button class="btn btn-link text-white-50 p-0 text-decoration-none" id="toggle-privacy-btn"
+                    onclick="togglePrivacy()">
+                    <i class="fas fa-eye small"></i>
+                </button>
+            </div>
+            <div class="wallet-balance mb-4" id="wallet-balance-total">KES
+                {{user.mgr_wallet.balance|floatformat:2 }}</div>
+
+            <div class="d-flex gap-4 border-start border-white border-opacity-10 ps-3">
+                <div>
+                    <div class="text-white-50 small text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">
+                        Available</div>
+                    <div class="h5 mb-0 privacy-sensitive">KES {{user.mgr_wallet.available_balance|floatformat:2}}</div>
+                </div>
+                <div>
+                    <div class="text-white-50 small text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">
+                        Locked</div>
+                    <div class="h5 mb-0 privacy-sensitive">KES {{ user.mgr_wallet.locked_balance|floatformat:2}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mt-4 mt-md-0 text-md-end">
+            <div class="d-flex flex-column gap-2 align-items-md-end">
+                <a href="{% url 'merry_go_round:wallet_dashboard' %}"
+                    class="btn btn-light text-primary fw-bold shadow-sm px-4" style="min-width: 160px;">
+                    <i class="fas fa-cog me-2"></i> Manage Wallet
+                </a>
+                <a href="{% url 'merry_go_round:create_round' %}" class="btn btn-glass text-white px-4"
+                    style="min-width: 160px;">
+                    <i class="fas fa-plus me-2"></i> Create Round
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 1: Active Rounds & Pending Invites -->
+<div class="row g-4 mb-4">
+    <!-- Active Rounds (Left, 8 Cols) -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 px-4 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="mb-0 fw-bold">Active Rounds</h5>
+                    {% if active_memberships %}
+                    <span class="badge bg-light text-muted rounded-pill">{{ active_memberships|length }} Total</span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'merry_go_round:my_rounds' %}"
+                    class="btn btn-link text-decoration-none btn-sm fw-bold text-success">
+                    View All <i class="fas fa-chevron-right small ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body px-4">
+                {% if active_memberships %}
+                <div class="list-group list-group-flush">
+                    {% for membership in active_memberships %}
+                    <div class="round-list-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-primary fw-bold"
+                                    style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                    {{ membership.round.name|slice:":1" }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold">
+                                        <a href="{% url 'merry_go_round:round_detail' membership.round.id %}"
+                                            class="text-dark text-decoration-none">
+                                            {{ membership.round.name }}
+                                        </a>
+                                    </h6>
+                                    <div class="d-flex align-items-center gap-3 small text-muted">
+                                        <span class="text-success fw-bold">KES
+                                            {{membership.round.contribution_amount|floatformat:0}}/{{membership.round.get_frequency_display}}</span>
+                                        <span>• {{membership.round.current_members }} Members</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end d-none d-md-block" style="min-width: 120px;">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>PROGRESS</span>
+                                    <span>{{ membership.get_contribution_percentage|floatformat:0}}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" role="progressbar"
+                                        style="width: {{ membership.get_contribution_percentage|floatformat:2 }}%">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3 text-muted opacity-50">
+                        <i class="fas fa-circle-notch fa-3x"></i>
+                    </div>
+                    <h6 class="text-muted">No active rounds found</h6>
+                    <a href="{% url 'merry_go_round:join_round' %}" class="btn btn-primary btn-sm mt-2">Join a Round</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Invites (Right, 4 Cols) -->
+    <div class="col-lg-4">
+        {% if pending_invites %}
+        <div class="card border-warning border-opacity-25 shadow-sm rounded-4 h-100 bg-amber-50">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark mb-0">Pending Invites</h6>
+                    <i class="fas fa-envelope text-warning"></i>
+                </div>
+                {% for invite in pending_invites %}
+                <div class="bg-white p-3 rounded-3 shadow-sm mb-3 border border-warning border-opacity-10">
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <span class="fw-bold small">Invitation to Join: {{ invite.round.name }}</span><br>
+                        <small class="text-muted">from {{ invite.inviter.username }}</small>
+                        </div>
+                        <div class="text-end">
+                            <span
+                                class="badge bg-warning text-dark bg-opacity-10 border border-warning border-opacity-25">KES 
+                                {{ invite.round.contribution_amount|floatformat:0 }} / {{ invite.round.get_frequency_display }}</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'merry_go_round:review_invitation' invite.token %}"
+                        class="btn btn-warning btn-sm w-100 text-white fw-bold rounded-pill shadow-sm">
+                        <i class="fas fa-eye me-1"></i> Review Invitation
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div
+            class="card border-0 shadow-sm rounded-4 h-100 d-flex align-items-center justify-content-center p-4 text-center">
+            <div class="text-muted">
+                <i class="far fa-envelope-open fa-2x mb-2 opacity-50"></i>
+                <p class="mb-0 small">No pending invites</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Row 2: Recently Completed & Upcoming Dues -->
+<div class="row g-4 mb-4">
+    <!-- Recently Completed (Left, 8 Cols) -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 px-4 pb-0">
+                <h5 class="mb-0 fw-bold">Recently Completed</h5>
+                <a href="{% url 'merry_go_round:my_rounds' %}"
+                    class="btn btn-link text-decoration-none btn-sm fw-bold text-success">
+                    View All <i class="fas fa-chevron-right small ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body px-4">
+                {% if completed_memberships %}
+                <div class="list-group list-group-flush">
+                    {% for membership in completed_memberships|slice:":2" %}
+                    <div class="round-list-item py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success"
+                                    style="width: 48px; height: 48px;">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-dark">{{ membership.round.name }}</h6>
+                                    <small class="text-muted">
+                                        <i class="far fa-calendar-check me-1"></i> Completed
+                                        {{membership.round.end_date|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+ KES {{ membership.payout_amount|floatformat:0 }}
+                                </div>
+                                <small class="text-muted" style="font-size: 0.7rem;">PAYOUT RECEIVED</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    No recently completed rounds.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Dues (Right, 4 Cols) -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h6 class="mb-0 fw-bold text-dark"><i class="far fa-clock text-danger me-2"></i> Upcoming Dues</h6>
+            </div>
+            <div class="card-body p-4">
+                {% if upcoming_contributions %}
+                <ul class="list-unstyled mb-0">
+                    {% for contribution in upcoming_contributions|slice:":3" %}
+                    <li class="mb-3 pb-3 border-bottom border-light last-no-border">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="fw-bold text-dark small">{{ contribution.membership.round.name }}</span>
+                            <span class="fw-bold text-dark small">KES {{ contribution.amount|floatformat:0 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted text-xs"><i class="far fa-calendar me-1"></i> Due:
+                                {{contribution.due_date|date:"M d" }}</small>
+                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 text-uppercase"
+                                style="font-size: 0.6rem;">Pending</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center text-muted small py-3">
+                    No upcoming contributions due.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 3: Recent Notifications & Expected Payouts -->
+<div class="row g-4 mb-4">
+    <!-- Recent Notifications (Left, 8 Cols) -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 px-4 pb-0">
+                <h6 class="mb-0 fw-bold text-primary"><i class="far fa-bell me-2"></i> Recent Notifications</h6>
+                <a href="{% url 'merry_go_round:notifications' %}"
+                    class="btn btn-link text-decoration-none btn-sm fw-bold text-primary">
+                    VIEW ALL
+                </a>
+            </div>
+            <div class="card-body p-4">
+                {% if recent_notifications %}
+                <div class="row g-3">
+                    {% for notification in recent_notifications|slice:":4" %}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-2 p-2">
+                            <i class="fas fa-circle text-primary mt-1" style="font-size: 6px;"></i>
+                            <div>
+                                <div class="small fw-bold">{{ notification.title }}</div>
+                                <div class="text-xs text-muted">{{ notification.message|truncatechars:50 }}</div>
+                                <div class="text-xs text-muted mt-1">{{ notification.created_at|timesince }} ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted small">
+                    No new notifications.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Expected Payouts (Right, 4 Cols) -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-chart-line text-success me-2"></i> Expected Payouts
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                {% if upcoming_payouts %}
+                <ul class="list-unstyled mb-0">
+                    {% for payout in upcoming_payouts|slice:":2" %}
+                    <li class="mb-4">
+                        <div class="fw-bold text-dark small mb-1">{{ payout.round.name }}</div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted text-xs"><i class="far fa-calendar me-1"></i> Expected:
+                                {{payout.scheduled_date|date:"M d" }}</small>
+                            <span class="fw-bold text-success fs-6">+ KES {{ payout.amount|floatformat:0 }}</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center text-muted small py-3">
+                    No scheduled payouts soon.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Round Completion Modal -->
+{% include 'merry_go_round/partials/round_complete_modal.html' %}
+
+{% if newly_completed_round %}
+<script>
+    $(document).ready(function () {
+        $('#modal-round-name').text('{{ newly_completed_round.round.name }}');
+        $('#modal-total-contributed').text('KES {{ newly_completed_round.total_contributed|floatformat:2 }}');
+        $('#modal-interest-earned').text('KES {{ newly_completed_round.interest_earned|floatformat:2 }}');
+        $('#modal-payout-amount').text('KES {{ newly_completed_round.payout_amount|floatformat:2 }}');
+        $('#view-round-details-btn').attr('href', '{% url "merry_go_round:round_detail" newly_completed_round.round.id %}');
+        var modal = new bootstrap.Modal(document.getElementById('roundCompleteModal'));
+        modal.show();
+    });
+</script>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePrivacy() {
+        const sensitiveElements = document.querySelectorAll('.privacy-sensitive');
+        const btn = document.getElementById('toggle-privacy-btn');
+        const icon = btn.querySelector('i');
+
+        sensitiveElements.forEach(el => {
+            el.closest('.wallet-stats').classList.toggle('privacy-active');
+        });
+
+        // Also toggle the main balance separately if needed or just use the class
+        const totalBalance = document.getElementById('wallet-balance-total');
+        if (totalBalance) {
+            if (totalBalance.classList.contains('privacy-sensitive')) {
+                totalBalance.classList.remove('privacy-sensitive');
+                totalBalance.closest('.d-flex').classList.remove('privacy-active');
+            } else {
+                totalBalance.classList.add('privacy-sensitive');
+                totalBalance.closest('.d-flex').classList.add('privacy-active');
+            }
+        }
+
+        // Toggle icon
+        if (icon.classList.contains('fa-eye')) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Initialize sticky header shadow on scroll
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 10) {
+            $('header.sticky-top').addClass('is-stuck');
+        } else {
+            $('header.sticky-top').removeClass('is-stuck');
+        }
+    });
+</script>
+{% endblock %}

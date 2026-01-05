@@ -1,0 +1,241 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Goal Details
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+        <main role="main" class="main-content p-0">
+            <header class=" weknz_header">
+                <div class="container">
+                    <nav class="page_nav mob_nav">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+
+                            <li class="">
+
+                                <button class="btn" type="button" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvasRight"
+                                        aria-controls="offcanvasRight">
+
+                                    <img src="{% static 'images/left_arrow.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
+
+
+            <div class="col-md-12">
+                <section class="banner car_banner house_banner">
+                    <div class="container">
+                        <div class="wekenza_content">
+                            <h2 class="wekenz_h mb-2">
+                                {{ goal_info.goal_name }}
+                            </h2>
+                            <p class="sub_heading mb-2">
+                                99 Months Left
+                            </p>
+                            <h4 class="wekenza_price mb-2 text_shadows">
+                                Kshs.
+                                {{ goal_info.achieved_amount|add:goal_info.profit }}
+                            </h4>
+                            <p class="sub_heading mt-0">
+                                Remaining
+                            </p>
+                            <div>
+                                <div class="bar_content mt-4">
+                                    <p class="mb-0">
+                                        Saving
+                                    </p>
+                                    <p class="mb-0">1%</p>
+                                    <p class="mb-0">Goals</p>
+                                </div>
+                                <div class="goal_progress">
+                                    <div class="inner" style="width: 3%;">
+                                    </div>
+                                </div>
+
+                                <div class="bar_content mt-1">
+                                    <p>
+                                        Kshs. {{ goal_info.goal_balance|floatformat:2 }}
+                                    </p>
+                                    <p>Kshs. {{ goal_info.goal_amount|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                <section class="creat_goals">
+                    <div class="container">
+                        <div class="d-flex flex-row align-items-center justify-content-between mt-3">
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#exampleModal9">
+                                <a href="{% url 'add_funds_to_group_goal' goal_info.id %}">
+                                    <div class="person_round d-flex align-items-center justify-content-center">
+                                        <img src="{% static 'images/wallet-money_.png' %}" alt="">
+                                    </div>
+                                    <h4 class="pesno_plus_h">Add Funds</h4>
+                                </a>
+
+                            </div>
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#exampleModal8">
+                                <div class="person_round d-flex align-items-center justify-content-center">
+                                    <img src="{% static 'images/money-send_.png' %}" alt="">
+                                </div>
+                                <h4 class="pesno_plus_h">Withdraw</h4>
+                            </div>
+                            <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                                 class="btn btn-primary"
+                                 data-bs-toggle="modal" data-bs-target="#exampleModal7">
+                                <div class="person_round d-flex align-items-center justify-content-center cursot-pointer">
+                                    <img src="{% static 'images/more_.png' %}" alt="">
+                                </div>
+                                <h4 class="pesno_plus_h">More</h4>
+                            </div>
+                        </div>
+                        <div class="pt-3 astimate border-top border-bottom d-flex align-items-center justify-content-between">
+                            <div class="astimate_content text-center">
+                                <h5>
+                                    Total Deposit
+                                </h5>
+                                <h4>
+                                    Kshs. {{ goal_info.achieved_amount|floatformat:2 }}
+                                </h4>
+                            </div>
+                            <div class="astimate_content text-center">
+                                <h5>
+                                    Interest Rate
+                                </h5>
+                                <h4>
+
+                                    6.00%
+
+                                </h4>
+                            </div>
+                            <div class="astimate_content text-center">
+                                <h5>
+                                    Earned Interest
+                                </h5>
+                                <h4>
+                                    Kshs. {{ goal_info.profit|floatformat:2 }}
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="records">
+                            <h4 class="recor_heading mb-0 mt-4">
+                                Records
+                            </h4>
+                            {% for item in all_members %}
+                                <div class="record_row d-flex align-items-center justify-content-between border-bottom pb-3 pt-3">
+
+                                    <p class="mb-0">
+                                        + Kshs. {{ item.amount|floatformat:2 }}
+                                    </p>
+
+
+                                    <p>
+                                        {{ item.user.first_name }} {{ item.user.last_name }}
+                                    </p>
+                                    <p>
+                                        + Kshs.{{ item.calculate_future_value|floatformat:2 }}
+                                    </p>
+
+                                </div>
+                            {% empty %}
+
+                                <p class="mb-0">
+                                    No Record found
+                                </p>
+                                <br>
+                                <br>
+
+                            {% endfor %}
+
+                            <a href="#" class="btn saving_btn "
+                            >
+                                All Members
+                            </a>
+                            <input class="form-control" type="hidden"
+                                   id="myInput" value="{{ goal_info.shareable_link }}">
+                            <button onclick="copyToClipboard()" class="btn saving_btn">
+                                Share with your firends
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <footer class="mbl_footer">
+                <div class="container">
+                    <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                        <button class="footer_button btn">
+                            <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                            <p>Home</p>
+                        </button>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/filter_active.png' %}" alt="">
+                            <p>Features</p>
+                        </button>
+                        <button class="footer_button btn coming_soon">
+                            <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                            <p>Account</p>
+                        </button>
+                        <button class="footer_button btn">
+                            <img src="{% static 'images/setting.png' %}" alt="">
+                            <p>Settings</p>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+
+    <script>
+       // copyToClipboard.js
+
+function copyToClipboard() {
+  const copyText = document.getElementById("myInput").value;
+
+  // Create a temporary input element
+  const tempInput = document.createElement("input");
+  tempInput.setAttribute("type", "text");
+  tempInput.setAttribute("value", copyText);
+  document.body.appendChild(tempInput);
+
+  // Select the temporary input field and copy its content to the clipboard
+  tempInput.select();
+  tempInput.setSelectionRange(0, 99999); // For mobile devices
+  document.execCommand("copy");
+
+  // Remove the temporary input
+  document.body.removeChild(tempInput);
+
+  // Alert the copied text
+  alert("Link copied: " + copyText);
+}
+
+
+
+</script>
+
+{% endblock %}

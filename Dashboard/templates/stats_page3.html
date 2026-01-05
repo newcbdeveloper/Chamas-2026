@@ -1,0 +1,120 @@
+
+
+
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Stats 3
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+        <main role="main" class="main-content">
+            <div class="container-fluid">
+                <section class="content">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="box">
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
+                                        <tr>
+
+                                            <th>ACTIVE CHAMAS MEMBERS</th>
+                                            <th>CONTACT NO.</th>
+                                            <th>NIC</th>
+                                            <th>DUE DATE</th>
+                                            <th>AWARDED</th>
+                                            <th>DATE OF NEXT CONTRIBUTION</th>
+                                            <th>CONTRIBUTED(Y/N)</th>
+                                            <th>TOTAL CONTRIBUTION</th>
+                                            <th>REMAINING CONTRIBUTION</th>
+
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+
+                                        {% for item in final_result %}
+
+
+
+
+                                            <tr>
+
+
+                                                <td>
+                                                    {{ item.user_id.first_name }}
+
+                                                </td>
+                                                <td>{{ item.user_id.email }}</td>
+
+                                                <td>
+
+
+                                                    2nd Quarter
+
+
+                                                </td>
+                                                <td>
+
+
+                                                    NO
+
+
+                                                </td>
+
+
+                                            </tr>
+
+                                        {% endfor %}
+
+
+                                        </tbody>
+
+
+                                    </table>
+                                </div>
+                                <div id="paginationcontainer">
+                                    <h3> Showing page {{ pag_obj.number }} of {{ pag_obj.paginator.num_pages }}</h3>
+
+                                    {% if pag_obj.has_other_pages %}
+                                        <ul class="pagination">
+                                            {% if pag_obj.has_previous %}
+                                                <li><a href="?page={{ pag_obj.previous_page_number }}">&laquo;</a></li>
+                                            {% else %}
+                                                <li class="disabled"><span>&laquo;</span></li>
+                                            {% endif %}
+                                            {% for i in pag_obj.paginator.page_range %}
+                                                {% if usepag_objrs.number == i %}
+                                                    <li class="active"><span>{{ i }} <span
+                                                            class="sr-only">(current)</span></span>
+                                                    </li>
+                                                {% else %}
+                                                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if pag_obj.has_next %}
+                                                <li><a href="?page={{ pag_obj.next_page_number }}">&raquo;</a></li>
+                                            {% else %}
+                                                <li class="disabled"><span>&raquo;</span></li>
+                                            {% endif %}
+                                        </ul>
+                                    {% endif %}
+                                </div><!-- /.box-body -->
+                            </div><!-- /.box -->
+                        </div>
+                    </div>
+
+
+                </section>
+            </div>
+        </main>
+
+    </div>
+
+{% endblock %}

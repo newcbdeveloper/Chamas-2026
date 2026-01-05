@@ -1,0 +1,264 @@
+
+
+{% extends 'merry_go_round/base.html' %}
+{% load static humanize %}
+
+{% block title %}Join {{ round.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Invitation Card -->
+            <div class="card shadow-lg border-0">
+                <!-- Header -->
+                <div class="card-header bg-gradient-primary text-white py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="text-center">
+                        <i class="fas fa-hand-holding-heart fa-3x mb-3 opacity-75"></i>
+                        <h3 class="mb-1 fw-bold">Join This Savings Round!</h3>
+                        <p class="mb-0 opacity-75">You've been invited via shareable link</p>
+                    </div>
+                </div>
+                
+                <!-- Body -->
+                <div class="card-body p-4 p-md-5">
+                    <!-- Round Details -->
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center text-primary fw-bold mb-3" 
+                             style="width: 80px; height: 80px; font-size: 2rem; border: 4px solid #e9ecef;">
+                            {{ round.name|slice:":1" }}
+                        </div>
+                        <h2 class="mb-2">{{ round.name }}</h2>
+                        {% if round.description %}
+                        <p class="text-muted">{{ round.description }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Key Info Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-warning bg-opacity-10 border-warning border-opacity-25 h-100">
+                                <div class="card-body text-center py-3">
+                                    <i class="fas fa-coins text-warning fa-2x mb-2"></i>
+                                    <div class="small text-muted text-uppercase fw-bold mb-1">Contribution</div>
+                                    <div class="h4 mb-0 fw-bold">KES {{ round.contribution_amount|floatformat:0|intcomma }}</div>
+                                    <div class="small text-muted">per {{ round.get_frequency_display }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-info bg-opacity-10 border-info border-opacity-25 h-100">
+                                <div class="card-body text-center py-3">
+                                    <i class="fas fa-users text-info fa-2x mb-2"></i>
+                                    <div class="small text-muted text-uppercase fw-bold mb-1">Members</div>
+                                    <div class="h4 mb-0 fw-bold">{{ round.current_members }} / {{ round.max_members }}</div>
+                                    <div class="small text-muted">
+                                        {% with spots_left=round.max_members|add:"-"|add:round.current_members %}
+                                            {{ spots_left }} spot{{ spots_left|pluralize }} left
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-success bg-opacity-10 border-success border-opacity-25 h-100">
+                                <div class="card-body text-center py-3">
+                                    <i class="fas fa-calendar-alt text-success fa-2x mb-2"></i>
+                                    <div class="small text-muted text-uppercase fw-bold mb-1">Duration</div>
+                                    <div class="h4 mb-0 fw-bold">{{ round.calculate_total_cycles }} Cycles</div>
+                                    <div class="small text-muted">{{ round.get_frequency_display }} contributions</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-primary bg-opacity-10 border-primary border-opacity-25 h-100">
+                                <div class="card-body text-center py-3">
+                                    <i class="fas fa-trophy text-primary fa-2x mb-2"></i>
+                                    <div class="small text-muted text-uppercase fw-bold mb-1">Payout Model</div>
+                                    <div class="h5 mb-0 fw-bold">{{ round.get_payout_model_display }}</div>
+                                    <div class="small text-muted">
+                                        {% if round.payout_model == 'marathon' %}
+                                            All members paid at end
+                                        {% else %}
+                                            Turn-based payouts
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Financial Breakdown -->
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <h6 class="text-uppercase text-muted small mb-3 fw-bold">
+                                <i class="fas fa-calculator me-2"></i>Financial Summary
+                            </h6>
+                            <div class="row g-2 small">
+                                <div class="col-7 text-muted">First Contribution Required:</div>
+                                <div class="col-5 text-end fw-bold">KES {{ first_contribution|floatformat:0|intcomma }}</div>
+                                
+                                <div class="col-7 text-muted">Total Commitment:</div>
+                                <div class="col-5 text-end fw-bold">KES {{ total_commitment|floatformat:0|intcomma }}</div>
+                                
+                                <div class="col-7 text-success">Projected Interest (after tax):</div>
+                                <div class="col-5 text-end fw-bold text-success">+ KES {{ projected_interest|floatformat:0|intcomma }}</div>
+                                
+                                <div class="col-12"><hr class="my-2"></div>
+                                
+                                <div class="col-7 text-primary fw-bold fs-6">Expected Total Return:</div>
+                                <div class="col-5 text-end fw-bold text-primary fs-5">KES {{ total_return|floatformat:0|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Requirements Check -->
+                    <div class="alert alert-info border-info">
+                        <h6 class="alert-heading fw-bold">
+                            <i class="fas fa-info-circle me-2"></i>Requirements to Join
+                        </h6>
+                        <ul class="mb-0 small">
+                            <li>Minimum Trust Score: <strong>{{ round.min_trust_score }}</strong> (Your score: <strong>{{ user.mgr_profile.trust_score }}</strong>)</li>
+                            <li>Available MGR Wallet Balance: <strong>KES {{ first_contribution|floatformat:0|intcomma }}</strong></li>
+                            <li>Commitment to contribute on time for {{ round.calculate_total_cycles }} cycles</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Wallet Balance Check -->
+                    {% if user.mgr_wallet.available_balance < first_contribution %}
+                    <div class="alert alert-warning border-warning">
+                        <h6 class="alert-heading fw-bold">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Insufficient Wallet Balance
+                        </h6>
+                        <p class="mb-2 small">
+                            Your MGR wallet has <strong>KES {{ user.mgr_wallet.available_balance|floatformat:2|intcomma }}</strong> available.
+                            You need <strong>KES {{ first_contribution|floatformat:0|intcomma }}</strong> to join.
+                        </p>
+                        <a href="{% url 'merry_go_round:transfer_from_main' %}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-plus-circle me-1"></i>Top Up Wallet
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Trust Score Check -->
+                    {% if user.mgr_profile.trust_score < round.min_trust_score %}
+                    <div class="alert alert-danger border-danger">
+                        <h6 class="alert-heading fw-bold">
+                            <i class="fas fa-shield-alt me-2"></i>Trust Score Too Low
+                        </h6>
+                        <p class="mb-0 small">
+                            Your trust score ({{ user.mgr_profile.trust_score }}) is below the required minimum ({{ round.min_trust_score }}).
+                            Complete more rounds successfully to increase your trust score.
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Join Form -->
+                    <form method="post" action="{% url 'merry_go_round:confirm_join_via_link' round.id %}" id="join_form">
+                        {% csrf_token %}
+                        
+                        <!-- Terms Checkbox -->
+                        <div class="form-check p-3 bg-light rounded border mb-4">
+                            <input class="form-check-input" type="checkbox" name="agree_to_terms" id="agree_to_terms" required
+                                   {% if user.mgr_wallet.available_balance < first_contribution or user.mgr_profile.trust_score < round.min_trust_score %}disabled{% endif %}>
+                            <label class="form-check-label" for="agree_to_terms">
+                                <strong>I agree to the following terms:</strong>
+                                <ul class="mt-2 mb-0 small">
+                                    <li>I will maintain sufficient balance for timely contributions</li>
+                                    <li>Contributions are auto-processed on due dates from my MGR wallet</li>
+                                    <li>Missing payments will affect my trust score and round participation</li>
+                                    <li>I understand the round rules and payout model</li>
+                                    <li>Interest is earned on contributions held in escrow</li>
+                                </ul>
+                            </label>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" 
+                                    class="btn btn-primary btn-lg" 
+                                    id="btn_join"
+                                    {% if user.mgr_wallet.available_balance < first_contribution or user.mgr_profile.trust_score < round.min_trust_score %}disabled{% endif %}>
+                                <i class="fas fa-check-circle me-2"></i>Join Round Now
+                            </button>
+                            <a href="{% url 'merry_go_round:dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Maybe Later
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <!-- Help Text -->
+                    <div class="mt-4 p-3 bg-light rounded border">
+                        <h6 class="fw-bold small text-uppercase text-muted mb-2">
+                            <i class="fas fa-lightbulb me-2"></i>What Happens Next?
+                        </h6>
+                        <p class="small text-muted mb-0">
+                            When you join, <strong>KES {{ first_contribution|floatformat:0|intcomma }}</strong> will be reserved 
+                            in your MGR wallet for your first contribution. The round starts automatically when all 
+                            <strong>{{ round.max_members }} members</strong> have joined. You'll receive notifications 
+                            before each contribution due date.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Link -->
+            <div class="text-center mt-4">
+                <a href="{% url 'merry_go_round:join_round' %}" class="text-decoration-none">
+                    <i class="fas fa-search me-1"></i>Browse Other Public Rounds
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Handle form submission with AJAX for better UX
+    $('#join_form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const $btn = $('#btn_join');
+        const originalText = $btn.html();
+        
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Joining...');
+        
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    // Show success message
+                    $btn.html('<i class="fas fa-check-circle me-2"></i>Success!');
+                    $btn.removeClass('btn-primary').addClass('btn-success');
+                    
+                    // Redirect after short delay
+                    setTimeout(function() {
+                        window.location.href = response.redirect_url;
+                    }, 1000);
+                }
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON?.error || 'Failed to join round';
+                alert(error);
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Enable join button only when terms are checked
+    const $checkbox = $('#agree_to_terms');
+    const $btnJoin = $('#btn_join');
+    
+    if (!$checkbox.is(':disabled')) {
+        $checkbox.on('change', function() {
+            $btnJoin.prop('disabled', !this.checked);
+        });
+        
+        // Initially disable if not checked
+        $btnJoin.prop('disabled', !$checkbox.is(':checked'));
+    }
+});
+</script>
+{% endblock %}

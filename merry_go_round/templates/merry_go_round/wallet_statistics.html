@@ -1,0 +1,199 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+{% block title %}Wallet Statistics{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- Header & Breadcrumbs -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a href="{% url 'merry_go_round:dashboard' %}"
+                            class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'merry_go_round:wallet_dashboard' %}"
+                            class="text-decoration-none">Wallet</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Statistics</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-slate-900 mb-0">Wallet Statistics</h2>
+            <p class="text-muted mb-0">Detailed breakdown of your wallet activity and performance.</p>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark border p-2">
+                <i class="fas fa-wallet me-2 text-muted"></i> Balance:
+                <span class="fw-bold">KES {{ wallet.balance|floatformat:2 }}</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Stats Cards Row 1: Key Performance -->
+    <div class="row g-4 mb-4">
+        <!-- Total Contributions -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success"
+                            style="width: 48px; height: 48px;">
+                            <i class="fas fa-piggy-bank fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem;">Total
+                                Contributions</h6>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill"
+                                style="font-size: 0.7rem;">{{ stats.contributions.count }} Txns</span>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold text-slate-900 mb-0">KES {{ stats.contributions.total|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Payouts -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center text-info"
+                            style="width: 48px; height: 48px;">
+                            <i class="fas fa-hand-holding-usd fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem;">Total
+                                Received</h6>
+                            <span class="badge bg-info bg-opacity-10 text-info rounded-pill"
+                                style="font-size: 0.7rem;">{{ stats.payouts.count }} Txns</span>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold text-slate-900 mb-0">KES {{ stats.payouts.total|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interest Earned -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary"
+                            style="width: 48px; height: 48px;">
+                            <i class="fas fa-chart-line fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem;">Interest
+                                Earned</h6>
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill"
+                                style="font-size: 0.7rem;">{{ stats.interest.count }} Txns</span>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold text-slate-900 mb-0">KES {{ stats.interest.total|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards Row 2: Funding Activity -->
+    <div class="row g-4 mb-4">
+        <!-- Total Deposits -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-dark"
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-muted fw-bold mb-0 small">Total Deposits</h6>
+                            <div class="h5 fw-bold text-slate-900 mb-0">KES {{ stats.deposits.total|floatformat:2 }}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge bg-light text-dark rounded-pill">{{ stats.deposits.count }} Transactions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Withdrawals -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center text-warning"
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-muted fw-bold mb-0 small">Total Withdrawals</h6>
+                            <div class="h5 fw-bold text-slate-900 mb-0">KES {{ stats.withdrawals.total|floatformat:2 }}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning bg-opacity-10 text-darning rounded-pill">{{ stats.withdrawals.count }}
+                        Transactions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Trends Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3">
+            <h6 class="fw-bold mb-0 text-slate-800"><i class="far fa-calendar-alt me-2 text-muted"></i> Monthly Activity
+                Breakdown</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted">
+                    <tr>
+                        <th class="ps-4 text-uppercase small fw-bold border-0 py-3" scope="col">Month</th>
+                        <th class="text-uppercase small fw-bold border-0 py-3" scope="col">Transaction Type</th>
+                        <th class="text-uppercase small fw-bold border-0 py-3" scope="col">Count</th>
+                        <th class="pe-4 text-end text-uppercase small fw-bold border-0 py-3" scope="col">Total Amount
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for item in monthly_data %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-dark">{{ item.month|date:"F Y" }}</td>
+                        <td>
+                            {% if item.transaction_type == 'contribution' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill">Contribution</span>
+                            {% elif item.transaction_type == 'contributions' %}
+                            <span
+                                class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill">Payout</span>
+                            {% elif item.transaction_type == 'payouts' %}
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill">Interest</span>
+                            {% elif item.transaction_type == 'interest' %}
+                            <span
+                                class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill">Deposit</span>
+                            {% elif item.transaction_type == 'withdrawals' %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill">Withdrawal</span>
+                            {% else %}
+                            <span class="badge bg-light text-dark border rounded-pill">{{ item.transaction_type|title
+                                }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ item.count }}</td>
+                        <td class="pe-4 text-end fw-bold text-slate-900">KES {{ item.total|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <div class="text-muted opacity-50 mb-2">
+                                <i class="fas fa-chart-bar fa-3x"></i>
+                            </div>
+                            <h6 class="fw-normal text-muted">No monthly data available yet</h6>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

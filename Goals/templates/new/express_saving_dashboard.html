@@ -1,0 +1,640 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Express Saving - ChamaSpace</title>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/express.css' %}">
+
+<style>
+/* ========== CELEBRATION SYSTEM STYLES ========== */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    opacity: 0;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.confetti-piece.active {
+    animation: confetti-fall 3s ease-in forwards;
+}
+
+.milestone-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.milestone-modal-overlay.show {
+    opacity: 1;
+}
+
+.milestone-modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.milestone-modal-overlay.show .milestone-modal {
+    transform: scale(1);
+}
+
+.milestone-header {
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+}
+
+.milestone-header.halfway {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
+
+.milestone-header.complete {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.milestone-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.milestone-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.milestone-message {
+    font-size: 18px;
+    opacity: 0.95;
+}
+
+.milestone-body {
+    padding: 30px;
+    text-align: center;
+}
+
+.milestone-subtitle {
+    color: #6b7280;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.milestone-btn {
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.milestone-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+}
+
+.goal-completed-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper modern-dashboard">
+
+<div id="confetti-container" class="confetti-container"></div>
+
+<div id="milestone-modal" class="milestone-modal-overlay">
+    <div class="milestone-modal">
+        <div id="milestone-header" class="milestone-header">
+            <div id="milestone-icon" class="milestone-icon">🏆</div>
+            <div id="milestone-title" class="milestone-title"></div>
+            <div id="milestone-message" class="milestone-message"></div>
+        </div>
+        <div class="milestone-body">
+            <p id="milestone-subtitle" class="milestone-subtitle"></p>
+            <button class="milestone-btn" onclick="closeMilestoneModal(); triggerConfetti()">
+                Continue Saving 💪
+            </button>
+        </div>
+    </div>
+</div>
+<main role="main" class="main-content p-0">
+
+        <div class="enhanced-header">
+            <div class="container">
+                <div class="mb-3">
+                    <a href="{% url 'goals:wekeza_dashboard' %}" class="btn btn-link text-white p-0" style="text-decoration: none; font-size: 0.85rem;">
+                        <i class="fe fe-arrow-left"></i> Back to Goals
+                    </a>
+                </div>
+                <div class="user-greeting">
+                    <h1>Express Saving</h1>
+                    <p>High-interest instant access savings @ {{ intrest_value|floatformat:1 }}% p.a.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container pt-4 pb-5">
+
+            <div class="row justify-content-center mb-4">
+                <div class="col-12 col-lg-10">
+                    <div class="wallet-card express-wallet-card text-white position-relative overflow-hidden">
+                        <div class="row text-center text-md-start">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <div class="wallet-label">TOTAL SAVED</div>
+                                <div class="wallet-amount">Ksh {{ my_wallet.saving_balance|floatformat:2 }}</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="wallet-label">Interest Earned @ {{ intrest_value|floatformat:1 }}%</div>                
+                                <div class="wallet-amount text-success">+ Ksh {{ my_wallet.saving_profit|floatformat:2 }}</div>
+                            </div>
+                        </div>                        
+                        <div class="mt-3 pt-2 border-top border-opacity-25" style="border-color: rgba(255,255,255,0.3) !important;">
+                            <div class="wallet-label text-start" style="font-size: 0.95rem;">
+                                Total Available After Tax: 
+                                <span class="fw-bold" style="font-size: 1.1rem;">Ksh {{ Fv_after_tax|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-5">
+                <div class="col-4">
+                    <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" data-bs-target="#exampleModal8">
+                        <div class="action-card bg-white">
+                            <div class="teal-icon">
+                                <i class="fe fe-plus-circle fs-4"></i>
+                            </div>
+                            <div class="action-label">Add Funds</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" data-bs-target="#withdrawal_request">
+                        <div class="action-card bg-white">
+                            <div class="teal-icon">
+                                <i class="fe fe-arrow-down-left fs-4"></i>
+                            </div>
+                            <div class="action-label">Withdraw</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="{% url 'goals:express_statement' request.user.username %}" download class="text-center text-decoration-none">
+                        <div class="action-card bg-white">
+                            <div class="teal-icon">
+                                <i class="fe fe-download fs-4"></i>
+                            </div>
+                            <div class="action-label">Statement</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="section-header-modern mb-3">
+                <h3>Recent Transactions</h3>
+                <span class="active-badge success">{{ paginator.count }} Records</span>
+            </div>
+
+            <div class="transactions-list">
+                {% for item in page_obj %}
+                <div class="transaction-item">
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="transaction-icon {% if item.transaction_type == 'withdrawal' %}bg-danger-light text-danger{% else %}bg-teal-light text-teal{% endif %}">
+                                <i class="fe fe-{{ item.transaction_type|yesno:'arrow-up-right,arrow-down-left' }} fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">{{ item.transaction_type|title }}</div>
+                                <small class="text-muted">{{ item.created_at|date:"d M Y, g:i A" }}</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold {% if item.transaction_type == 'withdrawal' %}text-danger{% else %}text-teal{% endif %}">
+                                {% if item.transaction_type == 'withdrawal' %}-{% else %}+{% endif %} Ksh {{ item.amount|floatformat:2 }}
+                            </div>
+                            <small class="text-muted" style="font-size: 0.8rem;">
+                                {% if item.transaction_type == 'deposit' and item.is_withdraw == 'No' %}
+                                    Interest Earned: Ksh {{ item.calculate_future_value_express_saving|floatformat:2 }}
+                                {% elif item.transaction_type == 'deposit' and item.is_withdraw == 'Yes' %}
+                                    <span class="badge bg-secondary">Settled</span>
+                                {% else %}
+                                    &nbsp;
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state text-center py-5">
+                    <div class="empty-state-icon">💰</div>
+                    <h4>No transactions yet</h4>
+                    <p>Start saving today and watch your money grow!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fe fe-arrow-left"></i> Previous
+                    </a>
+                {% else %}
+                    <button class="btn btn-outline-secondary btn-sm" disabled>Previous</button>
+                {% endif %}
+                
+                <span class="text-muted" style="font-size: 0.85rem;">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary btn-sm">
+                        Next <i class="fe fe-arrow-right"></i>
+                    </a>
+                {% else %}
+                    <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
+                {% endif %}
+            </div>
+
+            <div class="text-center mt-5 mb-5 pb-4">
+                <a href="{% url 'goals:wekeza_dashboard' %}" class="btn btn-teal">Back to All Goals</a>
+            </div>
+
+        </div>
+
+        <div class="modal fade" id="exampleModal8" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="popup_box" id="firstInnerHowmuch">
+                            <h4 class="popup_heading">How much do you want to save?</h4>
+                            <form id="add_amount_form" method="post" class="mt-25">
+                                {% csrf_token %}
+                                <label for="add_money">Add Money</label>
+                                <input type="number" name="add_money" id="add_money" placeholder="Enter Amount" class="mt-1" required>
+                                <p class="mt-4">This money will be added to your express savings</p>
+                                <button type="submit" class="btn popup_btn">Save</button>
+                            </form>
+                        </div>
+                        <div class="popupTwo" id="secondInnerHowmuch" style="display: none;">
+                            <div class="popup_box">
+                                <h4 class="popup_heading">Success!</h4>
+                                <div class="text-center mt-3 mb-3">
+                                    <img src="{% static 'images/success.png' %}" alt="">
+                                </div>
+                                <h4 class="popup_heading">You have successfully deposited funds into your Express Savings.</h4>
+                                <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="popupTwo" id="deposit_deniedInnerHowmuch" style="display: none;">
+                            <div class="popup_box">
+                                <h4 class="popup_heading">Sorry!</h4>
+                                <h4 class="popup_heading">You have not sufficient funds available in wallet. Please load balance first.</h4>
+                                <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="withdrawal_request" tabindex="-1" aria-labelledby="withdrawal_request" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="popup_box" id="firstInnerHowmuch_withdraw">
+                            <h4 class="popup_heading">Total available for withdrawal</h4>
+                            <form class="mt-25" method="post" id="withdrawal_request_form">
+                                {% csrf_token %}
+                                <label for="withdraw_money">Amount</label>
+                                <input type="text" value="Ksh {{ Fv_after_tax|floatformat:2 }}" name="withdraw_money_display" id="withdraw_money_display" class="mt-1" readonly>
+                                <input type="hidden" value="{{ Fv_after_tax|floatformat:2 }}" name="withdraw_money" id="withdraw_money">
+
+                                {% if Fv_after_tax > 0 %}
+                                <p class="mt-4">This amount includes principal and all earned interest (after tax) and will be transferred to your Main Wallet.</p>
+                                <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+                                {% else %}
+                                <br><br>
+                                <p class="btn btn-warning btn-xs">No funds are available</p>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <div class="popupTwo" id="secondInnerHowmuch_withdraw" style="display: none;">
+                            <div class="popup_box">
+                                <h4 class="popup_heading">Success!</h4>
+                                <div class="text-center mt-3 mb-3">
+                                    <img src="{% static 'images/success.png' %}" alt="">
+                                </div>
+                                <h4 class="popup_heading">Your withdrawal request has been received.</h4>
+                                <p>We are processing the transaction, and you will receive a confirmation once it is successfully completed.</p>
+                                <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <footer class="mbl_footer">
+            <div class="container">
+                <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Wallet</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+
+
+    </main>
+</div>
+
+<div id="comingSoonModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" aria-label="Close">&times;</button>
+        <div class="modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <h2>Coming Soon!</h2>
+        <p>We're busy cooking up something great for this feature. Stay tuned!</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Coming Soon Modal
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+    document.querySelectorAll('.coming_soon').forEach(el => el.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.classList.add('show');
+    }));
+    closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', e => e.target === modal && modal.classList.remove('show'));
+
+    // Donut animation (Remove if not using donut chart, but keeping for now)
+    const donuts = document.querySelectorAll('.donut-chart');
+    donuts.forEach(donut => {
+        const progress = parseFloat(donut.style.getPropertyValue('--progress')) || 0;
+        donut.style.setProperty('--progress', '0%');
+        setTimeout(() => {
+            donut.style.setProperty('--progress', progress + '%');
+        }, 100);
+    });
+});
+</script>
+
+<script>
+// Confetti + Modal Functions
+function triggerConfetti() {
+    const container = document.getElementById('confetti-container');
+    if (!container) return;
+
+    const colors = ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#22d3ee', '#818cf8', '#c084fc', '#f472b6', '#ec4899'];
+    
+    for (let i = 0; i < 180; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDelay = Math.random() * 4 + 's';
+        confetti.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        
+        const size = Math.random() * 10 + 8;
+        confetti.style.width = size + 'px';
+        confetti.style.height = size + 'px';
+
+        container.appendChild(confetti);
+        requestAnimationFrame(() => confetti.classList.add('active'));
+        setTimeout(() => confetti.remove(), 6000);
+    }
+}
+
+function closeMilestoneModal() {
+    const modal = document.getElementById('milestone-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 350);
+    }
+    document.querySelectorAll('.confetti-piece').forEach(p => p.remove());
+}
+
+// Close with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMilestoneModal();
+});
+
+// Milestone Detection Logic
+document.addEventListener('DOMContentLoaded', function () {
+    const currentBalance = parseFloat('{{ my_wallet.saving_balance|default:"0" }}') || 0;
+    const milestones = [5000, 10000, 20000, 30000, 40000, 50000, 75000, 100000];
+    
+    let highestMilestone = 0;
+    for (let milestone of milestones) {
+        if (currentBalance >= milestone) {
+            highestMilestone = milestone;
+        } else {
+            break; // since array is sorted
+        }
+    }
+    
+    if (highestMilestone > 0) {
+        const storageKey = `express_milestone_${highestMilestone}`;
+        if (!sessionStorage.getItem(storageKey)) {
+            setTimeout(() => {
+                const modal = document.getElementById('milestone-modal');
+                const header = document.getElementById('milestone-header');
+                const icon = document.getElementById('milestone-icon');
+                const title = document.getElementById('milestone-title');
+                const message = document.getElementById('milestone-message');
+                const subtitle = document.getElementById('milestone-subtitle');
+
+                header.className = 'milestone-header halfway';
+                icon.innerHTML = `<div style="font-size: 100px; animation: pop 0.8s ease-out;">🎉</div>`;
+                title.innerHTML = '✨ Milestone Achieved! ✨';
+                message.textContent = `Congratulations! You've saved KES ${highestMilestone.toLocaleString()}!`;
+                
+                const next = milestones[milestones.indexOf(highestMilestone) + 1] || highestMilestone * 2;
+                subtitle.innerHTML = `Only <strong>KES ${(next - currentBalance).toLocaleString()}</strong> to KES ${next.toLocaleString()}!`;
+
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                setTimeout(triggerConfetti, 300);
+
+                // Play sound
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3');
+                audio.volume = 0.5;
+                audio.play().catch(() => {});
+
+                sessionStorage.setItem(storageKey, 'true');
+            }, 1000);
+        }
+    }
+
+    // Close modal when clicking overlay
+    const modal = document.getElementById('milestone-modal');
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeMilestoneModal();
+    });
+});
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<script>
+    // Withdrawal Request
+    $('#withdrawal_request_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Withdrawal form submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:withdraw_money_express_saving' %}",
+            data: {
+                // IMPORTANT: Use the value from the hidden input field
+                withdraw_money: $('#withdraw_money').val(), 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+            success: function (response) {
+                if (response.success === '1') {
+                    $('#firstInnerHowmuch_withdraw').hide();
+                    $('#secondInnerHowmuch_withdraw').show();
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    // Assuming a '2' or '0' response means an issue or redirect is required
+                    window.location.href = 'https://chamaspace.com/goals/add_account'; 
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Withdrawal error:", error);
+                alert("Connection error. Please try again.");
+            }
+        });
+    });
+
+    // Add Amount
+    $('#add_amount_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Add funds form submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:express_saving' %}",
+            data: {
+                amount: $('#add_money').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+            success: function (response) {
+                if (response.success === '1') {
+                    $('#firstInnerHowmuch').hide();
+                    $('#secondInnerHowmuch').show();
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    $('#firstInnerHowmuch').hide();
+                    $('#deposit_deniedInnerHowmuch').show();
+                    setTimeout(function () {
+                        window.location.href = 'https://chamaspace.com/load_money/load_money';
+                    }, 4000);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Add funds error:", error);
+                alert("Connection error. Please try again.");
+            }
+        });
+    });
+</script>
+{% endblock %}

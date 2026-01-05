@@ -1,0 +1,252 @@
+{% extends 'support/base_support.html' %}
+{% load static %}
+
+{% block page_title %}{{ ticket.reference_number }}{% endblock %}
+{% block page_subtitle %}{{ ticket.subject }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'support:my_tickets' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Back to Tickets
+</a>
+{% endblock %}
+
+{% block support_content %}
+<div class="row">
+    <!-- Main Chat Area -->
+    <div class="col-lg-8">
+        <!-- Ticket Info Card -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                    <div class="mb-2 mb-md-0">
+                        <h5 class="mb-1">{{ ticket.subject }}</h5>
+                        <div class="ticket-meta">
+                            <span class="badge bg-light text-dark me-2">
+                                {{ ticket.get_category_display }}
+                            </span>
+                            <span class="badge status-{{ ticket.status }} me-2">
+                                {{ ticket.get_status_display }}
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-flag me-1"></i>{{ ticket.get_priority_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-muted small">
+                        <div><strong>Created:</strong> {{ ticket.created_at|date:"M d, Y" }}</div>
+                        {% if ticket.resolved_at %}
+                        <div><strong>Resolved:</strong> {{ ticket.resolved_at|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages (Chat Style) -->
+        <div class="card chat-card">
+            <div class="card-body p-0">
+                <div class="chat-messages" id="chatMessages">
+                    {% for message in messages_list %}
+                    <div class="chat-message {% if message.sender_type == 'user' %}user-message{% else %}admin-message{% endif %}">
+                        <div class="message-avatar">
+                            {% if message.sender_type == 'admin' %}
+                            <div class="avatar-circle bg-primary">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            {% else %}
+                            <div class="avatar-circle bg-success">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <strong>
+                                    {% if message.sender_type == 'admin' %}
+                                        Support Team
+                                    {% else %}
+                                        You
+                                    {% endif %}
+                                </strong>
+                                <span class="message-time">{{ message.created_at|date:"M d, Y" }} at {{ message.created_at|time:"h:i A" }}</span>
+                            </div>
+                            <div class="message-body">
+                                {{ message.message|linebreaks }}
+                            </div>
+                            {% if message.attachment %}
+                            <div class="message-attachment">
+                                <a href="{{ message.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-paperclip me-1"></i>{{ message.attachment_filename }}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Reply Form -->
+                {% if ticket.is_open %}
+                <div class="chat-input">
+                    <form method="post" enctype="multipart/form-data" id="replyForm">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ form.message }}
+                            <button type="button" class="btn btn-outline-secondary" id="attachBtn" title="Attach file">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="sendBtn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <input type="file" id="id_attachment" name="attachment" style="display: none;" accept=".jpg,.jpeg,.png,.pdf,.txt,.doc,.docx">
+                        <div id="attachmentInfo" class="mt-2"></div>
+                        <small class="form-text text-muted mt-1 d-block">
+                            Press Enter to send. Never share PIN/Password/OTP.
+                        </small>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-info m-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This ticket is {{ ticket.get_status_display|lower }}.
+                    {% if can_reopen %}
+                    <a href="#" class="alert-link">Click here to reopen</a> if you need further assistance.
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Ticket Status -->
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Ticket Status</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Status:</strong>
+                    <span class="badge status-{{ ticket.status }} float-end">
+                        {{ ticket.get_status_display }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <strong>Priority:</strong>
+                    <span class="badge bg-light text-dark float-end">
+                        {{ ticket.get_priority_display }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <strong>Category:</strong>
+                    <span class="badge bg-light text-dark float-end">
+                        {{ ticket.get_category_display }}
+                    </span>
+                </div>
+                {% if ticket.assigned_to %}
+                <div>
+                    <strong>Assigned to:</strong>
+                    <span class="float-end">{{ ticket.assigned_to.get_full_name }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Help Resources -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-book me-2"></i>Help Resources</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <a href="#" class="text-decoration-none">
+                            <i class="fas fa-question-circle me-2"></i>FAQ
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="text-decoration-none">
+                            <i class="fas fa-file-alt me-2"></i>User Guide
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-decoration-none">
+                            <i class="fas fa-phone me-2"></i>Contact Support
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block support_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chatMessages');
+    const replyForm = document.getElementById('replyForm');
+    const sendBtn = document.getElementById('sendBtn');
+    const attachBtn = document.getElementById('attachBtn');
+    const attachmentInput = document.getElementById('id_attachment');
+    const attachmentInfo = document.getElementById('attachmentInfo');
+    const messageTextarea = document.querySelector('textarea[name="message"]');
+    
+    // Scroll to bottom of chat
+    function scrollToBottom() {
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+    scrollToBottom();
+    
+    // Handle attachment button
+    if (attachBtn && attachmentInput) {
+        attachBtn.addEventListener('click', function() {
+            attachmentInput.click();
+        });
+        
+        attachmentInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                attachmentInfo.innerHTML = `
+                    <div class="alert alert-info alert-sm">
+                        <i class="fas fa-paperclip me-2"></i>
+                        <strong>${file.name}</strong> (${fileSize} MB)
+                        <button type="button" class="btn-close btn-sm float-end" onclick="this.closest('.alert').remove(); document.getElementById('id_attachment').value = '';"></button>
+                    </div>
+                `;
+            }
+        });
+    }
+    
+    // Handle Enter key to send (Shift+Enter for new line)
+    if (messageTextarea) {
+        messageTextarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                replyForm.submit();
+            }
+        });
+    }
+    
+    // Handle form submission
+    if (replyForm) {
+        replyForm.addEventListener('submit', function(e) {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        });
+    }
+    
+    // Auto-refresh messages every 30 seconds
+    setInterval(function() {
+        // This would use AJAX to fetch new messages
+        // Implementation depends on your API endpoints
+        console.log('Checking for new messages...');
+    }, 30000);
+});
+</script>
+{% endblock %}

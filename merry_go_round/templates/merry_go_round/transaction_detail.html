@@ -1,0 +1,247 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}Transaction Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'merry_go_round/css/mgrwallet.css' %}">
+<style>
+    .transaction-icon {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+    }
+    .transaction-icon i {
+        font-size: 2.25rem;
+    }
+    .bg-success-light {
+        background-color: #f0fdf4 !important;
+        color: var(--accent-color) !important;
+    }
+    .bg-danger-light {
+        background-color: #fef2f2 !important;
+        color: var(--danger-color) !important;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    .detail-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    .detail-value {
+        font-weight: 600;
+        color: var(--text-primary);
+        text-align: right;
+    }
+    .detail-value.code {
+        font-family: monospace;
+        background: #f1f5f9;
+        padding: 0.125rem 0.375rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+    @media (max-width: 768px) {
+        .transaction-icon {
+            width: 70px;
+            height: 70px;
+        }
+        .transaction-icon i {
+            font-size: 1.75rem;
+        }
+        .detail-value {
+            text-align: right;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{% url 'merry_go_round:wallet_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Wallet
+        </a>
+    </div>
+
+    <div class="col-12 col-lg-8 mx-auto">
+        <!-- Transaction Summary Card -->
+        <div class="balance-card text-center mb-4">
+            <!-- Icon -->
+            <div class="transaction-icon {% if transaction.transaction_type in 'deposit,payout,interest,unlock' %}bg-success-light{% else %}bg-danger-light{% endif %}">
+                {% if transaction.transaction_type in 'deposit,payout,interest,unlock' %}
+                    <i class="fas fa-arrow-down"></i>
+                {% else %}
+                    <i class="fas fa-arrow-up"></i>
+                {% endif %}
+            </div>
+
+            <!-- Type Badge -->
+            <div class="mb-3">
+                <span class="badge-type">{{ transaction.get_transaction_type_display }}</span>
+            </div>
+
+            <!-- Amount -->
+            <h2 class="mb-2">
+                {% if transaction.transaction_type in 'deposit,payout,interest,unlock' %}
+                    <span class="text-success">+KES {{ transaction.amount|floatformat:2 }}</span>
+                {% else %}
+                    <span class="text-danger">-KES {{ transaction.amount|floatformat:2 }}</span>
+                {% endif %}
+            </h2>
+
+            <!-- Status -->
+            <div class="mt-2">
+                {% if transaction.status == 'completed' %}
+                    <span class="badge-status bg-success-subtle">Completed</span>
+                {% elif transaction.status == 'pending' %}
+                    <span class="badge-status bg-warning-subtle">Pending</span>
+                {% elif transaction.status == 'failed' %}
+                    <span class="badge-status bg-danger-subtle">Failed</span>
+                {% else %}
+                    <span class="badge-status bg-secondary">{{ transaction.get_status_display }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Transaction Details -->
+        <div class="stat-card mb-4">
+            <h6 class="mb-3">Transaction Details</h6>
+            <div class="detail-row">
+                <div class="detail-label">Transaction ID</div>
+                <div class="detail-value code">{{ transaction.id }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Date & Time</div>
+                <div class="detail-value">
+                    {{ transaction.created_at|date:"M d, Y" }}<br>
+                    <span class="text-muted" style="font-weight: normal; font-size: 0.85rem;">{{ transaction.created_at|date:"h:i A" }}</span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Type</div>
+                <div class="detail-value">{{ transaction.get_transaction_type_display }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Amount</div>
+                <div class="detail-value">
+                    KES {{ transaction.amount|floatformat:2 }}
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                    {% if transaction.status == 'completed' %}
+                        <span class="badge-status bg-success-subtle">Completed</span>
+                    {% elif transaction.status == 'pending' %}
+                        <span class="badge-status bg-warning-subtle">Pending</span>
+                    {% elif transaction.status == 'failed' %}
+                        <span class="badge-status bg-danger-subtle">Failed</span>
+                    {% else %}
+                        <span class="badge-status bg-secondary">{{ transaction.get_status_display }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if transaction.description %}
+            <div class="detail-row">
+                <div class="detail-label">Description</div>
+                <div class="detail-value text-end">{{ transaction.description }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Balance Information -->
+        <div class="stat-card mb-4">
+            <h6 class="mb-3">Balance Information</h6>
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <div class="detail-label">Balance Before</div>
+                    <div class="detail-value">KES {{ transaction.balance_before|floatformat:2 }}</div>
+                </div>
+                <div class="col-6 mb-2">
+                    <div class="detail-label">Balance After</div>
+                    <div class="detail-value text-primary">KES {{ transaction.balance_after|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Information (if any) -->
+        {% if transaction.related_round or transaction.related_contribution or transaction.related_payout %}
+        <div class="stat-card mb-4">
+            <h6 class="mb-3">Related Information</h6>
+            {% if transaction.related_round %}
+            <div class="detail-row">
+                <div class="detail-label">Round</div>
+                <div class="detail-value text-end">
+                    <a href="{% url 'merry_go_round:round_detail' transaction.related_round.id %}" class="text-decoration-none">
+                        {{ transaction.related_round.name }}
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if transaction.related_contribution %}
+            <div class="detail-row">
+                <div class="detail-label">Contribution</div>
+                <div class="detail-value text-end">
+                    Cycle {{ transaction.related_contribution.cycle_number }}<br>
+                    <small class="text-muted">Due: {{ transaction.related_contribution.due_date }}</small>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if transaction.related_payout %}
+            <div class="detail-row">
+                <div class="detail-label">Payout</div>
+                <div class="detail-value text-end">
+                    Cycle {{ transaction.related_payout.payout_cycle }}<br>
+                    <small class="text-muted">
+                        Principal: KES {{ transaction.related_payout.principal_amount|floatformat:2 }}
+                        {% if transaction.related_payout.interest_amount > 0 %}
+                            | Interest: KES {{ transaction.related_payout.interest_amount|floatformat:2 }}
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Technical Details -->
+        {% if transaction.main_wallet_reference or transaction.metadata %}
+        <div class="stat-card">
+            <h6 class="mb-3">Technical Details</h6>
+            {% if transaction.main_wallet_reference %}
+            <div class="detail-row">
+                <div class="detail-label">Main Wallet Ref</div>
+                <div class="detail-value code">{{ transaction.main_wallet_reference }}</div>
+            </div>
+            {% endif %}
+
+            {% if transaction.metadata %}
+            <div class="detail-row flex-column align-items-start">
+                <div class="detail-label mb-2">Additional Info</div>
+                <pre class="bg-gray-100 p-2 rounded w-100" style="font-size: 0.85rem; white-space: pre-wrap; background: #f8fafc; border: 1px solid var(--border-color);"><code>{{ transaction.metadata|safe }}</code></pre>
+            </div>
+            {% endif %}
+
+            <div class="detail-row">
+                <div class="detail-label">Last Updated</div>
+                <div class="detail-value">{{ transaction.updated_at|date:"M d, Y h:i A" }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

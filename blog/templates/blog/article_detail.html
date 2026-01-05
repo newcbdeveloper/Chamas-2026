@@ -1,0 +1,100 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }}{% endblock %}
+{% block meta_description %}{{ article.excerpt }}{% endblock %}
+{% block og_title %}{{ article.title }} - ChamaSpace Blog{% endblock %}
+{% block og_description %}{{ article.excerpt }}{% endblock %}
+{% block og_image %}{% if article.featured_image %}{{ article.featured_image.url }}{% else %}{% static 'images/ChamaSpace_Logo.png' %}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/article_detail.css' %}">
+{% endblock %}
+
+{# REMOVED - No longer showing excerpt as subtitle #}
+{% block page_title %}{{ article.title }}{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+
+{% block content %}
+<div class="article-container">
+
+
+    <!-- Article Header -->
+    <div class="article-detail-header">
+        <div class="article-detail-meta">
+            <span>
+                <i class="far fa-user"></i>
+                {{ article.author.get_full_name|default:article.author.username }}
+            </span>
+            <span>
+                <i class="far fa-calendar"></i>
+                {{ article.published_at|date:"F d, Y" }}
+            </span>
+            {% if article.category %}
+            <span class="category-badge">
+                {{ article.category.name }}
+            </span>
+            {% endif %}
+            <span>
+                <i class="far fa-eye"></i>
+                {{ article.views }} views
+            </span>
+        </div>
+    </div>
+
+    <!-- Featured Image -->
+    {% if article.featured_image %}
+        <div class="featured-image-container">
+    <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="featured-image">
+</div>
+    </div>
+    {% endif %}
+
+    <!-- Article Body -->
+    <div class="article-body-container">
+        <div class="article-body">
+            {{ article.content|safe }}
+        </div>
+    </div>
+
+    <!-- Share Section -->
+<div class="share-section">
+    <h4>Share this article</h4>
+    <div class="share-buttons">
+        <a href="https://x.com/intent/post?text={{ article.title|urlencode }}&url={{ request.build_absolute_uri }}"
+           target="_blank" rel="noopener noreferrer" class="share-btn x">
+            <i class="fab fa-x-twitter"></i> X
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+           target="_blank" rel="noopener noreferrer" class="share-btn facebook">
+            <i class="fab fa-facebook-f"></i> Facebook
+        </a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}"
+           target="_blank" rel="noopener noreferrer" class="share-btn linkedin">
+            <i class="fab fa-linkedin-in"></i> LinkedIn
+        </a>
+        <a href="https://wa.me/?text={{ article.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
+           target="_blank" rel="noopener noreferrer" class="share-btn whatsapp">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+    </div>
+</div>
+
+    <!-- Static Tags (not clickable) -->
+{% if article.tags.all %}
+<div class="article-footer">
+    <h4><i class="fas fa-tags"></i> Tags</h4>
+    <div class="article-tags-list">
+        {% for tag in article.tags.all %}
+            <span class="tag-item">
+                <i class="fas fa-hashtag"></i>{{ tag.name }}
+            </span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'support/base_support.html' %}
+{% load static %}
+
+{% block page_title %}Support Tickets (Admin){% endblock %}
+{% block page_subtitle %}Manage all support requests{% endblock %}
+
+{% block support_content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card stat-open">
+            <div class="stat-value">{{ stats.open }}</div>
+            <div class="stat-label">Open</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card stat-pending">
+            <div class="stat-value">{{ stats.pending }}</div>
+            <div class="stat-label">Pending</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card stat-resolved">
+            <div class="stat-value">{{ stats.resolved }}</div>
+            <div class="stat-label">Resolved</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card stat-unassigned">
+            <div class="stat-value">{{ stats.unassigned }}</div>
+            <div class="stat-label">Unassigned</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card stat-mine">
+            <div class="stat-value">{{ stats.my_tickets }}</div>
+            <div class="stat-label">My Tickets</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="open" {% if current_status == 'open' %}selected{% endif %}>Open</option>
+                    <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="resolved" {% if current_status == 'resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for value, label in categories %}
+                    <option value="{{ value }}" {% if current_category == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="priority" class="form-select">
+                    <option value="">All Priorities</option>
+                    {% for value, label in priorities %}
+                    <option value="{{ value }}" {% if current_priority == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="assigned_to" class="form-select">
+                    <option value="">All Admins</option>
+                    <option value="unassigned" {% if current_assigned == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                    <option value="me" {% if current_assigned == 'me' %}selected{% endif %}>My Tickets</option>
+                    {% for admin in available_admins %}
+                    <option value="{{ admin.id }}" {% if current_assigned == admin.id|stringformat:"s" %}selected{% endif %}>
+                        {{ admin.get_full_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tickets Table -->
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Reference</th>
+                    <th>User</th>
+                    <th>Subject</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Last Activity</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in page_obj %}
+                <tr>
+                    <td>
+                        <a href="{% url 'support:admin_ticket_detail' ticket.id %}" class="fw-bold">
+                            {{ ticket.reference_number }}
+                        </a>
+                        {% if ticket.admin_unread_count > 0 %}
+                        <span class="badge bg-danger ms-1">{{ ticket.admin_unread_count }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ticket.user.get_full_name|default:ticket.user.username }}</td>
+                    <td>{{ ticket.subject|truncatechars:50 }}</td>
+                    <td><span class="badge bg-light text-dark">{{ ticket.get_category_display }}</span></td>
+                    <td><span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+                    <td><span class="badge bg-light text-dark">{{ ticket.get_priority_display }}</span></td>
+                    <td>
+                        {% if ticket.assigned_to %}
+                        {{ ticket.assigned_to.get_full_name }}
+                        {% else %}
+                        <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ticket.created_at|date:"M d, Y" }}</td>
+                    <td>{{ ticket.last_message_at|timesince }} ago</td>
+                    <td>
+                        <a href="{% url 'support:admin_ticket_detail' ticket.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center py-4 text-muted">
+                        No tickets found matching your criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_priority %}&priority={{ current_priority }}{% endif %}{% if current_assigned %}&assigned_to={{ current_assigned }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">
+                Previous
+            </a>
+        </li>
+        {% endif %}
+        
+        <li class="page-item disabled">
+            <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        </li>
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_priority %}&priority={{ current_priority }}{% endif %}{% if current_assigned %}&assigned_to={{ current_assigned }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">
+                Next
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

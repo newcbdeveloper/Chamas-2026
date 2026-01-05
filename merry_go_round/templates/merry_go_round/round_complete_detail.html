@@ -1,0 +1,567 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}{{ round.name }} - Completed{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'merry_go_round/css/round_detail.css' %}">
+<style>
+/* Additional celebration styles */
+.celebration-banner {
+    background: linear-gradient(135deg, #2191a5 0%, #2191a5 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.celebration-banner::before {
+    content: "🎉";
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.1;
+    right: -2rem;
+    top: -2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-box {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-box .label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-box .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.frozen-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+}
+
+.member-performance {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.performance-header {
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.member-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.member-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.member-card:hover {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.member-card.is-you {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #9b9da1;
+}
+
+.avatar-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2191a5, #2191a5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.member-info h4 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+}
+
+.member-stats {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.mini-stat {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.payout-badge {
+    text-align: right;
+}
+
+.payout-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #10b981;
+}
+
+.payout-breakdown {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.partial-alert {
+    background: #5c5c5b;
+    border: 1px solid #3a3936;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.partial-alert i {
+    color: #f59e0b;
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .celebration-banner {
+        padding: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .member-card {
+        grid-template-columns: 1fr;
+    }
+    
+    .payout-badge {
+        text-align: left;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- CELEBRATION BANNER -->
+<div class="celebration-banner">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-trophy me-2"></i>
+                {{ round.name }}
+            </h1>
+            <p class="mb-0 opacity-90">
+                <i class="fas fa-calendar-check me-2"></i>
+                Completed {{ round.end_date|date:"F d, Y" }}
+            </p>
+        </div>
+        <div class="frozen-indicator">
+            <i class="fas fa-lock"></i>
+            <span>Stats Frozen at Completion</span>
+        </div>
+    </div>
+    
+    <!-- ROUND-LEVEL STATS -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span class="label">Total Collected</span>
+            <span class="value">KES {{ completion_data.round.total_actual|floatformat:0 }}</span>
+            <small class="d-block mt-1">
+                {{ completion_data.round.completion_percentage|floatformat:0 }}% of target
+            </small>
+        </div>
+        
+        <div class="stat-box">
+            <span class="label">Gross Interest</span>
+            <span class="value">KES {{ completion_data.round.total_gross_interest|floatformat:2 }}</span>
+            <small class="d-block mt-1">
+                @ {{ completion_data.round.interest_rate_percent }}% p.a.
+            </small>
+        </div>
+        
+        <div class="stat-box">
+            <span class="label">Tax Deducted</span>
+            <span class="value text-warning">-KES {{ completion_data.round.total_tax_deducted|floatformat:2 }}</span>
+            <small class="d-block mt-1">
+                {{ completion_data.round.tax_rate_percent }}% on interest
+            </small>
+        </div>
+        
+        <div class="stat-box">
+            <span class="label">Total Paid Out</span>
+            <span class="value">KES {{ completion_data.round.total_paid_out|floatformat:0 }}</span>
+            <small class="d-block mt-1">
+                Principal + Net Interest
+            </small>
+        </div>
+    </div>
+    
+    {% if completion_data.round.is_partial_completion %}
+    <div class="partial-alert">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>Partial Round Completion</strong>
+            <p class="mb-0 mt-1">
+                Only {{ completion_data.round.completion_percentage|floatformat:0 }}% of expected contributions were collected.
+                Payouts were adjusted proportionally, but all members still earned interest on their contributions.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- YOUR PERSONAL STATS (if member) -->
+{% if user_stats %}
+<div class="member-performance">
+    <div class="performance-header">
+        <h3>
+            <i class="fas fa-user-circle text-primary me-2"></i>
+            Your Performance Summary
+        </h3>
+    </div>
+    
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="text-center p-3 bg-light rounded">
+                <div class="text-muted small mb-1">You Contributed</div>
+                <div class="h4 mb-0">KES {{ user_stats.actual_contributed|floatformat:0 }}</div>
+                <div class="small text-muted">
+                    {{ user_stats.completion_percentage|floatformat:0 }}% complete
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="text-center p-3 bg-light rounded">
+                <div class="text-muted small mb-1">Gross Interest</div>
+                <div class="h4 mb-0 text-success">KES {{ user_stats.gross_interest|floatformat:2 }}</div>
+                <div class="small text-muted">
+                    Before tax
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="text-center p-3 bg-light rounded">
+                <div class="text-muted small mb-1">Tax Deducted</div>
+                <div class="h4 mb-0 text-warning">-KES {{ user_stats.tax_deducted|floatformat:2 }}</div>
+                <div class="small text-muted">
+                    {{ completion_data.round.tax_rate_percent }}%
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="text-center p-3 bg-success bg-opacity-10 rounded border border-success">
+                <div class="text-muted small mb-1">Total Received</div>
+                <div class="h4 mb-0 text-success">KES {{ user_stats.total_payout|floatformat:0 }}</div>
+                <div class="small text-success">
+                    +KES {{ user_stats.net_interest|floatformat:2 }} profit
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3 pt-3 border-top">
+        <div class="row">
+            <div class="col-md-6">
+                <small class="text-muted">Contributions Made:</small>
+                <strong class="ms-2">{{ user_stats.contributions_made }}</strong>
+            </div>
+            <div class="col-md-6">
+                <small class="text-muted">Contributions Missed:</small>
+                <strong class="ms-2">{{ user_stats.contributions_missed }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- MEMBER PAYOUTS TABLE -->
+<div class="member-performance">
+    <div class="performance-header">
+        <h3>
+            <i class="fas fa-users me-2"></i>
+            Member Payouts
+            <span class="badge bg-primary ms-2">{{ memberships.count }}</span>
+        </h3>
+    </div>
+    
+    <div class="member-grid">
+        {% for membership in memberships %}
+        <div class="member-card {% if membership.user == user %}is-you{% endif %}">
+            <div class="avatar-circle">
+                {{ membership.display_name|slice:":1"|upper }}
+            </div>
+            
+            <div class="member-info">
+                <h4>
+                    {{ membership.display_name }}
+                    {% if membership.user == round.creator %}
+                        <span class="badge bg-primary">Creator</span>
+                    {% endif %}
+                    {% if membership.user == user %}
+                        <span class="badge bg-success">You</span>
+                    {% endif %}
+                </h4>
+                
+                <div class="member-stats">
+                    <span class="mini-stat">
+                        <i class="fas fa-coins"></i>
+                        Contributed: KES {{ membership.total_contributed|floatformat:0 }}
+                    </span>
+                    <span class="mini-stat">
+                        <i class="fas fa-check-circle"></i>
+                        {{ membership.contributions_made }} payments
+                    </span>
+                    {% if membership.contributions_missed > 0 %}
+                    <span class="mini-stat text-danger">
+                        <i class="fas fa-times-circle"></i>
+                        {{ membership.contributions_missed }} missed
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="payout-badge">
+                {% if membership.payout_info %}
+                <div class="payout-amount">
+                    KES {{ membership.payout_info.amount|floatformat:0 }}
+                </div>
+                <div class="payout-breakdown">
+                    Principal: KES {{ membership.payout_info.principal_amount|floatformat:0 }}
+                    <br>
+                    Interest: <span class="text-success">+KES {{ membership.payout_info.interest_amount|floatformat:2 }}</span>
+                </div>
+                {% else %}
+                <span class="badge bg-warning">No Payout</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- YOUR CONTRIBUTION HISTORY (if member) -->
+{% if user_contributions %}
+<div class="member-performance">
+    <div class="performance-header">
+        <h3>
+            <i class="fas fa-history me-2"></i>
+            Your Contribution History
+        </h3>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Cycle</th>
+                    <th>Due Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Interest Earned</th>
+                    <th>Days Held</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contribution in user_contributions %}
+                <tr>
+                    <td>
+                        <strong>Cycle {{ contribution.cycle_number }}</strong>
+                    </td>
+                    <td>
+                        {{ contribution.due_date|date:"M d, Y" }}
+                    </td>
+                    <td>
+                        KES {{ contribution.amount|floatformat:2 }}
+                    </td>
+                    <td>
+                        {% if contribution.status == 'completed' %}
+                            <span class="badge bg-success">Paid</span>
+                        {% elif contribution.status == 'missed' %}
+                            <span class="badge bg-danger">Missed</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ contribution.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if contribution.interest_accrued > 0 %}
+                            <span class="text-success">+KES {{ contribution.interest_accrued|floatformat:2 }}</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if contribution.days_in_escrow > 0 %}
+                            {{ contribution.days_in_escrow }} days
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- ROUND INFO & MESSAGES -->
+<div class="row g-3">
+    <div class="col-md-8">
+        <!-- Messages -->
+        <div class="member-performance">
+            <div class="performance-header">
+                <h3>
+                    <i class="fas fa-comments me-2"></i>
+                    Round Messages
+                </h3>
+            </div>
+            
+            {% if messages_list %}
+            <div class="list-group list-group-flush">
+                {% for message in messages_list %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <strong>{{ message.sender_display }}</strong>
+                        <small class="text-muted">{{ message.created_at|timesince }} ago</small>
+                    </div>
+                    {% if message.subject %}
+                    <div class="fw-bold mb-1">{{ message.subject }}</div>
+                    {% endif %}
+                    <div>{{ message.content }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center py-3">No messages in this round.</p>
+            {% endif %}
+            
+            {% if is_member %}
+            <form method="post" action="{% url 'merry_go_round:post_message' round.id %}" class="mt-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    <textarea name="content" class="form-control" rows="2" placeholder="Post a message..." required></textarea>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Round Info -->
+        <div class="member-performance">
+            <div class="performance-header">
+                <h4>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Round Details
+                </h4>
+            </div>
+            
+            <div class="list-group list-group-flush">
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Type</span>
+                    <span class="badge bg-primary">{{ round.get_round_type_display }}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Model</span>
+                    <span class="badge bg-success">{{ round.get_payout_model_display }}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Contribution</span>
+                    <strong>KES {{ round.contribution_amount|floatformat:0 }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Frequency</span>
+                    <strong>{{ round.get_frequency_display }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Members</span>
+                    <strong>{{ round.current_members }}/{{ round.max_members }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Started</span>
+                    <strong>{{ round.start_date|date:"M d, Y" }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Completed</span>
+                    <strong>{{ round.end_date|date:"M d, Y" }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Stats Frozen</span>
+                    <strong>{{ frozen_at|date:"M d, Y" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BACK BUTTON -->
+<div class="text-center mt-4">
+    <a href="{% url 'merry_go_round:my_rounds' %}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to My Rounds
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Optional: Add any interactive elements here
+    console.log('Completed round detail loaded');
+});
+</script>
+{% endblock %}

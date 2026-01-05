@@ -1,0 +1,372 @@
+/* ========================================================= */
+/*        GROUP GOAL DETAILS — MODERN TEAL THEME            */
+/* ========================================================= */
+
+:root {
+    --teal-primary: #14b8a6;
+    /* Brighter teal */
+    --teal-dark: #0f766e;
+    --teal-light: #f0fdf4;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --bg-light: #f8fafc;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.08);
+    --border-color: #e2e8f0;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Outfit', sans-serif;
+    /* Changed to Outfit */
+    color: var(--text-dark);
+}
+
+.font-outfit {
+    font-family: 'Outfit', sans-serif;
+}
+
+.main-content {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+}
+
+/* ========================================================= */
+/* HEADER SECTION                                            */
+/* ========================================================= */
+
+.enhanced-header {
+    background: transparent;
+    padding-top: 2rem;
+    padding-bottom: 0.5rem;
+}
+
+.back-link {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #f1f5f9;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--text-dark);
+    background: #e2e8f0;
+}
+
+.user-greeting h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.edit-icon-btn {
+    color: var(--text-muted);
+    font-size: 1rem;
+    padding: 0;
+    border-radius: 50%;
+    transition: all 0.2s;
+    background: #f1f5f9;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.edit-icon-btn:hover {
+    color: var(--teal-primary);
+    background: #e2e8f0;
+}
+
+.days-remaining {
+    color: var(--teal-primary);
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dot-indicator {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: var(--teal-primary);
+    border-radius: 50%;
+}
+
+/* ========================================================= */
+/* WALLET CARD                                               */
+/* ========================================================= */
+
+.personal-wallet-card {
+    border-radius: 20px;
+    border: 1px solid white;
+    /* Subtle border */
+    background: white;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+    /* Softer, spread out shadow */
+    padding: 3rem;
+}
+
+.wallet-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #94a3b8;
+    /* Lighter gray for labels */
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.wallet-amount {
+    font-size: 2.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.03em;
+    color: var(--text-dark);
+}
+
+.text-teal {
+    color: var(--teal-primary) !important;
+}
+
+.bg-success-soft {
+    background-color: transparent !important;
+    /* Removed bg for cleaner look based on image */
+    color: var(--teal-primary) !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 0;
+}
+
+.bg-teal {
+    background: linear-gradient(90deg, #2dd4bf 0%, #0d9488 100%) !important;
+}
+
+/* Progress Bar */
+.progress {
+    height: 16px;
+    /* Thicker bar */
+    background-color: #f1f5f9;
+    border-radius: 100px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.progress-bar {
+    border-radius: 100px;
+    background: linear-gradient(90deg, #2dd4bf 0%, #0f766e 100%);
+    /* Teal gradient */
+}
+
+/* ========================================================= */
+/* ACTION BUTTONS GRID                                       */
+/* ========================================================= */
+
+.action-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    height: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--teal-light);
+}
+
+.box-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.bg-teal {
+    background-color: var(--teal-primary) !important;
+}
+
+.bg-teal-dark {
+    background-color: var(--teal-dark) !important;
+}
+
+.bg-dark-slate {
+    background-color: #334155 !important;
+}
+
+.action-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================================= */
+/* CONTENT CARDS (MEMBERS & ACTIVITIES)                      */
+/* ========================================================= */
+
+.content-card {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    height: 100%;
+}
+
+.content-card h5 {
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+.badge.bg-teal-light {
+    background-color: var(--teal-light);
+    color: var(--teal-dark);
+    font-weight: 700;
+    padding: 0.35em 0.65em;
+}
+
+.badge.bg-teal-tiny {
+    background-color: var(--teal-primary);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Scroll Container */
+.scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* List Items */
+.list-group-item {
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.list-group-item:hover {
+    background-color: #f8fafc;
+}
+
+.list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+/* Avatar */
+.avatar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Activities */
+.activity-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    background-color: var(--teal-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.form-text-xs {
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* ========================================================= */
+/* RESPONSIVE STYLES                                         */
+/* ========================================================= */
+
+@media (max-width: 768px) {
+    .enhanced-header {
+        padding-top: 1.5rem;
+    }
+
+    .user-greeting h1 {
+        font-size: 1.75rem;
+    }
+
+    .personal-wallet-card {
+        padding: 1.5rem;
+    }
+
+    .wallet-amount {
+        font-size: 2rem;
+    }
+
+    .action-card {
+        padding: 1rem 0.5rem;
+    }
+
+    .box-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .action-label {
+        font-size: 0.7rem;
+    }
+
+    /* Ensure content cards have height on mobile */
+    .scroll-container {
+        max-height: 300px;
+    }
+}

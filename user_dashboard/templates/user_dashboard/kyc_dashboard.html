@@ -1,0 +1,646 @@
+{% extends 'user_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Account Verification - ChamaSpace</title>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #0D7C83;
+        --primary-light: #E8F5F6;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --info: #3B82F6;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-500: #6B7280;
+        --gray-700: #374151;
+        --gray-900: #111827;
+    }
+
+    body {
+        background: var(--gray-50);
+    }
+
+    .kyc-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .status-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .status-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .status-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+
+    .status-icon.warning { 
+        background: #FEF3C7; 
+        color: var(--warning); 
+    }
+    
+    .status-icon.info { 
+        background: #DBEAFE; 
+        color: var(--info); 
+    }
+    
+    .status-icon.success { 
+        background: #D1FAE5; 
+        color: var(--success); 
+    }
+    
+    .status-icon.danger { 
+        background: #FEE2E2; 
+        color: var(--danger); 
+    }
+
+    .status-text h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    .status-text p {
+        margin: 0;
+        color: var(--gray-500);
+        font-size: 0.9375rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.875rem;
+        color: var(--gray-500);
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+    }
+
+    .info-item .value {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 0.9375rem;
+    }
+
+    .requirements-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .requirements-card h3 {
+        margin: 0 0 1.25rem 0;
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    .requirement-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .requirement-list li {
+        padding: 0.875rem 0;
+        display: flex;
+        align-items: start;
+        gap: 0.875rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .requirement-list li:last-child {
+        border-bottom: none;
+    }
+
+    .requirement-list .icon {
+        color: var(--primary);
+        margin-top: 2px;
+        font-size: 1.125rem;
+    }
+
+    .requirement-list strong {
+        color: var(--gray-900);
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .requirement-list small {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .rejection-notice {
+        background: #FEE2E2;
+        border-left: 4px solid var(--danger);
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .rejection-notice h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--danger);
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rejection-notice p {
+        margin: 0;
+        color: #7F1D1D;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+
+    .btn-primary, .btn-secondary {
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #0A6269;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 124, 131, 0.3);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .restrictions-card {
+        background: #FEF3C7;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .restrictions-card h4 {
+        margin: 0 0 1rem 0;
+        color: #92400E;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .restrictions-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .restrictions-list li {
+        padding: 0.625rem 0;
+        color: #78350F;
+        display: flex;
+        align-items: start;
+        gap: 0.625rem;
+        font-size: 0.9375rem;
+    }
+
+    .restrictions-list li i {
+        margin-top: 2px;
+        opacity: 0.8;
+    }
+
+    .timeline-info {
+        background: var(--primary-light);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .timeline-info i {
+        color: var(--primary);
+        font-size: 1.25rem;
+    }
+
+    .timeline-info p {
+        margin: 0;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+    }
+
+    .timeline-info strong {
+        color: var(--gray-900);
+    }
+
+    /* Document Preview Card */
+    .documents-preview {
+        background: var(--gray-50);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .documents-preview h5 {
+        margin: 0 0 1rem 0;
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    .doc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .doc-preview {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid var(--gray-200);
+    }
+
+    .doc-preview img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .doc-preview-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        text-align: center;
+    }
+
+    /* Resubmission Instructions Card */
+    .resubmission-instructions {
+        background: #FEF3C7;
+        border: 2px solid var(--warning);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .resubmission-instructions h4 {
+        margin: 0 0 1rem 0;
+        color: #92400E;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .resubmission-instructions ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #78350F;
+    }
+
+    .resubmission-instructions li {
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .kyc-container {
+            padding: 0 0.5rem;
+            margin: 1rem auto;
+        }
+
+        .status-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .status-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .status-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 1.75rem;
+        }
+
+        .status-text h2 {
+            font-size: 1.25rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .requirements-card,
+        .restrictions-card {
+            padding: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kyc-container">
+    <!-- Status Card -->
+    <div class="status-card">
+        <div class="status-header">
+            <div class="status-icon {{ status_message.color }}">
+                {% if kyc_profile.verification_status == 'not_started' %}
+                    <i class="fas fa-exclamation-circle"></i>
+                {% elif kyc_profile.verification_status == 'pending' %}
+                    <i class="fas fa-clock"></i>
+                {% elif kyc_profile.verification_status == 'approved' %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif kyc_profile.verification_status == 'resubmission_required' %}
+                    <i class="fas fa-redo"></i>
+                {% else %}
+                    <i class="fas fa-times-circle"></i>
+                {% endif %}
+            </div>
+            <div class="status-text">
+                <h2>{{ status_message.title }}</h2>
+                <p>{{ status_message.message }}</p>
+            </div>
+        </div>
+
+        {% if kyc_profile.rejection_reason %}
+        <div class="rejection-notice">
+            <h4>
+                <i class="fas fa-info-circle"></i>
+                Feedback from our team
+            </h4>
+            <p>{{ kyc_profile.rejection_reason }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Special instructions for resubmission required status -->
+        {% if kyc_profile.verification_status == 'resubmission_required' %}
+        <div class="resubmission-instructions">
+            <h4>
+                <i class="fas fa-clipboard-list"></i>
+                What You Need to Do
+            </h4>
+            <ul>
+                <li>Review the feedback from our team above carefully</li>
+                <li>Prepare corrected/updated documents addressing the issues mentioned</li>
+                <li>Click "Resubmit Documents" below to start the resubmission process</li>
+                <li>You'll be able to upload new documents that meet our requirements</li>
+                <li>Once submitted, your documents will be reviewed again (1-2 business days)</li>
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Document Type</label>
+                <div class="value">
+                    {% if kyc_profile.document_type %}
+                        {{ kyc_profile.get_document_type_display }}
+                    {% else %}
+                        Not selected
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <label>ID Number</label>
+                <div class="value">{{ kyc_profile.declared_national_id }}</div>
+            </div>
+            
+            {% if kyc_profile.submitted_at %}
+            <div class="info-item">
+                <label>Submitted</label>
+                <div class="value">{{ kyc_profile.submitted_at|date:"M d, Y" }}</div>
+            </div>
+            {% endif %}
+            
+            {% if kyc_profile.approved_at %}
+            <div class="info-item">
+                <label>Approved</label>
+                <div class="value">{{ kyc_profile.approved_at|date:"M d, Y" }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Show Submitted Documents Preview for Rejected/Resubmission Required -->
+        {% if kyc_profile.verification_status in 'rejected,resubmission_required' and can_resubmit %}
+        <div class="documents-preview">
+            <h5>Previously Submitted Documents</h5>
+            <p class="text-muted small mb-3">These are the documents you previously uploaded. You'll be able to upload new ones in the resubmission process.</p>
+            <div class="doc-grid">
+                {% if kyc_profile.id_front_image %}
+                <div class="doc-preview">
+                    <img src="{{ kyc_profile.id_front_image.url }}" alt="ID Front">
+                    <div class="doc-preview-label">ID Front</div>
+                </div>
+                {% endif %}
+                
+                {% if kyc_profile.id_back_image %}
+                <div class="doc-preview">
+                    <img src="{{ kyc_profile.id_back_image.url }}" alt="ID Back">
+                    <div class="doc-preview-label">ID Back</div>
+                </div>
+                {% endif %}
+                
+                {% if kyc_profile.selfie_image %}
+                <div class="doc-preview">
+                    <img src="{{ kyc_profile.selfie_image.url }}" alt="Selfie">
+                    <div class="doc-preview-label">Selfie</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if kyc_profile.verification_status == 'pending' %}
+        <div class="timeline-info">
+            <i class="far fa-clock"></i>
+            <p>
+                <strong>Your documents are under review.</strong><br>
+                We typically complete reviews within 1-2 business days. You'll receive a notification once approved.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if status_message.action %}
+        <div class="action-buttons">
+            <a href="{% url 'user_dashboard:kyc:start' %}" class="btn-primary">
+                <i class="fas fa-arrow-right"></i>
+                {{ status_message.action }}
+            </a>
+            <a href="{% url 'user_dashboard:home' %}" class="btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not kyc_profile.is_verified %}
+    <!-- Restrictions Notice -->
+    <div class="restrictions-card">
+        <h4>
+            <i class="fas fa-lock"></i>
+            Features Requiring Verification
+        </h4>
+        <ul class="restrictions-list">
+            {% for restriction in requirements.restrictions_until_verified %}
+            <li>
+                <i class="fas fa-ban"></i>
+                <span>{{ restriction }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Requirements Card -->
+    <div class="requirements-card">
+        <h3>What You'll Need to Verify</h3>
+        <ul class="requirement-list">
+            {% for doc in requirements.required_documents %}
+            <li>
+                <i class="fas fa-check-circle icon"></i>
+                <div>
+                    <strong>{{ doc.name }}</strong>
+                    <small>{{ doc.description }}</small>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        
+        <div class="timeline-info">
+            <i class="far fa-clock"></i>
+            <p>
+                <strong>Processing Time:</strong> {{ requirements.processing_time }}
+            </p>
+        </div>
+    </div>
+    {% else %}
+    <!-- Verified Benefits Card -->
+    <div class="requirements-card" style="background: #D1FAE5; border: 2px solid var(--success);">
+        <h3 style="color: var(--success);">
+            <i class="fas fa-check-circle me-2"></i>
+            Your Verified Benefits
+        </h3>
+        <ul class="requirement-list">
+            <li>
+                <i class="fas fa-arrow-down icon" style="color: var(--success);"></i>
+                <div>
+                    <strong>Withdraw Funds</strong>
+                    <small>Transfer money from your wallet to your bank account anytime</small>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-bullseye icon" style="color: var(--success);"></i>
+                <div>
+                    <strong>Create Savings Goals</strong>
+                    <small>Set up Wekeza goals and watch your savings grow</small>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-hand-holding-usd icon" style="color: var(--success);"></i>
+                <div>
+                    <strong>Access Loans</strong>
+                    <small>Request and grant loans within the community</small>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-users icon" style="color: var(--success);"></i>
+                <div>
+                    <strong>Join Merry-Go-Rounds</strong>
+                    <small>Participate in community saving circles</small>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-building icon" style="color: var(--success);"></i>
+                <div>
+                    <strong>Manage Chamas</strong>
+                    <small>Become an admin and manage group finances</small>
+                </div>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

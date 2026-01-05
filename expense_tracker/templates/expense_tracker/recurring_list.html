@@ -1,0 +1,176 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Recurring Transactions{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-sync-alt me-2"></i>Recurring Transactions</h2>
+            <p class="text-muted">Manage your automatic recurring income and expenses</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'expense_tracker:recurring_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Recurring
+            </a>
+        </div>
+    </div>
+
+    {% if recurring_transactions %}
+        <div class="row g-4">
+            {% for recurring in recurring_transactions %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 {% if not recurring.is_active %}opacity-50{% endif %}">
+                        <div class="card-header {% if recurring.type == 'income' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <span style="font-size: 20px;">{{ recurring.category.icon|default:"💰" }}</span>
+                                    {{ recurring.category.name|default:"Uncategorized" }}
+                                </h6>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" 
+                                           {% if recurring.is_active %}checked{% endif %}
+                                           onchange="toggleRecurring({{ recurring.pk }}, this.checked)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Amount -->
+                            <div class="mb-3">
+                                <h4 class="{% if recurring.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                    {{ recurring.amount|currency }}
+                                </h4>
+                                <small class="text-muted">{{ recurring.get_type_display }}</small>
+                            </div>
+
+                            <!-- Description -->
+                            {% if recurring.description %}
+                                <p class="text-muted small mb-3">{{ recurring.description }}</p>
+                            {% endif %}
+
+                            <!-- Frequency Info -->
+                            <div class="recurring-info mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small class="text-muted">Frequency:</small>
+                                    <span class="badge bg-primary">{{ recurring.get_frequency_display }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small class="text-muted">Next Date:</small>
+                                    <strong>{{ recurring.next_occurrence }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Auto Generate:</small>
+                                    <span>
+                                        {% if recurring.auto_generate %}
+                                            <i class="fas fa-check-circle text-success"></i> Yes
+                                        {% else %}
+                                            <i class="fas fa-times-circle text-danger"></i> No
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Status Badge -->
+                            {% if not recurring.is_active %}
+                                <div class="alert alert-warning py-2 mb-3">
+                                    <small><i class="fas fa-pause-circle me-1"></i>Paused</small>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-success py-2 mb-3">
+                                    <small><i class="fas fa-play-circle me-1"></i>Active</small>
+                                </div>
+                            {% endif %}
+
+                            <!-- Actions -->
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'expense_tracker:recurring_detail' recurring.pk %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View History
+                                </a>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'expense_tracker:recurring_edit' recurring.pk %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal{{ recurring.pk }}">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Started: {{ recurring.start_date }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Modal -->
+                <div class="modal fade" id="deleteModal{{ recurring.pk }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Delete Recurring Transaction</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete this recurring transaction?</p>
+                                <div class="alert alert-warning">
+                                    <strong>{{ recurring.category.name|default:"Uncategorized" }}</strong><br>
+                                    Amount: {{ recurring.amount|currency }}<br>
+                                    Frequency: {{ recurring.get_frequency_display }}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <form method="post" action="{% url 'expense_tracker:recurring_delete' recurring.pk %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-sync-alt fa-4x text-muted mb-4"></i>
+                        <h4>No Recurring Transactions</h4>
+                        <p class="text-muted mb-4">
+                            Set up recurring transactions for regular income or expenses like salaries, rent, or subscriptions
+                        </p>
+                        <a href="{% url 'expense_tracker:recurring_create' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>Create Your First Recurring Transaction
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleRecurring(recurringId, isActive) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/expense-tracker/recurring/${recurringId}/toggle/`;
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+{% endblock %}

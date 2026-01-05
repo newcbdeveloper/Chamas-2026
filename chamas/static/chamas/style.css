@@ -1,0 +1,1251 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+
+:root {
+  --color-default: #2191a5;
+  --color-second: #0067ac;
+  --color-white: #fff;
+  --color-body: #e4e9f7;
+  --color-light: #e0e0e0;
+}
+
+* {
+  padding: 0%;
+  margin: 0%;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  height: auto;
+  background-color: #e4e9f7 !important;
+  /* Ensure no green backgrounds */
+  background: #e4e9f7 !important;
+}
+
+/* ================================
+   RESPONSIVE LAYOUT STRUCTURE
+   ================================ */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+.desktop-sidebar {
+  width: 260px;
+  background-color: var(--color-default);
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  padding: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.desktop-sidebar .sidebar-header {
+  padding: 20px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.desktop-sidebar .logo_details img {
+  max-width: 120px;
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
+.desktop-sidebar .sidebar-nav {
+  padding: 20px 0;
+}
+
+.desktop-sidebar .nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-sidebar .nav-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.desktop-sidebar .nav-list li a {
+  display: flex !important;
+  align-items: center !important;
+  padding: 15px 20px !important;
+  color: white !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  border-left: 3px solid transparent !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+}
+
+.desktop-sidebar .nav-list li a:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-left-color: white !important;
+  color: white !important;
+}
+
+.desktop-sidebar .nav-list li a i {
+  font-size: 20px !important;
+  margin-right: 15px !important;
+  min-width: 20px !important;
+}
+
+.desktop-sidebar .nav-list li a .link_name {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+}
+
+/* Desktop header */
+.desktop-header {
+  background: #fff;
+  border-radius: 0 0 20px 20px;
+  border-bottom: 1px solid #e0e4e8;
+  box-shadow: 4px 20px 69px -33px rgba(0, 0, 0, 0.54);
+  padding: 16px 24px;
+  width: 100%;
+  margin: 0;
+  display: none;
+}
+
+.desktop-header .header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.desktop-header .search-input {
+  flex: 1;
+  max-width: 300px;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.desktop-header .action-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.desktop-header .action-icons i {
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.desktop-header .action-icons i:hover {
+  transform: scale(1.1);
+}
+
+/* Mobile header */
+.mobile-header {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 0;
+  margin: 0;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 16px;
+  display: none;
+}
+
+.mobile-header .mobile-nav-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-header .menu-btn {
+  background: none !important;
+  border: none !important;
+  font-size: 24px !important;
+  color: #2191a5 !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: background 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mobile-header .menu-btn:hover {
+  background: rgba(33, 145, 165, 0.1) !important;
+}
+
+.mobile-header .mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: auto;
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* ================================
+   MOBILE SIDEBAR STYLES
+   ================================ */
+
+.sidenav {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  width: 0 !important;
+  position: fixed !important;
+  z-index: 2000 !important;
+  top: 0 !important;
+  left: 0 !important;
+  background-color: var(--color-default) !important;
+
+  /* Entire sidebar scrolls as a unit */
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important; /* Enable smooth scrolling on iOS */
+  transition: width 0.3s ease !important;
+  padding-top: 0 !important;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2) !important;
+  /* Ensure sidebar is initially hidden but ready to show */
+  visibility: visible !important;
+  opacity: 1 !important;
+  /* Transform for better performance */
+  transform: translateX(0) !important;
+  will-change: width !important;
+  
+  /* Additional mobile scrolling fixes */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.sidenav .logo_details {
+  padding: 20px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  flex-shrink: 0; /* Prevent logo section from shrinking */
+  min-height: 80px; /* Ensure consistent height */
+}
+
+.sidenav .logo_details img {
+  max-width: 120px;
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
+.sidenav .nav-list {
+  padding: 20px 0;
+  margin: 0;
+  list-style: none;
+  /* Let the entire sidebar (.sidenav) handle scrolling */
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.sidenav .nav-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.sidenav .nav-list li a {
+  display: flex !important;
+  align-items: center !important;
+  padding: 15px 20px !important;
+  color: white !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  border-left: 3px solid transparent !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+}
+
+.sidenav .nav-list li a:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-left-color: white !important;
+  color: white !important;
+}
+
+.sidenav .nav-list li a i {
+  font-size: 20px !important;
+  margin-right: 15px !important;
+  min-width: 20px !important;
+}
+
+.sidenav .nav-list li a .link_name {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+}
+
+.sidenav .closebtn {
+  position: absolute !important;
+  top: 15px !important;
+  right: 20px !important;
+  font-size: 28px !important;
+  color: white !important;
+  cursor: pointer !important;
+  z-index: 2001 !important;
+  width: 40px !important; /* Increased for better touch target */
+  height: 40px !important; /* Increased for better touch target */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  transition: background 0.3s ease !important;
+  text-decoration: none !important;
+  /* Ensure it's always above scrollable content */
+  flex-shrink: 0 !important;
+}
+
+.sidenav .closebtn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+/* Mobile overlay for background clicks */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1500;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Prevent body scroll when sidebar is open */
+body.sidebar-open {
+  overflow: hidden !important;
+  position: fixed !important; /* Additional fix for mobile browsers */
+  width: 100% !important;
+}
+
+/* Mobile-specific navigation enhancements */
+@media (max-width: 768px) {
+  .sidenav {
+    /* Fix for mobile viewport height issues */
+    height: 100vh !important;
+    height: 100dvh !important; /* Use dynamic viewport height when supported */
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    overflow-y: auto !important; /* Ensure entire sidebar scrolls on mobile */
+  }
+  
+  .sidenav .nav-list {
+    /* Let the full sidenav scroll on mobile */
+    max-height: none !important;
+    touch-action: auto !important;
+    overscroll-behavior: auto !important;
+    padding-bottom: 60px !important;
+  }
+  
+  /* Ensure navigation items are properly spaced for touch */
+  .sidenav .nav-list li a {
+    min-height: 48px !important; /* Minimum touch target size */
+    padding: 12px 20px !important;
+  }
+  
+  /* Add bottom padding to nav list to ensure last item is visible */
+  .sidenav .nav-list {
+    padding-bottom: 60px !important; /* Extra space at bottom for mobile safety */
+  }
+  
+  /* Ensure the last navigation item is easily accessible */
+  .sidenav .nav-list li:last-child {
+    margin-bottom: 20px !important;
+  }
+  
+  /* Custom scrollbar styling for WebKit browsers */
+  .sidenav .nav-list::-webkit-scrollbar {
+    width: 4px !important;
+  }
+  
+  .sidenav .nav-list::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  
+  .sidenav .nav-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 2px !important;
+  }
+  
+  .sidenav .nav-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+  }
+}
+
+/* Sidebar when opened */
+.sidenav.open,
+.sidenav[style*="width: 280px"] {
+  width: 280px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+/* Ensure sidebar content is visible when open */
+.sidenav.open .logo_details,
+.sidenav.open .nav-list,
+.sidenav.open .closebtn {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+.sidenav.open .nav-list li {
+  display: list-item !important;
+}
+
+.sidenav.open .nav-list li a {
+  display: flex !important;
+}
+
+/* Enhanced mobile overlay when active */
+.mobile-overlay.active,
+.mobile-overlay[style*="display: block"] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ================================
+   RESPONSIVE BREAKPOINTS
+   ================================ */
+
+/* Desktop View - Show desktop sidebar and hide mobile elements */
+@media (min-width: 769px) {
+  .main-content {
+    margin-left: 260px !important;
+  }
+  
+  .desktop-sidebar {
+    display: block !important;
+  }
+  
+  .desktop-header {
+    display: block !important;
+  }
+  
+  .mobile-header {
+    display: none !important;
+  }
+  
+  .sidenav {
+    display: none !important;
+  }
+  
+  .mobile-overlay {
+    display: none !important;
+  }
+}
+
+/* Mobile View - Show mobile sidebar and hide desktop elements */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .desktop-sidebar {
+    display: none !important;
+  }
+  
+  .desktop-header {
+    display: none !important;
+  }
+  
+  .mobile-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  
+  .sidenav {
+    display: block !important;
+    /* Ensure it's available but initially hidden via width */
+    visibility: visible !important;
+  }
+  
+  .page-content {
+    padding: 16px !important;
+  }
+  
+  /* Enhanced mobile overlay styling */
+  .mobile-overlay {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1500 !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+  }
+  
+  /* Force sidebar to be fully visible on mobile when open */
+  .sidenav {
+    /* Override any potential conflicts */
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+  
+  .sidenav.open {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+  }
+}
+
+/* ================================
+   LEGACY STYLES (for compatibility)
+   ================================ */
+
+.desktop-sidenav {
+  height: 100vh;
+  width: 260px;
+  background-color: var(--color-default);
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding-top: 0px;
+  text-align: left;
+  z-index: 1000;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.sidenav a,
+.desktop-sidenav a {
+  font-size: 20px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.sidenav li a,
+.desktop-sidenav li a {
+  color: var(--color-white);
+  width: 100%;
+}
+
+.sidenav li,
+.desktop-sidenav li {
+  list-style: none;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  margin-left: 5px;
+  margin-bottom: 10px;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav li:hover a,
+.desktop-sidenav li:hover a {
+  padding: 5px;
+  color: var(--color-default);
+  background-color: var(--color-white);
+  border-radius: 12px;
+  margin-bottom: 15px;
+  transition: 0.5s;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
+}
+
+.header {
+  padding: 32px 16px 16px 16px;
+  background: #fff;
+  border-radius: 20px;
+  border-bottom: 1px solid #e0e4e8;
+  box-shadow: 4px 20px 69px -33px rgba(0, 0, 0, 0.54);
+  -webkit-box-shadow: 4px 20px 69px -33px rgba(0, 0, 0, 0.54);
+  -moz-box-shadow: 4px 20px 69px -33px rgba(0, 0, 0, 0.54);
+}
+
+input {
+  display: flex;
+  width: 50%;
+  height: 3rem;
+  padding: 12px 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  border: 0.5px solid var(--light, rgba(0, 0, 0, 0.2));
+  background: var(--light-surface-secondary, #f8fafc);
+}
+
+.navbar-icons {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.avatar {
+  width: 47px;
+  height: 40.286px;
+  flex-shrink: 0;
+  border-radius: 9.592px;
+  background: var(--Primary-500, #2291A5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile {
+  padding: 5px;
+  align-items: center;
+  border-radius: 8px;
+  background: rgba(165, 180, 203, 0.2);
+  display: flex;
+  gap: 8px;
+}
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Mobile Footer Styles */
+.mbl_footer {
+    background: #2291A5 !important;
+    background-color: #2291A5 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 1000 !important;
+    padding: 10px 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: block !important;
+    margin: 0 !important;
+}
+
+.footer_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+}
+
+.footer_button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: transparent;
+    border: none;
+    min-width: 60px;
+    color: #fff;
+}
+
+.footer_button img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    filter: brightness(0) invert(1);
+}
+
+.footer_button p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+    text-align: center;
+    margin: 0;
+    color: #fff;
+}
+
+.footer_button.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
+.footer_button.active p {
+    color: #fff;
+    font-weight: 600;
+}
+
+.footer_button.active img {
+    filter: brightness(0) invert(1);
+}
+
+.footer_button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    color: #fff;
+}
+
+.footer_button:hover p {
+    color: #fff;
+}
+
+/* Hide footer on desktop */
+@media screen and (min-width: 992px) {
+    .mbl_footer {
+        display: none !important;
+    }
+}
+
+/* Add padding to body on mobile to prevent content being hidden behind footer */
+@media screen and (max-width: 991px) {
+    body {
+        padding-bottom: 80px !important;
+    }
+    
+    .mbl_footer {
+        display: block !important;
+    }
+}
+
+/* ================================
+   COMPREHENSIVE MODAL FIXES FOR CHAMAS
+   ================================ */
+
+/* Fix Bootstrap modals broken by style-test.css overrides */
+
+/* 1. Fix modal overlay and positioning issues */
+.modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1055 !important; /* Ensure modal is above everything else */
+    display: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    outline: 0 !important;
+}
+
+.modal.fade {
+    transition: opacity 0.15s linear !important;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+/* 2. Fix modal backdrop overlay */
+.modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1050 !important; /* Just below modal content */
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-backdrop.fade {
+    opacity: 0 !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+/* 3. Fix modal dialog sizing and positioning */
+.modal .modal-dialog {
+    position: relative !important;
+    width: auto !important;
+    max-width: 500px !important; /* Override restrictive 312px */
+    margin: 1.75rem auto !important; /* Center vertically with proper spacing */
+    padding: 0 !important; /* Remove conflicting padding */
+    pointer-events: none !important;
+    background-color: transparent !important; /* No background on dialog */
+}
+
+.modal .modal-dialog .modal-content {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+    background-color: #fff !important;
+    background-clip: padding-box !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important; /* Restore proper border */
+    border-radius: 0.375rem !important; /* Restore proper border radius */
+    outline: 0 !important;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5) !important; /* Add shadow for depth */
+}
+
+/* 4. Fix modal header */
+.modal .modal-header {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 1rem 1rem !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    border-top-left-radius: calc(0.375rem - 1px) !important;
+    border-top-right-radius: calc(0.375rem - 1px) !important;
+}
+
+/* 5. Fix modal body padding */
+.modal .modal-body {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    padding: 1rem !important; /* Restore proper padding instead of 0px */
+}
+
+/* 6. Fix modal footer */
+.modal .modal-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-shrink: 0 !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding: 0.75rem 1rem !important;
+    border-top: 1px solid #dee2e6 !important;
+    border-bottom-right-radius: calc(0.375rem - 1px) !important;
+    border-bottom-left-radius: calc(0.375rem - 1px) !important;
+}
+
+/* 7. Responsive modal sizing */
+@media (max-width: 576px) {
+    .modal .modal-dialog {
+        max-width: calc(100vw - 1rem) !important;
+        margin: 0.5rem !important;
+    }
+}
+
+@media (min-width: 576px) {
+    .modal .modal-dialog {
+        max-width: 500px !important;
+        margin: 1.75rem auto !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .modal .modal-dialog {
+        max-width: 600px !important;
+    }
+    
+    .modal .modal-dialog.modal-lg {
+        max-width: 800px !important;
+    }
+    
+    .modal .modal-dialog.modal-xl {
+        max-width: 1140px !important;
+    }
+}
+
+/* 8. Ensure modal content uses full available space */
+.modal .modal-dialog .modal-content .modal-body {
+    max-height: calc(100vh - 210px) !important; /* Allow content to use available space minus header/footer */
+    overflow-y: auto !important;
+}
+
+/* 9. Fix form controls inside modals */
+.modal .form-control,
+.modal .form-select {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+}
+
+/* 10. Fix button spacing in modal footer */
+.modal .modal-footer .btn {
+    margin-left: 0.5rem !important;
+}
+
+.modal .modal-footer .btn:first-child {
+    margin-left: 0 !important;
+}
+
+/* 11. Ensure modals are clickable and interactive */
+.modal[style*="display: block"] {
+    display: block !important;
+    z-index: 1055 !important;
+}
+
+.modal[style*="display: block"] .modal-dialog {
+    transform: none !important;
+    transition: transform 0.3s ease-out !important;
+}
+
+/* 12. Custom modal enhancements for better UX */
+.modal .modal-header .modal-title {
+    margin-bottom: 0 !important;
+    line-height: 1.5 !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.modal .modal-header .btn-close {
+    padding: 0.5rem 0.5rem !important;
+    margin: -0.5rem -0.5rem -0.5rem auto !important;
+}
+
+/* 13. Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+/* 14. Handle modal transitions properly */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out !important;
+    transform: translate(0, -50px) !important;
+}
+
+.modal.show .modal-dialog {
+    transform: none !important;
+}
+
+/* 15. Override any custom modal styles from inline CSS */
+/* These rules override any conflicting inline modal styles */
+.modal:not(.custom-modal) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1055 !important;
+    display: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important; /* Backdrop is handled separately */
+}
+
+.modal:not(.custom-modal).show {
+    display: block !important;
+    background: transparent !important; /* Backdrop is handled separately */
+}
+
+.modal:not(.custom-modal) .modal-content {
+    background: #fff !important;
+    border-radius: 0.375rem !important;
+    padding: 0 !important; /* Let header/body/footer handle their own padding */
+    max-width: none !important;
+    width: 100% !important;
+    text-align: left !important;
+    position: relative !important;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 16. Ensure Bootstrap modal functionality is preserved */
+.modal[tabindex="-1"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1055 !important;
+    display: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    outline: 0 !important;
+}
+
+.modal[tabindex="-1"] .modal-dialog {
+    position: relative !important;
+    width: auto !important;
+    margin: 1.75rem auto !important;
+    pointer-events: none !important;
+}
+
+.modal[tabindex="-1"] .modal-content {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+    background-color: #fff !important;
+    background-clip: padding-box !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    border-radius: 0.375rem !important;
+    outline: 0 !important;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ================================
+   MOBILE CHAMA HEADER ROW
+   ================================ */
+
+.mobile-chama-header {
+    background: linear-gradient(135deg, var(--color-default, #2191a5) 0%, #1e8396 100%);
+    box-shadow: 0 2px 8px rgba(33, 145, 165, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-chama-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+}
+
+.mobile-chama-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    min-height: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.mobile-chama-info {
+    flex: 1;
+    margin-right: 15px;
+}
+
+.mobile-chama-name {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mobile-toggle-container {
+    flex-shrink: 0;
+}
+
+.mobile-view-switch {
+    margin: 0;
+}
+
+.mobile-view-switch .form-check-input {
+    width: 48px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.mobile-view-switch .form-check-input:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.mobile-view-switch .form-check-input:checked {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.9);
+}
+
+.mobile-view-switch .form-check-input:checked:hover {
+    background-color: rgba(255, 255, 255, 1);
+    border-color: rgba(255, 255, 255, 1);
+}
+
+.mobile-view-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    outline: none;
+}
+
+.mobile-view-switch .form-check-input:active {
+    transform: scale(0.95);
+}
+
+.mobile-view-switch .form-check-label {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: 8px;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+.mobile-view-switch .form-check-label:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mobile-view-switch .switch-label-member,
+.mobile-view-switch .switch-label-admin {
+    display: inline-block;
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+.mobile-view-switch .switch-label-member:hover,
+.mobile-view-switch .switch-label-admin:hover {
+    transform: translateX(2px);
+}
+
+/* Hide mobile header on desktop */
+@media (min-width: 769px) {
+    .mobile-chama-header {
+        display: none !important;
+    }
+    
+    /* Ensure show_on_mobile elements are hidden on desktop */
+    .show_on_mobile {
+        display: none !important;
+    }
+    
+    /* Preserve desktop header completely unchanged */
+    .page_header.hide_on_mobile {
+        display: block !important;
+    }
+    
+    .page_header.hide_on_mobile .navbar {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+    
+    .page_header.hide_on_mobile .nav {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        margin-left: auto !important;
+        gap: 1rem !important;
+    }
+    
+    /* Ensure nav items stay on the right */
+    .page_header.hide_on_mobile .nav .nav-item {
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    /* Make sure avatar dropdown stays on the right */
+    .page_header.hide_on_mobile .nav .nav-item.dropdown {
+        margin-left: 0 !important;
+    }
+    
+    /* Fix spacer div to push nav items to the right */
+    .page_header.hide_on_mobile .navbar > div[style*="margin-left: auto"] {
+        flex: 1 !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* Show mobile elements only on mobile */
+@media (max-width: 768px) {
+    .hide_on_mobile {
+        display: none !important;
+    }
+    
+    .show_on_mobile {
+        display: block !important;
+    }
+    
+    /* Preserve mobile header navigation layout */
+    .page_nav.mob_nav.show_on_mobile {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 9px 0px !important;
+    }
+    
+    .page_nav.mob_nav.show_on_mobile .nav-list {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 16px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+    
+    .page_nav.mob_nav.show_on_mobile .nav-list li {
+        display: list-item !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .page_nav.mob_nav.show_on_mobile .brand {
+        flex-shrink: 0 !important;
+    }
+    
+    .page_nav.mob_nav.show_on_mobile .brand img {
+        max-height: 40px !important;
+        width: auto !important;
+    }
+    
+    /* Ensure mobile header buttons are properly styled */
+    .page_nav.mob_nav.show_on_mobile .nav-list li .btn {
+        background: transparent !important;
+        border: none !important;
+        padding: 8px !important;
+    }
+    
+    .page_nav.mob_nav.show_on_mobile .nav-list li img {
+        width: 24px !important;
+        height: 24px !important;
+        object-fit: contain !important;
+    }
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 360px) {
+    .mobile-chama-row {
+        padding: 10px 12px;
+    }
+    
+    .mobile-chama-name {
+        font-size: 1rem;
+    }
+    
+    .mobile-view-switch .form-check-input {
+        width: 42px;
+        height: 22px;
+    }
+    
+    .mobile-view-switch .form-check-label {
+        font-size: 0.8rem;
+    }
+}

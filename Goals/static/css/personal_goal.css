@@ -1,0 +1,435 @@
+/* ========================================================= */
+/*           PERSONAL GOAL DETAILS — MODERN TEAL THEME        */
+/* ========================================================= */
+
+:root {
+    --primary-teal: #0e8593;
+    --primary-teal-dark: #096d79;
+    --primary-teal-gradient: linear-gradient(135deg, #0e8593 0%, #066b78 100%);
+    --bg-light: #f8fafc;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --white: #ffffff;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 10px 15px -3px rgba(14, 133, 147, 0.15), 0 4px 6px -2px rgba(14, 133, 147, 0.1);
+    --radius-xl: 20px;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Overpass', sans-serif;
+}
+
+/* ========================================================= */
+/*           UNIFIED HERO CARD                               */
+/* ========================================================= */
+
+.unified-hero-card {
+    background: var(--primary-teal-gradient);
+    border-radius: var(--radius-xl);
+    padding: 2.5rem;
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Top Section: Header & Stats */
+.hero-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.back-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+    align-self: flex-start;
+}
+
+.back-link:hover {
+    color: var(--white);
+}
+
+.hero-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    /* Align bottom of title with bottom of balance card */
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+/* Left Content: Title & Days */
+.hero-title-content {
+    flex: 1;
+    min-width: 250px;
+}
+
+.goal-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+}
+
+.goal-days-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.dot-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #4ade80;
+    /* Bright Green */
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Right Content: Glassy Balance Card */
+.hero-balance-card {
+    background: rgba(0, 0, 0, 0.2);
+    /* Darker semi-transparent background */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    min-width: fit-content;
+}
+
+.balance-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.balance-label {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.balance-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.balance-value.positive {
+    font-weight: 600;
+    font-size: 1.75rem;
+}
+
+.balance-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Progress Bar */
+.hero-progress-container {
+    max-width: 100%;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #4ade80;
+    /* Bright Green */
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+}
+
+/* Footer Section: Info Pill */
+.hero-footer {
+    margin-top: 2rem;
+}
+
+.info-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* ========================================================= */
+/*           ACTION BUTTONS GRID                             */
+/* ========================================================= */
+
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.action-btn-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-decoration: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    /* Very subtle shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.action-btn-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1);
+    border-color: rgba(14, 133, 147, 0.1);
+    /* Subtle teal border on hover */
+}
+
+/* Icon Wrappers */
+.icon-wrapper {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.action-btn-card:hover .icon-wrapper {
+    transform: scale(1.05);
+}
+
+.icon-teal {
+    background-color: rgb(20, 184, 166);
+    /* Tailwind teal-500 equivalent */
+    color: white;
+    box-shadow: 0 4px 10px rgba(20, 184, 166, 0.3);
+}
+
+.icon-green {
+    background-color: rgb(34, 197, 94);
+    /* Tailwind green-500 */
+    color: white;
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+
+.icon-blue {
+    background-color: rgb(14, 165, 233);
+    /* Tailwind sky-500 */
+    color: white;
+    box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+}
+
+.icon-purple {
+    background-color: rgb(139, 92, 246);
+    /* Tailwind violet-500 */
+    color: white;
+    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+}
+
+.action-text {
+    color: var(--text-dark);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* ========================================================= */
+/*           TRANSACTIONS & SECTIONS                         */
+/* ========================================================= */
+
+.section-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 1rem;
+}
+
+.section-header-modern h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.active-badge {
+    background-color: #e0f2fe;
+    /* Light blue */
+    color: #0284c7;
+    /* Dark blue text */
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Transactions List */
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.transaction-item {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.transaction-item:hover {
+    border-color: var(--primary-teal);
+    box-shadow: 0 4px 12px rgba(14, 133, 147, 0.1);
+}
+
+.transaction-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-teal-light {
+    background-color: rgba(14, 133, 147, 0.1);
+}
+
+.text-teal {
+    color: var(--primary-teal) !important;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 3rem;
+    background: var(--bg-light);
+    border-radius: var(--radius-lg);
+    border: 2px dashed #cbd5e1;
+}
+
+.empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* ========================================================= */
+/*           RESPONSIVE DESIGN                               */
+/* ========================================================= */
+
+@media (max-width: 992px) {
+    .action-buttons-grid {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .unified-hero-card {
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        /* Slightly smaller radius on mobile */
+    }
+
+    .hero-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .hero-balance-card {
+        width: 100%;
+        padding: 1rem;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .balance-divider {
+        height: 30px;
+    }
+
+    .balance-value {
+        font-size: 1.4rem;
+    }
+
+    .balance-value.positive {
+        font-size: 1.4rem;
+    }
+
+    .action-buttons-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2x2 Grid on Tablet/Large Mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .goal-title {
+        font-size: 1.75rem;
+    }
+
+    .balance-label {
+        font-size: 0.65rem;
+    }
+
+    .balance-value,
+    .balance-value.positive {
+        font-size: 1.2rem;
+    }
+
+    .action-buttons-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* Keep 2x2 for reasonable tap targets */
+        gap: 0.75rem;
+    }
+
+    .action-btn-card {
+        padding: 1rem;
+    }
+
+    .icon-wrapper {
+        width: 44px;
+        height: 44px;
+        font-size: 1.25rem;
+    }
+
+    .action-text {
+        font-size: 0.85rem;
+    }
+}

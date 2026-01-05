@@ -1,0 +1,399 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Review KYC - {{ kyc_profile.user.get_full_name }}{% endblock %}
+
+{% block extrahead %}
+<style>
+    .kyc-review-container {
+        max-width: 1400px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .review-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .review-section {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .review-section h3 {
+        margin: 0 0 15px 0;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #0D7C83;
+        color: #0D7C83;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-row label {
+        font-weight: bold;
+        color: #666;
+    }
+
+    .document-viewer {
+        margin: 20px 0;
+    }
+
+    .document-viewer img {
+        width: 100%;
+        max-width: 500px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .document-viewer img:hover {
+        transform: scale(1.02);
+        border-color: #0D7C83;
+    }
+
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .action-panel {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .action-panel h3 {
+        margin: 0 0 20px 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.2s;
+    }
+
+    .btn-approve {
+        background: #10B981;
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #059669;
+    }
+
+    .btn-reject {
+        background: #EF4444;
+        color: white;
+    }
+
+    .btn-reject:hover {
+        background: #DC2626;
+    }
+
+    .btn-back {
+        background: #6B7280;
+        color: white;
+    }
+
+    .btn-back:hover {
+        background: #4B5563;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .warning-box {
+        background: #FEF3C7;
+        border-left: 4px solid #F59E0B;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        padding: 40px;
+    }
+
+    .modal img {
+        max-width: 100%;
+        max-height: 90vh;
+        margin: auto;
+        display: block;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        color: white;
+        font-size: 40px;
+        cursor: pointer;
+    }
+
+    @media (max-width: 1024px) {
+        .review-grid,
+        .comparison-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kyc-review-container">
+    <h1>KYC Review: {{ kyc_profile.user.get_full_name }}</h1>
+    
+    <div class="review-grid">
+        <!-- User Information -->
+        <div class="review-section">
+            <h3>User Information</h3>
+            <div class="info-row">
+                <label>Full Name:</label>
+                <span>{{ kyc_profile.user.get_full_name }}</span>
+            </div>
+            <div class="info-row">
+                <label>Email:</label>
+                <span>{{ kyc_profile.user.email }}</span>
+            </div>
+            <div class="info-row">
+                <label>Username:</label>
+                <span>{{ kyc_profile.user.username }}</span>
+            </div>
+            <div class="info-row">
+                <label>User ID:</label>
+                <span>{{ kyc_profile.user.id }}</span>
+            </div>
+            <div class="info-row">
+                <label>Account Created:</label>
+                <span>{{ kyc_profile.user.date_joined|date:"M d, Y" }}</span>
+            </div>
+        </div>
+
+        <!-- KYC Information -->
+        <div class="review-section">
+            <h3>KYC Information</h3>
+            <div class="info-row">
+                <label>Declared ID Number:</label>
+                <span><strong>{{ kyc_profile.declared_national_id }}</strong></span>
+            </div>
+            <div class="info-row">
+                <label>Document Type:</label>
+                <span>{{ kyc_profile.get_document_type_display }}</span>
+            </div>
+            <div class="info-row">
+                <label>Submitted:</label>
+                <span>{{ kyc_profile.submitted_at|date:"M d, Y H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <label>ID Corrections:</label>
+                <span>{{ kyc_profile.id_correction_count }}</span>
+            </div>
+            <div class="info-row">
+                <label>Resubmissions:</label>
+                <span>{{ kyc_profile.resubmission_count }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Review -->
+    <div class="review-section" style="margin-top: 30px;">
+        <h3>Document Review</h3>
+        
+        {% if kyc_profile.declared_national_id %}
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong> Verify that the ID number on the document matches or correct it below. 
+            Declared ID: <strong>{{ kyc_profile.declared_national_id }}</strong>
+        </div>
+        {% endif %}
+
+        <div class="comparison-grid">
+            <!-- ID Documents -->
+            <div>
+                <h4>ID Document(s)</h4>
+                {% if kyc_profile.id_front_image %}
+                <div class="document-viewer">
+                    <label>Front:</label>
+                    <img src="{{ kyc_profile.id_front_image.url }}" 
+                         alt="ID Front" 
+                         onclick="openModal(this.src)">
+                </div>
+                {% endif %}
+
+                {% if kyc_profile.id_back_image %}
+                <div class="document-viewer">
+                    <label>Back:</label>
+                    <img src="{{ kyc_profile.id_back_image.url }}" 
+                         alt="ID Back" 
+                         onclick="openModal(this.src)">
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Selfie -->
+            <div>
+                <h4>Selfie</h4>
+                {% if kyc_profile.selfie_image %}
+                <div class="document-viewer">
+                    <img src="{{ kyc_profile.selfie_image.url }}" 
+                         alt="Selfie" 
+                         onclick="openModal(this.src)">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Panel -->
+    <div class="action-panel">
+        <h3>Review Actions</h3>
+        
+        <!-- Approve Form -->
+        <form method="POST" action="{% url 'admin:kyc-approve' kyc_profile.id %}" 
+              style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 2px solid #ddd;">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="verified_id">Verified ID Number (from document): *</label>
+                <input type="text" 
+                       id="verified_id" 
+                       name="verified_id" 
+                       value="{{ kyc_profile.declared_national_id }}"
+                       required>
+                <small style="color: #666;">
+                    Extract the exact ID number from the uploaded document. 
+                    This becomes the authoritative verified ID.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="admin_notes_approve">Admin Notes (optional):</label>
+                <textarea id="admin_notes_approve" 
+                          name="admin_notes" 
+                          placeholder="Internal notes about this approval..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-approve">
+                ✓ Approve Verification
+            </button>
+        </form>
+
+        <!-- Reject Form -->
+        <form method="POST" action="{% url 'admin:kyc-reject' kyc_profile.id %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="rejection_reason">Rejection Reason (shown to user): *</label>
+                <textarea id="rejection_reason" 
+                          name="rejection_reason" 
+                          placeholder="Explain why the KYC is being rejected..."
+                          required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="admin_notes_reject">Admin Notes (optional):</label>
+                <textarea id="admin_notes_reject" 
+                          name="admin_notes" 
+                          placeholder="Internal notes..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="require_resubmission">
+                    Allow user to resubmit (otherwise permanently rejected)
+                </label>
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-reject">
+                    ✗ Reject Verification
+                </button>
+                <a href="{% url 'admin:user_dashboard_kycprofile_changelist' %}" 
+                   class="btn btn-back">
+                    ← Back to List
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <img id="modalImage" src="" alt="Document">
+</div>
+
+<script>
+function openModal(src) {
+    document.getElementById('imageModal').style.display = 'flex';
+    document.getElementById('modalImage').src = src;
+}
+
+function closeModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+// Prevent form double-submission
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+    });
+});
+</script>
+{% endblock %}

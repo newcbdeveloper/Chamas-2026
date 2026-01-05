@@ -1,0 +1,166 @@
+{% load static %}
+
+
+<nav class="topnav navbar navbar-light page_header hide_on_mobile">
+    <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+        <i class="fe fe-menu navbar-toggler-icon"></i>
+    </button>
+
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+                <i class="fe fe-sun fe-16"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
+                <span class="fe fe-grid fe-16"></span>
+            </a>
+        </li>
+        <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+                <span class="fe fe-bell fe-16"></span>
+                <span class="dot dot-md bg-success"></span>
+            </a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink"
+               role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="avatar avatar-sm mt-2">
+                           {% if user_profile.picture %}
+                               <img src="{{ user_profile.picture.url }}" alt="img" class="avatar-img rounded-circle">
+                           {% else %}
+                               <img src="{% static 'assets/avatars/face-1.png' %}" alt="img"
+                                    class="avatar-img rounded-circle">
+                           {% endif %}
+                        </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'user_dashboard:settings' %}">Settings</a>
+                <!-- <a class="dropdown-item" href="{% url 'user_dashboard:home' %}">Activities</a> -->
+                <a class="dropdown-item" href="{% url 'Logout' %}">Logout</a>
+            </div>
+        </li>
+    </ul>
+</nav>
+
+<aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
+    <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
+        <i class="fe fe-x"><span class="sr-only"></span></i>
+    </a>
+
+    <!-- <nav class="vertnav navbar navbar-light">
+
+        <div class="w-100 mb-4 d-flex">
+            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="dashboard.html">
+                <h1>ChamaBORA</h1>
+            </a>
+        </div>
+
+        <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100">
+                <a class="nav-link" href="dashboard.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="my-chamas.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">My Chamas</span>
+                </a>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="join-chama.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Join a Chamas</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="manage.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Manage</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="withdraw.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Withdraw</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="notifications.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Notifications</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="settings.html">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Settings</span>
+                </a>
+            </li>
+            </li>
+        </ul>
+    </nav> -->
+
+
+    <div class="offcanvas-header">
+        <h5>
+            <a href="#">
+                <img src="{% static 'images/offcanvas_logo.png' %}" alt="">
+            </a>
+        </h5>
+
+    </div>
+    <div class="offcanvas-body position-relative">
+        <ul class="offcanvas_list">
+            <li class="list-item">
+                <a href="{% url 'user_dashboard:home' %}">
+                    <img src="{% static 'images/icon_house.png' %}" alt="">
+                    Dashboard
+                </a>
+            </li>
+{#            <li class="list-item">#}
+{#                <a href="{% url 'mychamas' %}">#}
+{#                    <img src="{% static 'images/icon_people.png' %}" alt="">#}
+{#                    Chamaz#}
+{#                </a>#}
+{#            </li>#}
+{#            <li class="list-item">#}
+{#                <a href="{% url 'user_dashboard:home' %}" >#}
+{#                    <img src="{% static 'images/file-earmark.png' %}" alt="">#}
+{#                    Wekeza Goals#}
+{##}
+{#                </a>#}
+{#            </li>#}
+{#            <li class="list-item">#}
+{#                <a href="{% url 'joinchamas' %}">#}
+{#                    <img src="{% static 'images/icon_box.png' %}" alt="">#}
+{#                    Join Chamas#}
+{#                </a>#}
+{#            </li>#}
+{#            <li class="list-item">#}
+{#                <a href="{% url 'manage_chamas' %}">#}
+{#                    <img src="{% static 'images/icon_wallet.png' %}" alt="">#}
+{#                    Manage Chamas#}
+{#                </a>#}
+{#            </li>#}
+
+            <li class="list-item">
+                <a href="{% url 'user_dashboard:all_notifications' %}">
+                    <img src="{% static 'images/icon_bell_.png' %}" alt="">
+                    Notifications
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="{% url 'user_dashboard:settings' %}">
+                    <img src="{% static 'images/icon_gear.png' %} " alt="">
+                    Settings
+                </a>
+            </li>
+        </ul>
+        <a  href="{% url 'Logout' %}" class="btn log_out_btn">
+            Log Out
+        </a>
+    </div>
+</aside>

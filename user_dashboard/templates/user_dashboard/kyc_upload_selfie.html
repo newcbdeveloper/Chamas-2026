@@ -1,0 +1,88 @@
+{% extends 'user_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}<title>Upload Selfie - ChamaSpace</title>{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 700px;">
+    <!-- Progress Bar -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between mb-2">
+            <span class="small fw-bold text-primary">Step 3 of 4</span>
+            <span class="small text-muted">Upload Selfie</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-primary" style="width: 75%;"></div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="fw-bold mb-4">Take a Selfie</h2>
+            
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-user-circle me-2"></i>
+                <strong>Selfie Requirements:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Face the camera directly</li>
+                    <li>Remove sunglasses and hats</li>
+                    <li>Use good lighting</li>
+                    <li>Plain background preferred</li>
+                </ul>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Your Live Selfie *</label>
+                    
+                    {% if kyc_profile.selfie_image %}
+                    <div class="mb-3 text-center">
+                        <img src="{{ kyc_profile.selfie_image.url }}" class="img-fluid rounded border" style="max-height: 400px;">
+                        <div class="mt-2">
+                            <small class="text-success">
+                                <i class="fas fa-check-circle"></i> Already uploaded
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <input 
+                        type="file" 
+                        name="selfie" 
+                        class="form-control form-control-lg" 
+                        accept="image/jpeg,image/png,image/jpg"
+                        capture="user"
+                        {% if not kyc_profile.selfie_image %}required{% endif %}
+                    >
+                    <small class="form-text text-muted">
+                        Use your camera to take a live photo. JPG or PNG, max 5MB
+                    </small>
+                </div>
+
+                <div class="card" style="background: #FEF3C7; border: none;">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>Pro Tip</h6>
+                        <p class="mb-0 small">
+                            Your selfie will be compared with your ID photo to verify your identity. 
+                            Make sure your face is clearly visible and matches your ID photo.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                        Next: Review & Submit
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <a href="{% url 'user_dashboard:kyc:upload_documents' %}" class="btn btn-outline-secondary btn-lg">
+                        Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

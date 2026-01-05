@@ -1,0 +1,106 @@
+/* Personal Goal - Premium Wallet Card (Slightly different gradient for distinction) */
+.personal-wallet-card {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(4, 120, 87, 0.3);
+    transition: all 0.3s ease;
+}
+.personal-wallet-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(4, 120, 87, 0.4);
+}
+.wallet-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+.wallet-amount {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+/* Action Cards (Same as Express) */
+.action-card {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+.action-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+}
+.action-icon {
+    width: 64px; height: 64px;  /* Larger for better visibility */
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.75rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+.action-card:hover .action-icon {
+    transform: scale(1.1);
+}
+.action-label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+/* Transactions List (Same as Express) */
+.transaction-item {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;  /* More space between items */
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.transaction-item:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.transaction-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Donut Improvements (Same as Express) */
+.donut-container {
+    margin: 0 auto;  /* Better centering */
+}
+.donut-chart {
+    animation: donutFill 1.4s ease-out forwards;
+    box-shadow: 0 6px 20px rgba(4, 120, 87, 0.18);
+}
+.donut-percentage {
+    background: linear-gradient(135deg, #047857, #065f46);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Responsive Fixes (Same as Express) */
+@media (max-width: 768px) {
+    .wallet-amount { font-size: 1.8rem; }
+    .action-icon { width: 56px; height: 56px; }
+    .donut-container { width: 140px; height: 140px; }
+    .transaction-item { flex-direction: column; text-align: center; gap: 1rem; }
+}
+
+.action-icon i {
+    font-size: 1.5rem;
+}
+
+/* Addition for Edit Button in More Modal */
+.edit-button {
+    background-color: #047857; /* Matches personal gradient start */
+    color: white;
+}
+.edit-button:hover {
+    background-color: #065f46; /* Matches personal gradient end */
+}

@@ -1,0 +1,224 @@
+
+/*[ Responsive ]*/
+
+@media (max-width: 576px) {
+  .login-form {
+    padding: 43px 15px 57px 117px;
+    border:0px
+    
+  }
+ 
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 43px 15px 57px 15px;
+    border:0px
+
+  }
+
+  .label-input {
+    text-align: left;
+    position: unset;
+    top: unset;
+    left: unset;
+    width: 100%;
+    border:none;
+    padding: 0 5px;
+  }
+}
+
+
+/*   start login   */
+
+* {
+  padding: 0px; 
+  margin: 0px; 
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/*---------------------------------------------*/
+
+.header h2 {
+
+background-color: #0EA7C3;
+padding: 10px 30px;
+font-size: 25px;
+color:#fff;
+font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif; 
+
+
+}
+
+.containers {
+  width: 100%;  
+  min-height: 50vh;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+
+}
+
+.content {
+  width: 470px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+/*---------------------------------------------*/
+
+input {
+  outline: none;
+  border: none;
+}
+
+/*---------------------------------------------*/
+
+button {
+  outline: none !important;
+  border: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+/*------------------------------------------------------------------*/
+
+.login-form {
+  width: 100%;
+  justify-content: space-between;
+  padding: 20px 20px 20px 20px;
+  border :1px solid #000;
+  border-radius: 15px;
+  flex-wrap: wrap;
+  height: 645x;
+}
+
+.login-form  .title {
+  text-align: center;
+  font-size: 24px;
+}
+
+.login-form  .log {
+  text-align: center;
+  color : #000;
+}
+
+.login-form hr {
+  background:#0089D0;
+} 
+
+/*------------------------------------------------------------------*/
+
+.form-input {
+  width: 100%;
+  position: relative;
+}
+
+
+.input {
+  font-size: 15px;
+  padding: 0 5px;
+  display: block;
+  width: 100%;
+}
+
+.label { 
+  font-family: arial;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+input.input {
+  height: 35px;
+  border :1px solid;
+  margin: 12px 0;
+  border-radius: 10px;
+}
+
+/*------------------------------------------------------------------*/
+
+.containers-button {
+  width: 100%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  flex-wrap: wrap;
+}
+
+.containers-button button {
+  background-color: #0089A2;
+  color :black;
+  padding : 10px 20px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.button {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 115px;
+  height: 35px;
+  font-family: arial;
+  font-size: 16px;
+  color: #fff;
+  line-height: 1.2;
+  -webkit-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  transition: all 0.4s;
+  margin-top: 7px;
+}
+
+.last-buttons {
+  overflow: hidden;
+  padding-top: 20px;
+}
+
+.last-buttons  .one {
+  float:left
+}
+
+.last-buttons  .two {
+  float:right
+}
+
+/* End login  */
+
+/*////////////////////////////////////////////////////////////////// [ FONT ]*/
+
+@font-face {
+  font-family: Poppins-Regular;
+  src: url('../fonts/poppins/Poppins-Regular.ttf'); 
+}
+
+@font-face {
+  font-family: Poppins-Medium;
+  src: url('../fonts/poppins/Poppins-Medium.ttf'); 
+}
+
+@font-face {
+  font-family: Poppins-Bold;
+  src: url('../fonts/poppins/Poppins-Bold.ttf'); 
+}
+
+@font-face {
+  font-family: Poppins-SemiBold;
+  src: url('../fonts/poppins/Poppins-SemiBold.ttf'); 
+
+}

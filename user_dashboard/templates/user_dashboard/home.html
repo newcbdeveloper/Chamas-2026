@@ -1,0 +1,634 @@
+{% extends 'user_dashboard/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>Dashboard - ChamaSpace</title>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Header -->
+    <div class="welcome-header mb-4 px-3 px-md-0 pt-3 pt-md-0">
+    <div class="welcome-title-with-badge">
+        <h1 class="welcome-title mb-0">{{ greeting }}, {{ profile.owner.first_name|default:"Friend" }}!</h1>
+        {% if profile.owner.kyc_profile.is_verified %}
+        <span class="verified-badge verified-badge-lg" title="Verified Account">
+            <i class="fas fa-check"></i>
+        </span>
+        {% endif %}
+    </div>
+    
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div class="d-flex align-items-center gap-2 text-muted">
+            <i class="far fa-clock"></i>
+            <small title="{{ last_login_exact }}">Last login: {{ last_login_display }}</small>
+        </div>
+        
+        {% if profile.owner.kyc_profile.is_verified %}
+        <div class="verified-indicator">
+            <i class="fas fa-shield-check"></i>
+            <span>Verified Account</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+    <!-- 1. Live Wallet Card -->
+    <div class="wallet-card-wrapper mb-4">
+        <div class="wallet-card">
+            <div class="wallet-card-overlay"></div>
+            <div class="wallet-content position-relative z-1">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="wallet-label"><i class="fas fa-wallet me-2"></i> Main Wallet Balance</span>
+                    <button class="btn btn-icon-light"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+
+                <h2 class="wallet-balance mb-1">{{ wallet_currency }} {{ wallet_balance|floatformat:2|intcomma }}</h2>
+                <p class="wallet-recent mb-4">
+                    <i class="fas fa-history me-1"></i>
+                    {% if latest_transaction %}
+                    Latest: {{ latest_transaction.get_transaction_type_display }} of {{ wallet_currency }} {{latest_transaction.amount|floatformat:2|intcomma }}
+                    {% else %}
+                    No recent transactions
+                    {% endif %}
+                </p>
+
+                <div class="wallet-actions row g-3">
+                    <div class="col-6">
+                        <a href="{% url 'wallet:deposit_mpesa' %}" class="btn btn-light w-100 fw-bold py-2">
+                            <i class="fas fa-plus me-2 text-dark"></i> Top Up
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'wallet:wallet_dashboard' %}" class="btn btn-glass w-100 fw-bold py-2">
+                            <i class="fas fa-wallet me-2"></i> View Wallet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Quick Actions Strip -->
+    <div class="mb-5">
+        <h5 class="section-label px-3 px-md-0 mb-3">Quick Actions</h5>
+        <div class="quick-actions-strip">
+            <!-- MGR Contribution -->
+            {% if next_contribution %}
+            <a href="{% url 'merry_go_round:round_detail' next_contribution.membership.round.id %}"
+                class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-red position-relative">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">
+                        URGENT
+                    </span>
+                </div>
+                <span class="d-block mt-2 text-center small fw-bold">Pay Contribution</span>
+                <span class="d-block text-center text-muted" style="font-size: 0.65rem;">
+                    Due {{ next_contribution.due_date|timeuntil }}
+                </span>
+            </a>
+            {% else %}
+            <a href="{% url 'merry_go_round:dashboard' %}" class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-blue">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span class="d-block mt-2 text-center small">Add Contribution</span>
+            </a>
+            {% endif %}
+
+            <!-- Goals Deposit -->
+            {% if active_goals_count > 0 %}
+            <a href="{% url 'goals:wekeza_dashboard' %}" class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-emerald">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <span class="d-block mt-2 text-center small">Deposit to Goal</span>
+                <span class="d-block text-center text-muted" style="font-size: 0.65rem;">
+                    {{ active_goals_count }} Active
+                </span>
+            </a>
+            {% else %}
+            <a href="{% url 'goals:create_personal_goals' %}" class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-emerald position-relative">
+                    <i class="fas fa-plus-circle"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
+                        style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">
+                        NEW
+                    </span>
+                </div>
+                <span class="d-block mt-2 text-center small">Create Goal</span>
+            </a>
+            {% endif %}
+
+            <!-- Express Saving -->
+            <a href="{% url 'goals:express_saving_dashboard' %}"
+                class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-amber">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span class="d-block mt-2 text-center small">Express Saving</span>
+                <span class="d-block text-center text-muted" style="font-size: 0.65rem;">12% Interest</span>
+            </a>
+
+            <!-- Join Round -->
+            <a href="{% url 'merry_go_round:join_round' %}" class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-purple">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="d-block mt-2 text-center small">Join Round</span>
+            </a>
+
+            <!-- Withdraw Money -->
+            {% if wallet_balance > 100 %}
+            <a href="{% url 'wallet:withdraw_mpesa' %}" class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-rose">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <span class="d-block mt-2 text-center small">Withdraw</span>
+                <span class="d-block text-center text-muted" style="font-size: 0.65rem;">
+                    KES {{ wallet_balance|floatformat:0|intcomma }}
+                </span>
+            </a>
+            {% else %}
+            <a href="{% url 'wallet:deposit_mpesa' %}" class="quick-action-item text-decoration-none text-dark">
+                <div class="action-icon action-blue">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <span class="d-block mt-2 text-center small">Top Up Wallet</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    
+    <!-- 3. PRIORITY: Pending Invitations (Always at Top) -->
+    {% if pending_invitations %}
+    <div class="mb-4 px-3 px-md-0">
+        <h6 class="text-uppercase fw-bold mb-3" style="color: #f59e0b; font-size: 0.85rem; letter-spacing: 0.5px;">
+            <i class="far fa-envelope me-2"></i> Pending Invitations ({{ pending_invitations.count }})
+        </h6>
+
+        <div class="d-flex flex-column gap-3">
+            {% for invite in pending_invitations %}
+            <div class="pending-invite-card position-relative" id="invite-{{ invite.id }}">
+                <button class="btn-close-invite" onclick="dismissInvite('{{ invite.id }}')" title="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="invite-icon-box">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="mb-1">
+                            <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">{{ invite.round.name }}</h5>
+                            <p class="text-muted small mb-0">from {{invite.inviter.first_name|default:invite.inviter.username }}</p>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 mb-3 text-muted small fw-medium">
+                            <span><i class="fas fa-coins text-warning me-1"></i> KES {{invite.round.contribution_amount|floatformat:0|intcomma }}</span>
+                            <span><i class="fas fa-users text-primary me-1"></i> {{ invite.round.current_members }}/{{invite.round.max_members }}</span>
+                        </div>
+
+                        <a href="{% url 'merry_go_round:review_invitation' invite.token %}"
+                            class="btn btn-warning text-white fw-bold px-4">
+                            <i class="far fa-eye me-2"></i> Review Invitation
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+ 
+<!-- 4. Attention Required (Other Items) -->
+<div class="mb-5 px-3 px-md-0">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-label mb-0">Attention Required</h5>
+        <a href="{% url 'user_dashboard:all_notifications' %}" class="text-decoration-none small fw-bold"
+            style="color: var(--primary);">See All</a>
+    </div>
+
+    <div class="status-feed">
+
+        <!-- Next Contribution Due -->
+        {% if next_contribution %}
+        <div class="feed-item feed-urgent" data-notification-id="contribution_{{ next_contribution.id }}">
+            <div class="feed-indicator"></div>
+            <div class="feed-icon-wrapper text-danger">
+                <i class="fas fa-exclamation-circle fa-lg"></i>
+            </div>
+            <div class="feed-content w-100">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="feed-title mb-0">Contribution Due</h6>
+                    <span class="feed-time">{{ next_contribution.due_date|timeuntil|upper }}</span>
+                </div>
+                <p class="feed-desc mb-2">
+                    <strong>{{ next_contribution.membership.round.name }}</strong> -
+                    KES {{ next_contribution.amount|floatformat:0|intcomma }} due on {{next_contribution.due_date|date:"M d, Y" }}
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'merry_go_round:round_detail' next_contribution.membership.round.id %}"
+                        class="btn btn-sm btn-danger px-3 fw-bold">
+                        Pay Now
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary px-3 fw-bold"
+                        onclick="dismissNotification('contribution_{{ next_contribution.id }}', this)">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Notifications (Recent 2) -->
+        {% for notif in notifications|slice:":2" %}
+        <div class="feed-item feed-success" data-notification-id="notif_{{ notif.id }}">
+            <div class="feed-indicator"></div>
+            <div class="feed-icon-wrapper text-success">
+                <i class="fas fa-check-circle fa-lg"></i>
+            </div>
+            <div class="feed-content w-100">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="feed-title mb-0">{{ notif.notification_title }}</h6>
+                    <span class="feed-time">{{ notif.created_at|timesince|upper }} AGO</span>
+                </div>
+                <p class="feed-desc mb-2">{{ notif.notification_body|truncatewords:15|safe }}</p>
+                <button class="btn btn-sm btn-outline-success px-3 fw-bold bg-white"
+                    onclick="dismissNotification('notif_{{ notif.id }}', this)">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Empty State -->
+        {% if not next_contribution and not notifications %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-check-circle fa-3x mb-3 opacity-50"></i>
+            <p class="mb-0">All caught up! No urgent items.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+    <!-- 5. Financial Tools -->
+    <div class="px-3 px-md-0 mb-5">
+        <h5 class="section-label mb-3">Your Financial Tools</h5>
+        <div class="row g-3">
+            <!-- Goals -->
+            <div class="col-md-4 col-12">
+                <a href="{% url 'goals:wekeza_dashboard' %}" class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon icon-wekeza">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        {% if active_goals_count > 0 %}
+                        <div class="red-dot visible"></div>
+                        {% endif %}
+                    </div>
+                    <div class="tool-body">
+                        <h5 class="tool-title">Goals</h5>
+                        <p class="tool-subtitle">Save towards a goal</p>
+                        <div class="tool-footer">
+                            {% if active_goals_count > 0 %}
+                            <span class="tool-status text-primary fw-bold">
+                                {{ active_goals_count }} GOAL{{ active_goals_count|pluralize }} ACTIVE • KES {{total_saved_goals|floatformat:0|intcomma }}
+                            </span>
+                            {% else %}
+                            <span class="tool-status text-muted fw-bold">NO ACTIVE GOALS</span>
+                            {% endif %}
+                            <i class="fas fa-chevron-right text-muted small"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Merry-Go-Round -->
+            <div class="col-md-4 col-12">
+                <a href="{% url 'merry_go_round:dashboard' %}" class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon icon-merry">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        {% if next_contribution %}
+                        <div class="red-dot visible"></div>
+                        {% endif %}
+                    </div>
+                    <div class="tool-body">
+                        <h5 class="tool-title">Merry-Go-Round</h5>
+                        <p class="tool-subtitle">Group savings</p>
+                        <div class="tool-footer">
+                            {% if next_contribution %}
+                            <span class="tool-status text-danger fw-bold">
+                                CONTRIBUTION DUE {{ next_contribution.due_date|timeuntil|upper }}
+                            </span>
+                            {% else %}
+                            <span class="tool-status text-muted fw-bold">NO CONTRIBUTION DUE SOON</span>
+                            {% endif %}
+                            <i class="fas fa-chevron-right text-muted small"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Chama Bookkeeping -->
+            <div class="col-md-4 col-12">
+                <a href="/chamas-bookeeping/your-chamas/" class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon icon-chama">
+                            <i class="fas fa-suitcase"></i>
+                        </div>
+                        {% if pending_invitations %}
+                        <div class="red-dot visible"></div>
+                        {% endif %}
+                    </div>
+                    <div class="tool-body">
+                        <h5 class="tool-title">Chama Bookkeeping</h5>
+                        <p class="tool-subtitle">Track Chama activities</p>
+                        <div class="tool-footer">
+                            {% if pending_invitations %}
+                            <span class="tool-status text-danger fw-bold">
+                                {{ pending_invitations.count }} PENDING INVITATION{{ pending_invitations.count|pluralize}}
+                            </span>
+                            {% else %}
+                            <span class="tool-status text-muted fw-bold">NO PENDING INVITATIONS</span>
+                            {% endif %}
+                            <i class="fas fa-chevron-right text-muted small"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Expense Tracker -->
+            <div class="col-md-4 col-12">
+                <a href="{% url 'expense_tracker:dashboard' %}" class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon icon-expense">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <h5 class="tool-title">Expense Tracker</h5>
+                        <p class="tool-subtitle">Track spending & income</p>
+                        <div class="tool-footer">
+                            <span class="tool-status text-muted fw-bold">BUDGETING ACTIVE</span>
+                            <i class="fas fa-chevron-right text-muted small"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Kopesha (Soon) -->
+            <div class="col-md-4 col-12">
+                <div class="tool-card coming_soon cursor-pointer">
+                    <div class="tool-header">
+                        <div class="tool-icon icon-kopesha">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                    </div>
+                    <div class="tool-body">
+                        <h5 class="tool-title">Kopesha</h5>
+                        <p class="tool-subtitle">P2P lending</p>
+                        <div class="tool-footer">
+                            <span class="tool-status text-muted fw-bold">SOON</span>
+                            <i class="fas fa-chevron-right text-muted small"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-2">
+                <h5 class="modal-title fw-bold" id="notificationsModalLabel">
+                    <i class="fas fa-bell me-2"></i> Notifications
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                {% if notifications %}
+                {% for item in notifications %}
+                <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-success fa-lg"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="fw-semibold mb-1">{{ item.notification_title }}</p>
+                        <p class="text-muted small mb-1">{{ item.notification_body|safe }}</p>
+                        <small class="text-muted"><i class="far fa-clock"></i> {{ item.created_at|timesince }}
+                            ago</small>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="far fa-bell-slash fa-3x mb-3" style="opacity: 0.3;"></i>
+                    <p class="lead">No notifications yet</p>
+                    <p class="mb-0">Your notifications will appear here</p>
+                </div>
+                {% endif %}
+            </div>
+            {% if notifications %}
+            <div class="modal-footer border-0 justify-content-center pt-0">
+                <a href="{% url 'user_dashboard:all_notifications' %}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-list me-2"></i> View all notifications
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Coming Soon Modal (for Kopesha) -->
+<div id="comingSoonModal" class="modal" style="display: none;">
+    <div class="modal-content"
+        style="background: white; padding: 2rem; border-radius: 12px; max-width: 400px; margin: 10% auto;">
+        <button class="close-btn" aria-label="Close"
+            style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <div class="modal-icon text-center mb-3">
+            <i class="fas fa-clock fa-3x text-muted"></i>
+        </div>
+        <h2 class="text-center mb-2">Coming Soon!</h2>
+        <p class="text-center text-muted">We're busy cooking up something great for this feature. Stay tuned!</p>
+    </div>
+</div>
+
+
+{% block extra_js %}
+<script>
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    // ✅ Enhanced dismiss function that persists to database
+    async function dismissInvite(inviteId) {
+        if (confirm('Are you sure you want to dismiss this invitation? It will not reappear.')) {
+            const inviteCard = document.getElementById('invite-' + inviteId);
+            const notificationId = 'invitation_' + inviteId;
+
+            try {
+                const response = await fetch('{% url "user_dashboard:dismiss_notification" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: `notification_id=${notificationId}`
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Add fade out animation
+                    inviteCard.style.transition = 'opacity 0.3s ease';
+                    inviteCard.style.opacity = '0';
+
+                    setTimeout(() => {
+                        inviteCard.remove();
+
+                        // Check if any invites remain
+                        const remainingInvites = document.querySelectorAll('[id^="invite-"]');
+                        if (remainingInvites.length === 0) {
+                            // Remove the entire pending invites section
+                            const invitesSection = inviteCard.closest('.mb-4');
+                            if (invitesSection) {
+                                invitesSection.style.transition = 'opacity 0.3s ease';
+                                invitesSection.style.opacity = '0';
+                                setTimeout(() => invitesSection.remove(), 300);
+                            }
+                        }
+                    }, 300);
+                } else {
+                    alert('Failed to dismiss invitation: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error dismissing invitation:', error);
+                alert('An error occurred while dismissing the invitation');
+            }
+        }
+    }
+
+    // ✅ Function to dismiss notifications in Attention Required section
+    async function dismissNotification(notificationId, element) {
+        try {
+            const response = await fetch('{% url "user_dashboard:dismiss_notification" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `notification_id=${notificationId}`
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const feedItem = element.closest('.feed-item');
+                if (feedItem) {
+                    feedItem.style.transition = 'opacity 0.3s ease';
+                    feedItem.style.opacity = '0';
+                    setTimeout(() => {
+                        feedItem.remove();
+                        
+                        // Check if attention section is now empty
+                        const statusFeed = document.querySelector('.status-feed');
+                        const remainingItems = statusFeed.querySelectorAll('.feed-item');
+                        
+                        if (remainingItems.length === 0) {
+                            // Show empty state
+                            statusFeed.innerHTML = `
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-check-circle fa-3x mb-3 opacity-50"></i>
+                                    <p class="mb-0">All caught up! No urgent items.</p>
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                }
+            } else {
+                console.error('Failed to dismiss:', data.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Coming Soon Modal
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('comingSoonModal');
+        const closeBtn = modal ? modal.querySelector('.close-btn') : null;
+
+        if (modal && closeBtn) {
+            document.querySelectorAll('.coming_soon').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    modal.style.display = 'block';
+                });
+            });
+
+            closeBtn.addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+        }
+
+        // Add onclick handlers for dismiss buttons in Attention Required section
+        document.querySelectorAll('.btn-outline-success[onclick]').forEach(button => {
+            const originalOnclick = button.getAttribute('onclick');
+            if (originalOnclick && originalOnclick.includes('dismiss')) {
+                button.removeAttribute('onclick');
+                
+                // Extract notification ID from parent elements
+                const feedItem = button.closest('.feed-item');
+                if (feedItem) {
+                    // Try to find notification ID from various sources
+                    let notificationId = feedItem.dataset.notificationId;
+                    
+                    // If no data attribute, try to infer from content
+                    if (!notificationId) {
+                        const notifTitle = feedItem.querySelector('.feed-title');
+                        if (notifTitle) {
+                            const titleText = notifTitle.textContent.trim();
+                            // Create a notification ID based on the title
+                            notificationId = `notif_${titleText.replace(/\s+/g, '_').toLowerCase()}`;
+                        }
+                    }
+                    
+                    if (notificationId) {
+                        button.addEventListener('click', function() {
+                            dismissNotification(notificationId, this);
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 
+{% endblock %}

@@ -1,0 +1,56 @@
+
+
+
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Add Number
+{% endblock %}
+{% block content %}
+    <div class="wrapper">
+
+
+
+      <main role="main" class="main-content">
+        <div class="container-fluid">
+            <section class="wallet-banner">
+                <div class="container">
+                    <nav class="page_nav mob_nav show_on_mobile">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+                            <li class="">
+                                <img src="{% static 'images/Notifications.png' %}" alt="">
+                            </li>
+                            <li class="">
+
+                                <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+
+                                    <img src="{% static 'images/menu.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="c-o-b-e-dwrapper">
+                        <div class="wallet-content">
+                            <h5 class="h-heding">
+                                Request proceed successfully. <br>Please check your mobile phone
+                            </h5>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+      </main>
+    </div>
+
+
+{% endblock %}
+

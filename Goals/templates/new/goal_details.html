@@ -1,0 +1,822 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/personal_goal.css' %}">
+<style>
+    /* ========== CELEBRATION SYSTEM STYLES ========== */
+    .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+    }
+
+    .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        opacity: 0;
+    }
+
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    .confetti-piece.active {
+        animation: confetti-fall 3s ease-in forwards;
+    }
+
+    .milestone-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .milestone-modal-overlay.show {
+        opacity: 1;
+    }
+
+    .milestone-modal {
+        background: white;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+
+    .milestone-modal-overlay.show .milestone-modal {
+        transform: scale(1);
+    }
+
+    .milestone-header {
+        padding: 40px 20px;
+        text-align: center;
+        color: white;
+    }
+
+    .milestone-header.halfway {
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    }
+
+    .milestone-header.complete {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .milestone-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .milestone-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .milestone-message {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    .milestone-body {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .milestone-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    .milestone-btn {
+        background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .milestone-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+    }
+
+    .goal-completed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.8;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper modern-dashboard">
+
+    <!-- ========== CELEBRATION SYSTEM HTML ========== -->
+    <div id="confetti-container" class="confetti-container"></div>
+
+    <div id="milestone-modal" class="milestone-modal-overlay">
+        <div class="milestone-modal">
+            <div id="milestone-header" class="milestone-header">
+                <div id="milestone-icon" class="milestone-icon">🏆</div>
+                <div id="milestone-title" class="milestone-title"></div>
+                <div id="milestone-message" class="milestone-message"></div>
+            </div>
+            <div class="milestone-body">
+                <p id="milestone-subtitle" class="milestone-subtitle"></p>
+                <button class="milestone-btn" onclick="closeMilestoneModal()">
+                    Continue Saving 💪
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- ========== END CELEBRATION HTML ========== -->
+
+    <!-- Disabled Goal Popup -->
+    <div class="modal fade" id="disable_group_popup" tabindex="-1" aria-labelledby="disable_group_popup"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="delete_form_popup">
+                        <h4 class="popup_heading mb-3">
+                            Sorry! This goal is currently disabled for withdrawals.
+                        </h4>
+                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Funds Modal -->
+    <div class="modal fade" id="add_funds" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="add_amount_to_goal">
+                        <h4 class="popup_heading">How much do you want to save?</h4>
+                        <form id="add_amount_form" method="post" class="mt-25">
+                            {% csrf_token %}
+                            <label for="add_money">Add Money</label>
+                            <input type="number" name="add_money" id="add_money" placeholder="Enter Amount" class="mt-1"
+                                required>
+                            <p class="mt-4">This amount will be added to your {{ goal_info.name }}</p>
+                            <button type="submit" class="btn popup_btn">Save</button>
+                        </form>
+                    </div>
+                    <div class="popupTwo" id="add_amount_to_goal_second" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Success!</h4>
+                            <div class="text-center mt-3 mb-3">
+                                <img src="{% static 'images/success.png' %}" alt="">
+                            </div>
+                            <h4 class="popup_heading">You successfully deposited amount to {{ goal_info.name }}.</h4>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    <div class="popupTwo" id="add_amount_to_goal_third" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Sorry!</h4>
+                            <h4 class="popup_heading" style="color: red">Sorry, you have insufficient balance to invest
+                                here.</h4>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Request Modal -->
+    <div class="modal fade" id="withdrawal_request" tabindex="-1" aria-labelledby="withdrawal_request"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="withdrawal_request_firstinner">
+                        <h4 class="popup_heading">How much do you want to withdraw?</h4>
+                        <form class="mt-25" method="post" id="withdrawal_request_form">
+                            {% csrf_token %}
+                            <label for="withdraw_money">Withdraw Money</label>
+                            <input type="text" value="Kshs.{{ Fv_after_tax|floatformat:2 }}" name="withdraw_money"
+                                id="withdraw_money" class="mt-1" readonly>
+                            {% if goal_info.goal_balance|add:goal_info.goal_profit > 0 %}
+                            <p class="mt-4">This amount will be deducted from your {{ goal_info.name }} goal balance.
+                            </p>
+                            <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+                            {% else %}
+                            <br><br>
+                            <p class="btn btn-warning btn-xs">No funds are available</p>
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="popupTwo" id="withdrawal_success_popup" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Success!</h4>
+                            <div class="text-center mt-3 mb-3">
+                                <img src="{% static 'images/success.png' %}" alt="">
+                            </div>
+                            <h4 class="popup_heading">Your payment withdrawal request has been received.</h4>
+                            <p>We are processing the transaction, and you will receive a confirmation once it is
+                                successfully completed.</p>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Denied Modal -->
+    <div class="modal fade" id="withdrawal_request_denied" tabindex="-1" aria-labelledby="withdrawal_request_denied"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="delete_form_popup">
+                        <h4 class="popup_heading mb-3">{{ withdrawal_message }}</h4>
+                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Goal Modal -->
+    <div class="modal fade" id="delete_button" tabindex="-1" aria-labelledby="delete_button" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="delete_form_popup">
+                        <h4 class="popup_heading mb-3" style="color: #dc3545;">
+                            Are you sure you want to delete your Goal: {{ goal_info.name }}?
+                        </h4>
+                        <p class="mb-4">You can only delete this goal because the total saved amount is low/zero.</p>
+                        <form id="delete_form" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn popup_btn mt-4 white_btn"
+                                style="background-color: #dc3545; color: white;">
+                                Delete Goal Permanently
+                            </button>
+                        </form>
+                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <br>
+                    <div class="popupTwo" id="delete_success" style="display: none;">
+                        <div class="popup_box">
+                            <h4 class="popup_heading">Success!</h4>
+                            <div class="text-center mt-3 mb-3">
+                                <img src="{% static 'images/success.png' %}" alt="">
+                            </div>
+                            <h4 class="popup_heading">Selected goal removed.</h4>
+                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Goal Modal -->
+    <div class="modal fade" id="edit_goal" tabindex="-1" aria-labelledby="edit_goal" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 600px;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="popup_box" id="edit_goal_popup">
+                        <form id="edit_goal_form" method="post" action="{% url 'goals:edit_goal' %}" class="mt-25">
+                            {% csrf_token %}
+                            <label for="goal_title">Goal Title</label>
+                            <input type="hidden" name="goal_id" value="{{ goal_info.id }}">
+                            <input type="text" name="goal_title" id="goal_title" value="{{ goal_info.name }}"
+                                class="mt-1" required>
+                            <br><br>
+                            <button type="submit" class="btn popup_btn">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main role="main" class="main-content p-0">
+
+        <div class="container pt-4 pb-5">
+
+            <!-- UNIFIED HERO CARD -->
+            <div class="unified-hero-card">
+                <!-- Top Section: Navigation & Title -->
+                <div class="hero-header">
+                    <a href="{% url 'goals:wekeza_dashboard' %}" class="back-link">
+                        <i class="fe fe-chevron-left"></i> Back to Goals
+                    </a>
+
+                    <div class="hero-title-row">
+                        <div class="hero-title-content">
+                            <h1 class="goal-title">{{ goal_info.name }}</h1>
+                            <div class="goal-days-left">
+                                <span class="dot-indicator"></span> {{ goal_info.calculate_month_difference }} Days Left
+                            </div>
+                        </div>
+
+                        <!-- Glassy Balance Card -->
+                        <div class="hero-balance-card">
+                            <div class="balance-item">
+                                <div class="balance-label">TOTAL SAVED</div>
+                                <div class="balance-value">Kshs. {{goal_info.goal_balance|add:goal_info.goal_profit|floatformat:2 }}</div>
+                            </div>
+                            <div class="balance-divider"></div>
+                            <div class="balance-item">
+                                <div class="balance-label">INTEREST EARNED</div>
+                                <div class="balance-value positive">+ {{ goal_info.goal_profit|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar Section -->
+                <div class="hero-progress-container mt-4 mb-2">
+                    <div class="d-flex justify-content-between text-white-50 mb-1 small fw-bold">
+                        <span>PROGRESS</span>
+                        <span>{{ goal_info.percentage|floatformat:0 }}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: {{ goal_info.percentage }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Hero Footer: Info Pill -->
+                <div class="hero-footer text-center text-md-start">
+                    <div class="info-pill">
+                        <i class="fe fe-info"></i>
+                        <span>{{ interest_rate }}% interest per year
+                                {% if goal_info.goal_amount and goal_info.goal_amount > 0 %}<br>
+                                Target: Kshs. {{ goal_info.goal_amount|floatformat:2 }}
+                                {% else %}
+                                No target amount (flexible savings)
+                                {% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS GRID -->
+            <div class="action-buttons-grid">
+                <!-- Add Funds -->
+                {% if goal_info.is_active == 'Yes' %}
+                <a href="#" class="action-btn-card" data-bs-toggle="modal" data-bs-target="#add_funds">
+                    {% else %}
+                    <a href="#" class="action-btn-card" data-bs-toggle="modal" data-bs-target="#disable_group_popup">
+                        {% endif %}
+                        <div class="icon-wrapper icon-teal">
+                            <i class="fe fe-plus"></i>
+                        </div>
+                        <span class="action-text">Add Funds</span>
+                    </a>
+
+                    <!-- Withdraw -->
+                    {% if can_withdraw == 'Yes' %}
+                    <a href="#" class="action-btn-card" data-bs-toggle="modal" data-bs-target="#withdrawal_request">
+                        {% else %}
+                        <a href="#" class="action-btn-card" data-bs-toggle="modal"
+                            data-bs-target="#withdrawal_request_denied">
+                            {% endif %}
+                            <div class="icon-wrapper icon-green">
+                                <i class="fe fe-arrow-up-right"></i>
+                            </div>
+                            <span class="action-text">Withdraw</span>
+                        </a>
+
+                        <!-- Edit Goal -->
+                        <a href="#" class="action-btn-card" data-bs-toggle="modal" data-bs-target="#edit_goal">
+                            <div class="icon-wrapper icon-blue">
+                                <i class="fe fe-edit-2"></i>
+                            </div>
+                            <span class="action-text">Edit Goal</span>
+                        </a>
+
+                        <!-- Statement -->
+                        <a href="{% url 'goals:personal_goal_statement' goal_info.id %}" download
+                            class="action-btn-card">
+                            <div class="icon-wrapper icon-purple">
+                                <i class="fe fe-file-text"></i>
+                            </div>
+                            <span class="action-text">Statement</span>
+                        </a>
+            </div>
+
+            <!-- Recent Transactions Header -->
+            <div class="section-header-modern mt-5 mb-3">
+                <h3>Recent Transactions</h3>
+                {% if all_deposits %}
+                <span class="active-badge">{{ all_deposits|length }} Records</span>
+                {% endif %}
+            </div>
+
+            <!-- Transactions List -->
+            <div class="transactions-list">
+                {% for item in all_deposits %}
+                <div class="transaction-item">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="transaction-icon bg-teal-light text-teal">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Deposit</div>
+                                <small class="text-muted">{{ item.deposit_date|date:"d M Y, g:i A" }}</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-teal">+ Kshs. {{ item.amount|floatformat:2 }}</div>
+                            <small class="text-muted">Interest: Kshs. {{ item.calculate_future_value|floatformat:2}}</small>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state text-center py-5">
+                    <div class="empty-state-icon">📊</div>
+                    <h4>No transactions yet</h4>
+                    <p>Start saving today and watch your money grow!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Delete Button (Existing Logic) -->
+            <div class="row justify-content-center mb-4 mt-5">
+                <div class="col-12 text-center">
+                    {% if goal_info.goal_balance|add:goal_info.goal_profit > 1 %}
+                    <button type="button" class="btn btn-link text-muted text-decoration-none" disabled>
+                        Active Goals cannot be deleted
+                    </button>
+                    {% else %}
+                    <a href="#" class="btn btn-link text-danger text-decoration-none" data-bs-toggle="modal"
+                        data-bs-target="#delete_button">
+                        Delete Goal
+                    </a>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'goals:wekeza_dashboard' %}" class="btn btn-sm btn-outline-secondary">Back to
+                            All Goals</a>
+                    </div>
+                </div>
+            </div>
+
+            <b>{% include '_messages.html' %}</b>
+
+        </div>
+    </main>
+
+    <footer class="mbl_footer">
+        <div class="container">
+            <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                    <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                    <p>Home</p>
+                </a>
+                <a href="#" class="footer_button btn">
+                    <img src="{% static 'images/filter_active.png' %}" alt="">
+                    <p>Features</p>
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                    <p>Wallet</p>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                    <img src="{% static 'images/setting.png' %}" alt="">
+                    <p>Settings</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Donut animation -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const donuts = document.querySelectorAll('.donut-chart');
+        donuts.forEach(donut => {
+            const progress = parseFloat(donut.style.getPropertyValue('--progress')) || 0;
+            donut.style.setProperty('--progress', '0%');
+            setTimeout(() => {
+                donut.style.setProperty('--progress', progress + '%');
+            }, 100);
+        });
+    });
+</script>
+
+<!-- Load jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<!-- jQuery Scripts -->
+<script>
+    // ADD FUNDS FORM
+    $('#add_amount_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Add funds form submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:add_funds_to_goal' goal_info.id %}",
+            data: {
+                add_money: $('#add_money').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+            success: function (response) {
+                if (response.success === '1') {
+                    console.log("Success:", response.success);
+                    $('#add_amount_to_goal').hide();
+                    $('#add_amount_to_goal_second').show();
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    $('#add_amount_to_goal').hide();
+                    $('#add_amount_to_goal_third').show();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Add funds error:", error);
+                alert("Connection error. Please try again.");
+            }
+        });
+    });
+
+    // WITHDRAWAL FORM
+    $('#withdrawal_request_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Withdrawal form submitted');
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:withdraw_money_personal_goal' %}",
+            data: {
+                goal_id: {{ goal_info.id }},
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+            },
+        success: function (response) {
+            if (response.success === '1') {
+                console.log("Success:", response.success);
+                $('#withdrawal_request_firstinner').hide();
+                $('#withdrawal_success_popup').show();
+                setTimeout(function () {
+                    window.location.reload();
+                }, 3000);
+            } else {
+                alert(response.message || "Withdrawal failed");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Withdrawal error:", error);
+            alert("Connection error. Please try again.");
+        }
+        });
+    });
+
+    // DELETE FORM
+    $('#delete_form').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Delete form submitted');
+
+        if (!confirm("Are you sure you want to delete this goal? This action cannot be undone.")) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:delete_goal' %}",
+            data: {
+                goal_id: {{ goal_info.id }},
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+            },
+        success: function (response) {
+            if (response.success === '1') {
+                console.log("Success:", response.success);
+                $('#delete_form_popup').hide();
+                $('#delete_success').show();
+                setTimeout(function () {
+                    window.location.href = "{% url 'goals:wekeza_dashboard' %}";
+                }, 2000);
+            } else {
+                alert("Failed to delete goal");
+                window.location.href = "{% url 'goals:wekeza_dashboard' %}";
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Delete error:", error);
+            alert("Connection error. Please try again.");
+        }
+        });
+    });
+</script>
+
+<!-- ========== CELEBRATION SYSTEM JAVASCRIPT ========== -->
+<script>
+// Confetti Animation
+function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    if (!container) return;
+    
+    const colors = ['#0d9488', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+    const confettiCount = 50;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.5;
+        const duration = 2 + Math.random() * 2;
+        
+        confetti.style.left = left + '%';
+        confetti.style.backgroundColor = color;
+        confetti.style.animationDelay = delay + 's';
+        confetti.style.animationDuration = duration + 's';
+        
+        container.appendChild(confetti);
+        
+        setTimeout(() => {
+            confetti.classList.add('active');
+        }, 10);
+        
+        setTimeout(() => {
+            confetti.remove();
+        }, (duration + delay) * 1000);
+    }
+}
+
+function triggerConfetti() {
+    createConfetti();
+    setTimeout(createConfetti, 500);
+    setTimeout(createConfetti, 1000);
+}
+
+function showMilestoneModal(type, data) {
+    const modal = document.getElementById('milestone-modal');
+    const header = document.getElementById('milestone-header');
+    const icon = document.getElementById('milestone-icon');
+    const title = document.getElementById('milestone-title');
+    const message = document.getElementById('milestone-message');
+    const subtitle = document.getElementById('milestone-subtitle');
+    
+    if (!modal) return;
+    
+    if (type === 'halfway') {
+        header.className = 'milestone-header halfway';
+        icon.textContent = '🎉';
+        title.textContent = 'Halfway There!';
+        message.textContent = "You're doing amazing! You've reached 50% of your goal.";
+        subtitle.textContent = "Consistency is the key to success. Keep up the great work!";
+    } else if (type === 'seventy-five') {  // ✅ NEW: Add specific handler for 75%
+        header.className = 'milestone-header halfway';
+        icon.textContent = '🌟';
+        title.textContent = '75% Complete!';
+        message.textContent = "You're almost there! Just a little more to go!";
+        subtitle.textContent = "The finish line is in sight. Keep pushing forward!";
+    } else if (type === 'complete') {
+        header.className = 'milestone-header complete';
+        icon.textContent = '🏆';
+        title.textContent = 'Goal Achieved!';
+        message.textContent = "Congratulations! You've reached your target!";
+        subtitle.textContent = "Your dedication has paid off. You can withdraw anytime!";
+    }
+    
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+    
+    setTimeout(triggerConfetti, 300);
+}
+
+function closeMilestoneModal() {
+    const modal = document.getElementById('milestone-modal');
+    if (!modal) return;
+    
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Goal Completion Detection
+document.addEventListener('DOMContentLoaded', function() {
+    const goalCompleted = {{ goal_info.percentage }} >= 100;
+    const hasTargetAmount = {% if goal_info.goal_amount %}true{% else %}false{% endif %};
+    
+    // Show confetti for completed goals with target amount
+    if (goalCompleted && hasTargetAmount) {
+        setTimeout(triggerConfetti, 500);
+        
+        const header = document.querySelector('.user-greeting h1');
+        if (header && !header.querySelector('.goal-completed-badge')) {
+            const badge = document.createElement('span');
+            badge.className = 'goal-completed-badge';
+            badge.innerHTML = '✓ Goal Achieved!';
+            badge.style.marginLeft = '15px';
+            badge.style.fontSize = '14px';
+            header.appendChild(badge);
+        }
+    }
+    
+    // Show 50% milestone
+    {% if show_50_milestone %}
+    setTimeout(() => {
+        showMilestoneModal('halfway', {});
+    }, 1000);
+    {% endif %}
+    
+    // Show 75% milestone
+    {% if show_75_milestone %}
+    setTimeout(() => {
+        showMilestoneModal('seventy-five', {});
+    }, 1000);
+    {% endif %}
+    
+    // Close modal on overlay click
+    const modal = document.getElementById('milestone-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeMilestoneModal();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

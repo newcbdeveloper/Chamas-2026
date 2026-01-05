@@ -1,0 +1,449 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}My Rounds{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Improved header layout for mobile with responsive flex direction -->
+    <div class="col-12 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-md-items-center gap-3">
+            <div>
+                <h2><i class="fas fa-layer-group"></i> My Rounds</h2>
+                <p class="text-muted">Manage your active, pending, and completed savings rounds</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'merry_go_round:join_round' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-search"></i> Join Round
+                </a>
+                <a href="{% url 'merry_go_round:create_round' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Create Round
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary cards now fully responsive with proper column sizing -->
+<div class="row mb-4">
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2 small">Active Rounds</h6>
+                        <h3 class="mb-0">{{ active_rounds|length }}</h3>
+                    </div>
+                    <div class="icon-box bg-success bg-opacity-10 text-success">
+                        <i class="fas fa-circle-notch fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2 small">Pending Rounds</h6>
+                        <h3 class="mb-0">{{ pending_rounds|length }}</h3>
+                    </div>
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                        <i class="fas fa-clock fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2 small">Completed Rounds</h6>
+                        <h3 class="mb-0">{{ completed_rounds|length }}</h3>
+                    </div>
+                    <div class="icon-box bg-info bg-opacity-10 text-info">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2 small">Total Invested</h6>
+                        <h3 class="mb-0 small">KES {{ invested|floatformat:0 }}</h3>
+                    </div>
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="fas fa-coins fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Rounds -->
+{% if active_rounds %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-circle-notch text-success"></i> Active Rounds
+                    <span class="badge bg-success ms-2">{{ active_rounds|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Responsive grid: 1 col mobile, 2 col tablet, 3 col desktop -->
+                <div class="row">
+                    {% for membership in active_rounds %}
+                    <div class="col-12 col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 border round-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <a href="{% url 'merry_go_round:round_detail' membership.round.id %}" 
+                                           class="text-decoration-none">
+                                            {{ membership.round.name|truncatewords:5 }}
+                                        </a>
+                                    </h5>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted small">
+                                            <i class="fas fa-coins"></i> Contribution
+                                        </span>
+                                        <strong>KES {{ membership.round.contribution_amount|floatformat:0 }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted small">
+                                            <i class="fas fa-calendar"></i> Frequency
+                                        </span>
+                                        <strong>{{ membership.round.get_frequency_display }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted small">
+                                            <i class="fas fa-users"></i> Members
+                                        </span>
+                                        <strong>{{ membership.round.current_members }}/{{ membership.round.max_members }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-light border mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">You've contributed</small>
+                                        <strong class="text-success">KES {{ membership.total_contributed|floatformat:2 }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">Interest earned</small>
+                                        <strong class="text-warning">KES {{ membership.interest_earned|floatformat:2 }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Contribution Progress</small>
+                                        <small class="text-muted">{{ membership.get_contribution_percentage|floatformat:0 }}%</small>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" 
+                                             style="width: {{ membership.get_contribution_percentage }}%;"></div>
+                                    </div>
+                                </div>
+
+                                <a href="{% url 'merry_go_round:round_detail' membership.round.id %}" 
+                                   class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                            <div class="card-footer bg-light border-0">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> Ends on {{ membership.round.end_date }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Pending Rounds -->
+{% if pending_rounds %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock text-warning"></i> Pending Rounds
+                    <span class="badge bg-warning text-dark ms-2">{{ pending_rounds|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for membership in pending_rounds %}
+                    <div class="list-group-item border-0 px-0 py-3">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-2">
+                                    <a href="{% url 'merry_go_round:round_detail' membership.round.id %}" 
+                                       class="text-decoration-none">
+                                        {{ membership.round.name }}
+                                    </a>
+                                </h6>
+                                <div class="d-flex flex-wrap gap-3 mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users"></i> 
+                                        {{ membership.round.current_members }}/{{ membership.round.max_members }} members
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-coins"></i> 
+                                        KES {{ membership.round.contribution_amount|floatformat:0 }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> 
+                                        {{ membership.round.get_frequency_display }}
+                                    </small>
+                                </div>
+                                <p class="mb-0 small text-muted">
+                                    <i class="fas fa-lock"></i> 
+                                    KES {{ membership.locked_amount|floatformat:2 }} locked in your wallet
+                                </p>
+                            </div>
+                            <div class="text-end ms-md-3">
+                                {% if membership.round.status == 'open' %}
+                                    <span class="badge bg-info mb-2">Open for Joining</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark mb-2">Draft</span>
+                                {% endif %}
+                                <br>
+                                <a href="{% url 'merry_go_round:round_detail' membership.round.id %}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Completed Rounds -->
+{% if completed_rounds %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-check-circle text-info"></i> Completed Rounds
+                    <span class="badge bg-info ms-2">{{ completed_rounds|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 small">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Round Name</th>
+                                <th class="d-none d-md-table-cell">Duration</th>
+                                <th>Contributed</th>
+                                <th class="d-none d-lg-table-cell">Interest</th>
+                                <th class="d-none d-xl-table-cell">Payout</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for membership in completed_rounds %}
+                            <tr id="round-row-{{ membership.round.id }}">
+                                <td>
+                                    <strong>{{ membership.round.name|truncatewords:5 }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ membership.round.get_payout_model_display }}</small>
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    <small>
+                                        {{ membership.round.start_date }}<br>
+                                        to {{ membership.round.end_date }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong>KES {{ membership.total_contributed|floatformat:2 }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ membership.contributions_made }} pmts</small>
+                                </td>
+                                <td class="d-none d-lg-table-cell">
+                                    <strong class="text-success">KES {{ membership.interest_earned|floatformat:2 }}</strong>
+                                </td>
+                                <td class="d-none d-xl-table-cell">
+                                    {% if membership.has_received_payout %}
+                                        <strong class="text-primary">KES {{ membership.payout_amount|floatformat:2 }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ membership.payout_received_date }}</small>
+                                    {% else %}
+                                        <span class="text-muted">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'merry_go_round:round_detail' membership.round.id %}" 
+                                           class="btn btn-sm btn-outline-secondary"
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger delete-completed-round-btn"
+                                                data-round-id="{{ membership.round.id }}"
+                                                data-round-name="{{ membership.round.name }}"
+                                                title="Hide from list">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Empty State -->
+{% if not active_rounds and not pending_rounds and not completed_rounds %}
+<div class="row">
+    <div class="col-12">
+        <div class="empty-state">
+            <i class="fas fa-circle-notch fa-4x text-muted mb-4"></i>
+            <h4>No Rounds Yet</h4>
+            <p class="text-muted mb-4">You haven't joined or created any savings rounds yet.</p>
+            <div>
+                <a href="{% url 'merry_go_round:join_round' %}" class="btn btn-primary me-2">
+                    <i class="fas fa-search"></i> Browse Rounds
+                </a>
+                <a href="{% url 'merry_go_round:create_round' %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Create Your First Round
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .round-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+    
+    .round-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+<!-- FIXED: JavaScript moved to proper block -->
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Handle completed round deletion
+    $('.delete-completed-round-btn').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const roundId = $(this).data('round-id');
+        const roundName = $(this).data('round-name');
+        const $button = $(this);
+        
+        if (confirm(`Remove "${roundName}" from your completed rounds?\n\nThis will hide it from your list, but the round data will remain in the system for records.`)) {
+            // Disable button during request
+            $button.prop('disabled', true);
+            
+            $.ajax({
+                url: `/merry-go-round/round/${roundId}/delete-completed/`,
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Remove the row with animation
+                        $(`#round-row-${roundId}`).fadeOut(300, function() {
+                            $(this).remove();
+                            
+                            // Check if table is now empty
+                            const remainingRows = $('.table tbody tr').length;
+                            if (remainingRows === 0) {
+                                // Reload to show empty state
+                                window.location.reload();
+                            }
+                        });
+                        
+                        // Show success message (if you have a toast function)
+                        if (typeof MGR !== 'undefined' && MGR.showToast) {
+                            MGR.showToast('Round removed from your list', 'success');
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    $button.prop('disabled', false);
+                    const error = xhr.responseJSON?.error || 'Failed to remove round';
+                    alert(error);
+                }
+            });
+        }
+    });
+});
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

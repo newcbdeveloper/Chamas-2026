@@ -1,0 +1,344 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <extend name="author" content="">
+
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="{% static 'css/simplebar.css' %}">
+    
+    <!-- Fonts CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Icons CSS -->
+    <link rel="stylesheet" href="{% static 'css/feather.css' %}">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Additional CSS -->
+    <link rel="stylesheet" href="{% static 'css/select2.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
+    <link rel="stylesheet" href="{% static 'css/uppy.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery.steps.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery.timepicker.css' %}">
+    <link rel="stylesheet" href="{% static 'css/quill.snow.css' %}">
+    <link rel="stylesheet" href="{% static 'css/daterangepicker.css' %}">
+    
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{% static 'css/app-light.css' %}" id="lightTheme">
+    <link rel="stylesheet" href="{% static 'css/app-dark.css' %}" id="darkTheme" disabled>
+    <link rel="stylesheet" href="{% static 'css/swiper.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style-test.css' %}">
+    <link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+    <link rel="stylesheet" href="{% static 'css/goals.css' %}">
+
+    <!-- Allow child templates to inject extra CSS -->
+    {% block extra_css %}{% endblock %}
+
+    {% block title %}
+    <title>ChamaSpace | User Profile</title>
+    {% endblock %}
+</head>
+
+<body class="vertical light">
+    {% include 'goal_navbar.html' %}
+
+    {% block content %}
+    {% endblock %}
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT - LOAD IN CORRECT ORDER -->
+    <!-- ============================================ -->
+    
+    <!-- 1. jQuery FIRST (Required by many plugins) -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    
+    <!-- 2. Popper.js (Required by Bootstrap) -->
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    
+    <!-- 3. Bootstrap 5 Bundle (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 4. Moment.js (For date handling) -->
+    <script src="{% static 'js/moment.min.js' %}"></script>
+    
+    <!-- 5. Other utility libraries -->
+    <script src="{% static 'js/simplebar.min.js' %}"></script>
+    <script src="{% static 'js/daterangepicker.js' %}"></script>
+    <script src="{% static 'js/jquery.stickOnScroll.js' %}"></script>
+    <script src="{% static 'js/tinycolor-min.js' %}"></script>
+    <script src="{% static 'js/config.js' %}"></script>
+    
+    <!-- 6. D3 and mapping libraries -->
+    <script src="{% static 'js/d3.min.js' %}"></script>
+    <script src="{% static 'js/topojson.min.js' %}"></script>
+    <script src="{% static 'js/datamaps.all.min.js' %}"></script>
+    <script src="{% static 'js/datamaps-zoomto.js' %}"></script>
+    <script src="{% static 'js/datamaps.custom.js' %}"></script>
+    
+    <!-- 7. Chart.js -->
+    <script src="{% static 'js/Chart.min.js' %}"></script>
+    <script>
+        /* Define global Chart.js options */
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
+            Chart.defaults.global.defaultFontColor = colors.mutedColor;
+        }
+    </script>
+    
+    <!-- 8. Other chart libraries -->
+    <script src="{% static 'js/gauge.min.js' %}"></script>
+    <script src="{% static 'js/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static 'js/apexcharts.min.js' %}"></script>
+    <script src="{% static 'js/apexcharts.custom.js' %}"></script>
+    
+    <!-- 9. Form plugins -->
+    <script src="{% static 'js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <script src="{% static 'js/jquery.steps.min.js' %}"></script>
+    <script src="{% static 'js/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'js/jquery.timepicker.js' %}"></script>
+    <script src="{% static 'js/dropzone.min.js' %}"></script>
+    <script src="{% static 'js/uppy.min.js' %}"></script>
+    <script src="{% static 'js/quill.min.js' %}"></script>
+
+    <!-- 10. Initialize plugins -->
+    <script>
+    (function($) {
+        'use strict';
+        
+        $(document).ready(function() {
+            console.log('=== ChamaSpace Goals Base - Initializing ===');
+            console.log('jQuery Version:', $.fn.jquery);
+            console.log('Bootstrap Version:', typeof bootstrap !== 'undefined' ? bootstrap.Modal.VERSION : 'NOT LOADED');
+            
+            // Initialize Select2
+            if ($.fn.select2) {
+                $('.select2').select2({ theme: 'bootstrap4' });
+                $('.select2-multi').select2({ multiple: true, theme: 'bootstrap4' });
+            }
+            
+            // Initialize Date Range Picker
+            if ($.fn.daterangepicker) {
+                $('.drgpicker').daterangepicker({
+                    singleDatePicker: true,
+                    timePicker: false,
+                    showDropdowns: true,
+                    locale: { format: 'MM/DD/YYYY' }
+                });
+                
+                if ($('.datetimes').length) {
+                    $('.datetimes').daterangepicker({
+                        timePicker: true,
+                        startDate: moment().startOf('hour'),
+                        endDate: moment().startOf('hour').add(32, 'hour'),
+                        locale: { format: 'M/DD hh:mm A' }
+                    });
+                }
+                
+                var start = moment().subtract(29, 'days');
+                var end = moment();
+                
+                function cb(start, end) {
+                    $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                }
+                
+                if ($('#reportrange').length) {
+                    $('#reportrange').daterangepicker({
+                        startDate: start,
+                        endDate: end,
+                        ranges: {
+                            'Today': [moment(), moment()],
+                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                            'This Month': [moment().startOf('month'), moment().endOf('month')],
+                            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                        }
+                    }, cb);
+                    cb(start, end);
+                }
+            }
+            
+            // Initialize Timepicker
+            if ($.fn.timepicker) {
+                $('.time-input').timepicker({
+                    'scrollDefault': 'now',
+                    'zindex': '9999'
+                });
+            }
+            
+            // Initialize Input Masks
+            if ($.fn.mask) {
+                $('.input-placeholder').mask("00/00/0000", { placeholder: "__/__/____" });
+                $('.input-zip').mask('00000-000', { placeholder: "____-___" });
+                $('.input-money').mask("#.##0,00", { reverse: true });
+                $('.input-phoneus').mask('(000) 000-0000');
+                $('.input-mixed').mask('AAA 000-S0S');
+                $('.input-ip').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+                    translation: {
+                        'Z': { pattern: /[0-9]/, optional: true }
+                    },
+                    placeholder: "___.___.___.___"
+                });
+            }
+
+            // Initialize Quill Editor
+            var editor = document.getElementById('editor');
+            if (editor && typeof Quill !== 'undefined') {
+                var toolbarOptions = [
+                    [{ 'font': [] }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ];
+                var quill = new Quill(editor, {
+                    modules: { toolbar: toolbarOptions },
+                    theme: 'snow'
+                });
+            }
+
+            // Bootstrap Form Validation
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+            
+            console.log('=== Plugin Initialization Complete ===');
+        });
+        
+    })(jQuery);
+    </script>
+
+    <!-- 11. Uppy File Upload -->
+    <script>
+    (function() {
+        var uptarg = document.getElementById('drag-drop-area');
+        if (uptarg && typeof Uppy !== 'undefined') {
+            var uppy = Uppy.Core().use(Uppy.Dashboard, {
+                inline: true,
+                target: uptarg,
+                proudlyDisplayPoweredByUppy: false,
+                theme: 'dark',
+                width: 770,
+                height: 210,
+                plugins: ['Webcam']
+            }).use(Uppy.Tus, {
+                endpoint: 'https://master.tus.io/files/'
+            });
+            uppy.on('complete', (result) => {
+                console.log('Upload complete! We've uploaded these files:', result.successful);
+            });
+        }
+    })();
+    </script>
+
+    <!-- 12. App-specific JS -->
+    <script src="{% static 'js/apps.js' %}"></script>
+    
+    <!-- 13. Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-56159088-1');
+    </script>
+
+    <!-- 14. Swiper JS -->
+    <script src="{% static 'js/swiper.min.js' %}"></script>
+    <script>
+    (function() {
+        if (typeof Swiper !== 'undefined') {
+            var swiper = new Swiper('.swiper-container', {
+                touchEventsTarget: 'container',
+                pagination: { el: ".swiper-pagination" },
+                navigation: { nextEl: null, prevEl: null }
+            });
+        }
+    })();
+    </script>
+    
+    <!-- 15. Global Error Handler -->
+    <script>
+    (function($) {
+        'use strict';
+        
+        // Global AJAX error handler
+        $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+            console.error('AJAX Error:', {
+                url: settings.url,
+                status: jqxhr.status,
+                error: thrownError,
+                response: jqxhr.responseText
+            });
+        });
+        
+        // Ensure Bootstrap modals are properly initialized
+        $(document).ready(function() {
+            // Fix for modal backdrop issues
+            $('.modal').on('show.bs.modal', function() {
+                console.log('Modal opening:', $(this).attr('id'));
+            });
+            
+            $('.modal').on('hidden.bs.modal', function() {
+                console.log('Modal closed:', $(this).attr('id'));
+                // Remove any leftover backdrops
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            });
+        });
+        
+    })(jQuery);
+    </script>
+    
+    <!-- 16. Allow child templates to inject extra JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+</body>
+
+<footer class="mbl_footer">
+            <div class="container">
+                <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Wallet</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+</html>

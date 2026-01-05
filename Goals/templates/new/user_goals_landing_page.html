@@ -1,0 +1,2630 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+
+<title>Homepage</title>
+<style rel="stylesheet">
+    /* full‐screen overlay */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* when visible */
+.modal.show {
+  display: flex;
+}
+
+/* white box */
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* the close “×” */
+.close-btn {
+  position: absolute;
+  top: 0.5rem; right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* optional icon styling */
+.modal-icon img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+/* Improve chazem_row for 4 items */
+.chazem_row {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: space-around; /* Better spacing than 'between' for even distribution */
+    align-items: center;
+    gap: 1rem; /* Add consistent spacing between items */
+}
+
+/* Style each column/item */
+.chazem_col {
+    flex: 1 1 20%; /* Grow/shrink flexibly, base width ~25% for 4 items */
+    min-width: 100px; /* Prevent squeezing too small on mobile */
+    max-width: 25%; /* Cap width for larger screens */
+    text-align: center; /* Center content inside each col */
+    padding: 0rem; /* Add padding for breathing room */
+}
+
+/* Icon circle adjustments */
+.accunt_round {
+    width: 60px; /* Reduce size slightly for better fit on mobile */
+    height: 60px;
+    margin: 0 auto 0.5rem; /* Center and space below */
+    border-radius: 50%; /* Ensure it's circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Text adjustments */
+.account_content {
+    font-size: 0.9rem; /* Slightly smaller text for mobile */
+}
+
+/* Media query for mobile (screens < 768px wide, like your image) */
+@media (max-width: 768px) {
+    .chazem_col {
+        flex: 1 1 45%; /* 2 items per row on small screens */
+        max-width: 50%;
+    }
+    
+    .accunt_round {
+        width: 50px; /* Even smaller icons on mobile */
+        height: 50px;
+    }
+    
+    .chazem_row {
+        justify-content: space-between; /* Fallback for better mobile spacing */
+    }
+}
+
+/* Optional: If you want to switch to CSS Grid (more robust for grids) */
+.chazem_row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Auto-fit columns, min 100px each */
+    gap: 1rem;
+    justify-items: center;
+    align-items: center;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="modal fade modal-notif modal-slide notefi-model" tabindex="-1" role="dialog"
+     aria-labelledby="defaultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group list-group-flush my-n3">
+                    {% for item in user_notifications %}
+                    <div class="list-group-item bg-transparent">
+                        <div class="row align-items-center">
+                            <br>
+                            <br>
+
+                            <div class="col">
+                                <small><strong>{{ item.notification_body|safe }}</strong></small>
+
+                                <small class="badge badge-pill badge-light text-muted"> {{ item.created_at }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal8" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box" id="firstInnerHowmuch">
+                    <h4 class="popup_heading">
+                        How much do you want to <br>save?
+                    </h4>
+
+                    <form action="" class="mt-25">
+                        <label for="add_money">
+                            Add Money
+                        </label>
+                        <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1">
+                    </form>
+                    <p class="mt-4">This money will be added to your express savings Goal</p>
+                    <button class="btn popup_btn" onclick="toggleHowmuch()">
+                        Save
+                    </button>
+                </div>
+                <div class="popupTwo" id="secondInnerHowmuch">
+
+                    <div class="popup_box">
+                        <h4 class="popup_heading">
+                            Success!
+
+                        </h4>
+
+
+                        <div class="text-center mt-3 mb-3">
+                            <img src="images/success.png" alt="">
+                        </div>
+                        <h4 class="popup_heading">
+
+                            Kshs. XXX.00
+                        </h4>
+                        <p>Has been deducted from your Group Goal [Name] and transfered to your account.</p>
+
+                        <button class="btn popup_btn"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="exampleModal7" tabindex="-1" aria-labelledby="exampleModal7Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading mb-3">
+                        What do you want to do with your Goal of Buying a New?
+                    </h4>
+
+
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Delete Goal
+                    </button>
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Close
+                    </button>
+                    <button class="btn popup_btn mt-4" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!--buy a new  New House pop up models end-->
+<!--with draw model -->
+<div class="modal fade" id="exampleModal8" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading">
+                        Congratulations!
+                    </h4>
+                    <p>
+                        You Achieved your Goal!
+                    </p>
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+                    <h4 class="popup_heading">
+                        You got your New House
+                    </h4>
+                    <h4 class="popup_heading text_shadows">
+                        Kshs. 1,500,000.00
+                    </h4>
+                    <button class="btn popup_btn mt-3"
+                            data-bs-dismiss=" modal">
+                        Withdraw Cash
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="goal_created_success" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box" id="goal_created_success_popup">
+                    <h4 class="popup_heading">
+                        Congratulations!
+                    </h4>
+                    <p>
+                        Goal Created successfully.
+                    </p>
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!-- add fonts pop up-->
+<div class="modal fade" id="exampleModal9" tabindex="-1" aria-labelledby="exampleModal9Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading">
+                        Buying a New House
+                    </h4>
+                    <h4 class="popup_heading mb-0 mt-3">
+                        Your weekly target!
+                    </h4>
+                    <h4 class="popup_heading text_shadows text-dark">
+                        Kshs. 15,000.00
+                    </h4>
+
+                    <form action="" class="mt-25">
+                        <label for="add_money">
+                            Add Money
+                        </label>
+                        <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1">
+                    </form>
+                    <p class="mt-4">This money will be added to your express savings</p>
+                    <button class="btn popup_btn">
+                        Add Funds
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!--+++++++++++++++++++++++bu a new car pages pop ups start-->
+<!--buy a new car pop up models start-->
+<!-- Modal -->
+<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModal1Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading mb-3">
+                        What do you want to do with your Goal of Buying a New?
+                    </h4>
+
+
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Delete Goal
+                    </button>
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Close
+                    </button>
+                    <button class="btn popup_btn mt-4" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!--buy a new car pop up models end-->
+<!--with draw model -->
+<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModal3Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading">
+                        Congratulations!
+                    </h4>
+                    <p>
+                        You Achieved your Goal!
+                    </p>
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+                    <h4 class="popup_heading">
+                        You got your New Car
+                    </h4>
+                    <h4 class="popup_heading text_shadows">
+                        Kshs. 1,500,000.00
+                    </h4>
+                    <button class="btn popup_btn mt-3"
+                            data-bs-dismiss="modal">
+                        Withdraw Cash
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!-- add fonts pop up-->
+<div class="modal fade" id="exampleModal6" tabindex="-1" aria-labelledby="exampleModal6Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading">
+                        Buying a New Car
+                    </h4>
+                    <h4 class="popup_heading mb-0 mt-3">
+                        Your weekly target!
+                    </h4>
+                    <h4 class="popup_heading text_shadows text-dark">
+                        Kshs. 15,000.00
+                    </h4>
+
+                    <form action="" class="mt-25">
+                        <label for="add_money">
+                            Add Money
+                        </label>
+                        <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1">
+                    </form>
+                    <p class="mt-4">This money will be added to your express savings</p>
+                    <button class="btn popup_btn">
+                        Add Funds
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!--grup saving pop us is start from here-->
+<!-- Modal -->
+<div class="modal fade" id="exampleModalOne" tabindex="-1" aria-labelledby="exampleModalOneLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box popupOne">
+                    <h4 class="popup_heading mb-3">
+                        What do you want to do with your Group Goal [Group Name]?
+                    </h4>
+
+
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Edit Goal
+                    </button>
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Get Goal Statement
+                    </button>
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Exit Goal
+                    </button>
+                    <button class="btn popup_btn mt-4 white_btn">
+                        Delete Goal
+                    </button>
+                    <button class="btn popup_btn mt-4" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="exampleModalThree" tabindex="-1" aria-labelledby="exampleModalThreeLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="popup_box" id="firstInnerDiv">
+                        <h4 class="popup_heading">
+                            Withdraw from
+                            [Group Name]
+                        </h4>
+                        <P>This will affect your Group saving timelines. Make sure your members are aware of this
+                            action.</P>
+
+                        <form action="" class="mt-25">
+                            <label for="add_money">
+                                Add Money
+                            </label>
+                            <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1 bg-pre">
+                        </form>
+                        <p class="mt-4">
+                            This money will be deducted from your Group Goal Savings.
+                        </p>
+                        <button class="btn popup_btn" onclick="toggleVisibility()">
+                            Withdraw Funds
+                        </button>
+                    </div>
+                    <div class="popupTwo" id="secondInnerDiv">
+
+                        <div class="popup_box">
+                            <h4 class="popup_heading">
+                                Success!
+
+                            </h4>
+
+
+                            <div class="text-center mt-3 mb-3">
+                                <img src="images/success.png" alt="">
+                            </div>
+                            <h4 class="popup_heading">
+
+                                Kshs. XXX.00
+                            </h4>
+                            <p>Has been deducted from your Group Goal [Name] and transfered to your account.</p>
+
+                            <button class="btn popup_btn" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade " id="exampleModalInactive" tabindex="-1" aria-labelledby="exampleModalInactive"
+     aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box">
+                    <h4 class="popup_heading">
+                        Congratulations!
+                    </h4>
+                    <p>
+                        You Achieved your Goal!
+                    </p>
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+                    <h4 class="popup_heading">
+                        You got your New Car
+                    </h4>
+                    <h4 class="popup_heading text_shadows">
+                        Kshs. 1,500,000.00
+                    </h4>
+                    <button class="btn popup_btn mt-3"
+                    "
+                    data-bs-dismiss=" modal">
+                    Withdraw Cash
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="exampleModalSix" tabindex="-1" aria-labelledby="exampleModalSixLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box" id="firstInnerFund">
+                    <h4 class="popup_heading">
+                        Saving for [Group Name]
+                    </h4>
+                    <h4 class="popup_heading mb-0 mt-3">
+                        Your Group target!
+                    </h4>
+                    <h4 class="popup_heading text_shadows text-dark">
+                        Kshs. 300,000.00
+                    </h4>
+
+                    <form action="" class="mt-25">
+                        <label for="add_money">
+                            Add Money
+                        </label>
+                        <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1 bg-pre">
+                    </form>
+                    <p class="mt-4">
+                        This money will be added to your Group Goal Savings
+                    </p>
+                    <button class="btn popup_btn" onclick="toggleFund()">
+                        Add Funds
+                    </button>
+                </div>
+                <div class="popup_box popupTwo" id="secondInnerFund">
+                    <h4 class="popup_heading">
+                        Success!
+
+                    </h4>
+
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+                    <h4 class="popup_heading">
+
+                        Kshs. [Entered Amount]
+                    </h4>
+                    <p>Has been added to your Group Goal [Name]</p>
+
+                    <button class="btn popup_btn" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="exampleModalMemb" tabindex="-1" aria-labelledby="exampleModalMembLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box" id="firstInnerInvato">
+                    <h4 class="popup_heading">
+                        Add a Member to Group Goal [Name] saving plan.
+                    </h4>
+
+                    <p class="mt-4">
+                        The member will receive an invitation to join this saving plan.
+                        The individual can accept or reject.
+                        Make sure that the individual is aware that you have invited them to this group saving goal.
+                    </p>
+
+                    <form action="" class="mt-25">
+
+                        <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1 bg-pre">
+                    </form>
+
+                    <button class="btn popup_btn mt-4 invite_color" onclick="toggleInvato()">
+                        Invite
+                    </button>
+                </div>
+                <div class="popup_box popupTwo" id="secondInnerInvato">
+                    <h4 class="popup_heading">
+                        Success!
+
+                    </h4>
+
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+                    <p>Invitation Sent to</p>
+                    <h4 class="popup_heading">
+
+                        Solomon Ndirangu
+                        0716642790
+                    </h4>
+                    <button class="btn popup_btn mb-3">
+                        Add another Member
+                    </button>
+                    <button class="btn popup_btn" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!--+++++++++++++++++++++++bu a new car pages pop ups end-->
+<!--page off canvas is start from here-->
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5>
+            <a href="#">
+                <img src="{% static 'images/offcanvas_logo.png' %}" alt="">
+            </a>
+        </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body position-relative">
+        <ul class="offcanvas_list">
+            <li class="list-item">
+                <a href="#">
+                    <img src="{% static 'images/icon_house.png' %}" alt="">
+                    Dashboard
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="/chamas-bookeeping/chamas/">
+                    <img src="{% static 'images/icon_people.png' %}" alt="">
+                    Chamaz
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight2"
+                   aria-controls="offcanvasRight2">
+                    <img src="{% static 'images/file-earmark.png' %}" alt="">
+                    Wekeza Goals
+
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="#">
+                    <img src="{% static 'images/icon_box.png' %}" alt="">
+                    Kopesha Peers
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="#">
+                    <img src="{% static 'images/icon_wallet.png' %}" alt="">
+                    My Account
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="#">
+                    <img src="{% static 'images/icon_chat.png' %}" alt="">
+                    Activities
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="#">
+                    <img src="{% static 'images/icon_bell_.png' %}" alt="">
+                    Notifications
+                </a>
+            </li>
+            <li class="list-item">
+                <a href="#">
+                    <img src="{% static 'images/icon_gear.png ' %}" alt="">
+                    Settings
+                </a>
+            </li>
+        </ul>
+        <a href="#" class="btn log_out_btn abst_button">
+            Log Out
+        </a>
+    </div>
+</div>
+<!--off canvas end-->
+<!--wakeza off can-->
+<!--wakeza popup-->
+<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="popup_box">
+            <h4 class="popup_heading">
+                How much do you want to <br>save?
+            </h4>
+
+            <form action="" class="mt-25">
+                <label for="add_money">
+                    Add Money
+                </label>
+                <input type="text" name="add_money" placeholder="Enter Amount" class="mt-1">
+            </form>
+            <p class="mt-4">This money will be added to your express savings</p>
+            <button class="btn popup_btn">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+<!--wakeza off can-->
+
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight2" aria-labelledby="offcanvasRight2Label">
+
+
+    <div class="offcanvas-body position-relative full_page">
+        <div class="weknz_header">
+            <div class="container">
+                <nav class="page_nav mob_nav">
+                    <div class="brand">
+                        <a href="#">
+                            <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                        </a>
+                    </div>
+                    <ul class="nav-list">
+
+                        <li class="">
+
+
+                            <button type="button" class="btn btn-wek" data-bs-dismiss="offcanvas"
+                                    aria-label="Close">
+                                <img src="{% static 'images/left_arrow.png' %}" alt="">
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <section class="banner wekenz-banner">
+            <div class="container">
+
+                <div class="wenze_goals_row d-flex align-items-center justify-content-between">
+                    <div class="goals_box">
+                        <div class="goals-cob">
+                                <span>
+                                    {{ progressing_goals|length }}
+                                </span>
+                        </div>
+                        <h3>
+                            Personal Goals
+                        </h3>
+                    </div>
+                    <div class="goals_box">
+                        <div class="goals-cob">
+                                <span>
+                                    {{ group_progressing_goals|length }}
+                                </span>
+                        </div>
+                        <h3>
+                            Group Goals
+                        </h3>
+                    </div>
+                    <div class="goals_box">
+                        <div class="goals-cob">
+                                <span>
+                                    {{total_complete}}
+
+
+                                </span>
+                        </div>
+                        <h3>
+                            Achieved Goals
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="creat_goals mb-5 pb-5">
+            <div class="container">
+                <div class="creat_g_content">
+                    <h3 class="heading">
+                        Create a Goal
+
+                    </h3>
+                    <p class="sub_heading">
+                        Start Saving Now
+                    </p>
+                </div>
+                <div class="d-flex flex-row align-items-center justify-content-between">
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                    >
+                        <a href="{% url 'express_saving_dashboard' %}">
+                            <div class="person_round d-flex align-items-center justify-content-center">
+                                <img src="{% static 'images/flash.png' %}" alt="">
+                            </div>
+                            <h4 class="pesno_plus_h">Express Saving</h4>
+                        </a>
+                    </div>
+
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight11"
+                         aria-controls="offcanvasRight11">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/person-plus.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Personal Goals</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight3"
+                         aria-controls="offcanvasRight3">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/people-fill.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Group Goals</h4>
+                    </div>
+
+                </div>
+                <div class="savings_row">
+
+
+                    <h3 class="Goals_heading fw_600 pt-3">
+                        Express Saving
+                    </h3>
+
+                    <a href="{% url 'express_saving_dashboard' %}">
+                        <div class="new_car_goals cursot-pointer" style="background-color: #EFE7E7">
+                            <h5> My Express Saving Wallet</h5>
+                            <h4>
+                                Kshs. {{ my_wallet.goal_balance }}
+                            </h4>
+
+
+                        </div>
+                    </a>
+
+                    <hr>
+
+
+                    <h3 class="Goals_heading fw_600 pt-3">
+                        Personal Goals
+                    </h3>
+                    <h4 class="Goals_heading fw_600 pt-3">Active Personal Goals</h4>
+                    {% for item in progressing_goals %}
+                    <a href="{% url 'goal_details' item.id %}">
+                        <div class="new_car_goals cursot-pointer" style="background-color: #EFE7E7">
+                            <h5> {{ item.name }}</h5>
+                            <h4>
+                                Kshs. {{ item.goal_amount }}
+                            </h4>
+                            <p>
+                                {{ item.calculate_month_difference }} Days left
+                            </p>
+                            <p class="mb-0">{{ item.percentage }}%</p>
+                            <div class="goal_progress">
+                                <div class="inner" style="width: {{ item.percentage }}%;">
+                                </div>
+                            </div>
+                            <div class="bar_content">
+                                <p>
+                                    Kshs.
+
+
+                                    {{ item.goal_balance|add:item.goal_profit }}
+                                </p>
+                                <p>Kshs. {{ item.goal_amount|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    <h4 class="Goals_heading fw_600 pt-3">Inactive Personal Goals</h4>
+                    {% for item in complete_goals %}
+                    <a href="{% url 'goal_details' item.id %}">
+                        <div class="new_car_goals cursot-pointer" style="background-color: #EFE7E7">
+                            <h5> {{ item.name }}</h5>
+                            <h4>
+                                Kshs. {{ item.goal_amount }}
+                            </h4>
+                            <p>
+                                {{ item.calculate_month_difference }} Days left
+                            </p>
+                            <p class="mb-0">{{ item.percentage }}%</p>
+                            <div class="goal_progress">
+                                <div class="inner" style="width: {{ item.percentage }}%;">
+                                </div>
+                            </div>
+                            <div class="bar_content">
+                                <p>
+                                    Kshs.
+
+
+                                    {{ item.goal_balance|add:item.goal_profit }}
+                                </p>
+                                <p>Kshs. {{ item.goal_amount|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    <hr>
+
+                    <h3 class="Goals_heading fw_600 pt-3 ">
+                        Group Goals
+                    </h3>
+                    <h4 class="Goals_heading fw_600 pt-3">Active Group Goals</h4>
+                    {% for item in group_progressing_goals %}
+                    <a href="{% url 'group_goal_details' item.id %}">
+                        <div class="new_car_goals cursot-pointer" data-bs-toggle="offcanvas"
+                             style="background-color: #EFE7E7"
+                        >
+                            <h5> {{ item.goal_name }}</h5>
+                            <h4>
+                                Kshs. {{ item.target_amount }}
+                            </h4>
+                            <p>
+                                {{ item.calculate_month_difference }} Days left
+                            </p>
+                            <p class="mb-0">{{ item.percentage }}%</p>
+                            <div class="goal_progress">
+                                <div class="inner" style="width: {{ item.percentage }}%;">
+                                </div>
+                            </div>
+                            <div class="bar_content">
+                                <p>
+                                    Kshs. {{ item.achieved_amount }}
+                                </p>
+                                <p>Kshs. {{ item.target_amount }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    <hr>
+                    <h4 class="Goals_heading fw_600 pt-3">Inactive Group Goals</h4>
+                    {% for item in group_complete_goals %}
+                    <a href="{% url 'group_goal_details' item.id %}">
+                        <div class="new_car_goals cursot-pointer" data-bs-toggle="offcanvas"
+                             style="background-color: #EFE7E7"
+                        >
+                            <h5> {{ item.goal_name }}</h5>
+                            <h4>
+                                Kshs. {{ item.target_amount }}
+                            </h4>
+                            <p>
+                                {{ item.calculate_month_difference }} Days left
+                            </p>
+                            <p class="mb-0">{{ item.percentage }}%</p>
+                            <div class="goal_progress">
+                                <div class="inner" style="width: {{ item.percentage }}%;">
+                                </div>
+                            </div>
+                            <div class="bar_content">
+                                <p>
+                                    Kshs. {{ item.achieved_amount }}
+                                </p>
+                                <p>Kshs. {{ item.target_amount }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </section>
+
+        <footer class="mbl_footer">
+            <div class="container">
+                <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Wallet</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<!--wakiza off end here-->
+<!-- creat goal header is start from here-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight3" aria-labelledby="offcanvasRight3Label">
+
+    <div class="offcanvas-body full_page">
+        <div class=" weknz_header">
+            <div class="container">
+                <nav class="page_nav mob_nav">
+                    <div class="brand">
+                        <a href="#">
+                            <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                        </a>
+                    </div>
+                    <ul class="nav-list">
+
+                        <li class="">
+
+                            <button class="btn" type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+
+                                <img src="{% static 'images/left_arrow.png' %}" alt="">
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <section class="banner wekenz-banner">
+            <div class="container">
+                <div class="wekenza_content">
+                    <h2 class="wekenz_h">
+                        Create a New <br>Group Goal
+                    </h2>
+                    <p class="sub_heading">
+                        Groups can have a maximum of 15<br> members and minimum of 2 members.</p>
+
+
+                </div>
+
+            </div>
+        </section>
+        <section class="creat_goals mb-5 pb-5">
+            <div class="container">
+
+                <div class="savings_row pb-4">
+
+                    <form id="group_goal_id" method="post">
+                        {% csrf_token %}
+                        <div>
+                            <label for="goal_name" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Group Goal Name:
+                            </label>
+                            <input type="text" name="goal_name" id="goal_name" placeholder="Name your Goal"
+                                   required>
+                        </div>
+                        <div>
+                            <label for="goal_name" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Group Goal Mission:
+                            </label>
+                            <textarea name="goal_mission" id="goal_mission" rows="2" cols="4"
+                                      placeholder="Name your Goal" required></textarea>
+                        </div>
+                        <div>
+                            <label for="neme_your_goals" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Select goal type
+                            </label>
+
+
+                            <select name="saving_type_input" id="saving_type_input" class="text-start">
+                                <option value="Select"> Select goal saving type</option>
+                                <option value="regular" selected> Regular Saving ({{ interest_rate.percent_regular_deposit }} % intrest per anum)
+                                </option>
+                                <option value="fixed"> Fixed Saving ({{ interest_rate.percent_fixed_deposit }} % intrest
+                                    per anum)
+                                </option>
+
+                            </select>
+                        </div>
+                        <div>
+                            <label for="target-amount" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Target Amount
+                            </label>
+                            <input type="number" name="target_amount" id="target_amount" placeholder="Target Amount"
+                                   required>
+                        </div>
+                        <div>
+                            <label for="start_date" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Start Date
+                            </label>
+                            <input type="date" name="start_date" id="start_date_group" placeholder="Start Date"
+                                   required>
+                        </div>
+                        <div>
+                            <label for="end_date" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                End Date
+                            </label>
+                            <input type="date" name="end_date" id="end_date_group" placeholder="End Date" required>
+                        </div>
+                        <br>
+                        <div>
+                            <button type="submit" class="btn saving_btn ">
+                                Set Goal
+                            </button>
+                        </div>
+
+                    </form>
+
+
+                </div>
+            </div>
+        </section>
+        <footer class="mbl_footer">
+            <div class="container">
+                <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="#" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Account</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<!-- creat goal header is End here-->
+<!--new car geals canvas start-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight4" aria-labelledby="offcanvasRight4Label">
+    <div class=" weknz_header">
+        <div class="container">
+            <nav class="page_nav mob_nav">
+                <div class="brand">
+                    <a href="#">
+                        <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                    </a>
+                </div>
+                <ul class="nav-list">
+
+                    <li class="">
+
+                        <button class="btn" type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+
+                            <img src="{% static 'images/left_arrow.png' %}" alt="">
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="offcanvas-body full_page">
+        <section class="banner car_banner">
+            <div class="container">
+                <div class="wekenza_content">
+                    <h2 class="wekenz_h mb-2">
+                        Buying a New Car
+                    </h2>
+                    <p class="sub_heading mb-2">
+                        67 Weeks Left
+                    </p>
+                    <h4 class="wekenza_price mb-2 text_shadows">
+                        Kshs. 940,000.00
+                    </h4>
+                    <p class="sub_heading mt-0">
+                        Remaining
+                    </p>
+                    <div>
+                        <div class="bar_content mt-4">
+                            <p class="mb-0">
+                                Saving
+                            </p>
+                            <p class="mb-0">33%</p>
+                            <p class="mb-0">Goals</p>
+                        </div>
+                        <div class="goal_progress">
+                            <div class="inner" style="width: 60%;">
+                            </div>
+                        </div>
+
+                        <div class="bar_content mt-1">
+                            <p>
+                                Kshs. 560,000.00
+                            </p>
+                            <p>Kshs. 1,500,000.00</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <section class="creat_goals mb-5 pb-5">
+            <div class="container">
+                <div class="d-flex flex-row align-items-center justify-content-between mt-3">
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="modal" data-bs-target="#exampleModal6">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/wallet-money_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Add Funds</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="modal" data-bs-target="#exampleModal3">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/money-send_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Withdraw</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal1">
+                        <div class="person_round d-flex align-items-center justify-content-center cursot-pointer">
+                            <img src="{% static 'images/more_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">More</h4>
+                    </div>
+                </div>
+                <div
+                        class="pt-3 astimate border-top border-bottom d-flex align-items-center justify-content-between">
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Weekly Target
+                        </h5>
+                        <h4>
+                            Kshs. 15,000.00
+                        </h4>
+                    </div>
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Interest Rate
+                        </h5>
+                        <h4>
+                            6.5%
+                        </h4>
+                    </div>
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Earned Interest
+                        </h5>
+                        <h4>
+                            Kshs. 74,250.00
+                        </h4>
+                    </div>
+                </div>
+                <div class="records">
+                    <h4 class="recor_heading mb-0 mt-4">
+                        Records
+                    </h4>
+                    <div
+                            class="record_row d-flex align-items-center justify-content-between border-bottom pb-3 pt-3">
+                        <p class="mb-0">
+                            12 May 2023
+                        </p>
+                        <p class="mb-0">
+                            + Kshs. 27,000.00
+                        </p>
+                    </div>
+                    <div
+                            class="record_row d-flex align-items-center justify-content-between border-bottom pb-3 pt-3">
+                        <p class="mb-0">
+                            12 May 2023
+                        </p>
+                        <p class="mb-0">
+                            + Kshs. 27,000.00
+                        </p>
+                    </div>
+                    <div class="record_row d-flex align-items-center justify-content-between pb-3 pt-3">
+                        <p class="mb-0">
+                            02 May 2023
+                        </p>
+                        <p class="mb-0">
+                            + Kshs. 12,200.00
+                        </p>
+                    </div>
+                    <button class="btn saving_btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight2"
+                            aria-controls="offcanvasRight2">
+                        All Goals
+                    </button>
+                    <button class="btn saving_btn cursot-pointer" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasRight11" aria-controls="offcanvasRight11">
+                        Add a New Goal
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mbl_footer mt-4">
+            <div class="container">
+                 <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="#" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Account</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<!--new car geals End-->
+<!--creat profectional goals canves-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight11" aria-labelledby="offcanvasRight11Label">
+    <div class=" weknz_header">
+        <div class="container">
+            <nav class="page_nav mob_nav">
+                <div class="brand">
+                    <a href="#">
+                        <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                    </a>
+                </div>
+                <ul class="nav-list">
+
+                    <li class="">
+
+                        <button class="btn" type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+
+                            <img src="{% static 'images/left_arrow.png' %}" alt="">
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="offcanvas-body full_page">
+        <section class="banner wekenz-banner">
+            <div class="container">
+                <div class="wekenza_content">
+                    <h2 class="wekenz_h">
+                        Create a New<br> Personal Goal
+                    </h2>
+                    <p class="sub_heading">
+                        What are you saving for?</p>
+
+                </div>
+
+            </div>
+        </section>
+        <section class="creat_goals">
+            <div class="container">
+
+                <div class="savings_row pb-4">
+                    <h4 class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                        Select Goal Type
+                    </h4>
+                    <form class="mt-3" id="personal_goals_created">
+                        {% csrf_token %}
+
+                        <div class="gol_type card_border d-flex align-items-center justify-content-between ps-4 pe-4">
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <label for="regular_saving">
+                                    <div class="dirty_c d-flex align-items-center justify-content-center">
+                                        <img src="{% static 'images/dirty.png' %}" alt="">
+                                    </div>
+                                    <p class="dirty_text">
+                                        {{ interest_rate.percent_regular_deposit }} % Interest
+                                        <br> Regular Saving
+                                    </p>
+                                    <input type="radio" name="saving_input_type" id="regular_saving" value="regular"
+                                           required>
+                                </label>
+                            </div>
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <label for="fixed_saving">
+                                    <div class="dirty_c d-flex align-items-center justify-content-center">
+                                        <img src="{% static 'images/dirty.png' %}" alt="">
+                                    </div>
+                                    <p class="dirty_text">
+                                        {{ interest_rate.percent_fixed_deposit }} % Interest
+                                        <br> Fixed Saving
+                                    </p>
+                                    <input type="radio" name="saving_input_type" id="fixed_saving" value="fixed"
+                                           required>
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <label for="neme_your_goals" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Name Your Goal
+                            </label>
+                            <input type="text" class="text-start" name="goal_title" id="goal_title" required>
+
+
+                        </div>
+                        <div>
+                            <label for="target-amount" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Target Amount
+                            </label>
+                            <input type="number" name="target_amount" id="target-amount" placeholder="Target Amount"
+                                   required>
+                        </div>
+
+                        <div class="check_box d-flex align-items-center">
+                            <input type="checkbox" name="is_saving_or_goal" id="is_saving_or_goal">
+                            <h6 class="check_box_content ms-2 mb-0">
+                                No target. Just want to save
+                            </h6>
+                        </div>
+                        <div>
+                            <label for="start_date" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Start Date
+                            </label>
+                            <input type="date" name="start_date" id="start_date" placeholder="Start Date" required>
+                        </div>
+                        <div>
+                            <label for="end_date" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                End Date
+                            </label>
+                            <input type="date" name="end_date" id="end_date" placeholder="End Date" required>
+                        </div>
+                        <div class="check_box d-flex align-items-center">
+                            <input type="checkbox" name="just_want_to_save" id="just_want_to_save" value="off">
+                            <h6 class="check_box_content ms-2 mb-0">
+                                Just want to save
+                            </h6>
+                        </div>
+
+                        <div class="d-flex flex-row align-items-center justify-content-between gap_40">
+                            <div>
+                                <label for="neme_your_goals" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                    Frequency
+                                </label>
+
+                                <select name="select_payment_frequency" id="select_payment_frequency"
+                                        class="text-start">
+                                    <option value="monthly" selected> Monthly</option>
+                                    <option value="weekly"> Weekly</option>
+                                    <option value="daily"> Daily</option>
+
+
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="amount-to-save" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                    Amount to Save
+                                </label>
+                                <input type="number" name="amount_to_save" id="calculated-amount"
+                                       placeholder="Amount to Save" readonly>
+                            </div>
+
+                        </div>
+                        <div>
+                            <h4 class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                Reminders Frequency
+                            </h4>
+                            <div class="d-flex flex-row align-items-center justify-content-between gap_40">
+
+                                <div>
+                                    <label for="neme_your_goals" class="Goals_heading fw_400 mt-3 mb-1 pb-0 ">
+                                        Frequency
+                                    </label>
+
+                                    <select name="reminder_frequency" id="reminder_frequency" class="text-start">
+                                        <option value="Select"> Select Frequency</option>
+                                        <option value="monthly"> Monthly</option>
+                                        <option value="weekly"> Weekly</option>
+                                        <option value="daily"> Daily</option>
+
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br>
+
+
+                        <div>
+                            <button type="submit" class="btn saving_btn ">
+                                Set Goal
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+</div>
+<div class="modal fade" id="exampleModalcratm" tabindex="-1" aria-labelledby="exampleModalcratmLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="popup_box" id="firstInnercratm">
+                    <h4 class="popup_heading">
+                        Commitment
+                    </h4>
+
+
+                    <p class="mt-4">
+                        I commit to save Ksh. <span class="ksh1">Ksh. 500 weekly</span> for <span class="ksh1" b>100 weeks</span>
+                        towards the goal of <span class="ksh1">
+                        Buying a new Car.
+                       </span class="ksh1">
+
+                    </p>
+                    <button class="btn popup_btn" onclick="togglecratm()">
+                        Start saving
+                    </button>
+                </div>
+                <div class="popup_box popupTwo" id="secondInnercratm">
+                    <h4 class="popup_heading">
+                        Congratulations!
+
+                    </h4>
+                    <h4 class="popup_heading">
+                        A new goal has been created.
+
+                    </h4>
+
+
+                    <div class="text-center mt-3 mb-3">
+                        <img src="{% static 'images/success.png' %}" alt="">
+                    </div>
+
+                    <p>Has been added to your Group Goal [Name]We encourage you not to give up on this new journey
+                        of saving towards this goal.</p>
+                    <h4 class="popup_heading">
+
+                        A reward of 7.5 % p.a interest awaits you at the end of your saving journey.
+                    </h4>
+                    <button class="btn popup_btn" data-bs-dismiss="modal">
+                        Start saving
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!--buy new house off canvas re-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight5" aria-labelledby="offcanvasRight5Label">
+    <div class=" weknz_header">
+        <div class="container">
+            <nav class="page_nav mob_nav">
+                <div class="brand">
+                    <a href="#">
+                        <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                    </a>
+                </div>
+                <ul class="nav-list">
+
+                    <li class="">
+
+                        <button class="btn" type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+
+                            <img src="{% static 'images/left_arrow.png' %}" alt="">
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="offcanvas-body full_page">
+        <section class="banner car_banner house_banner">
+            <div class="container">
+                <div class="wekenza_content">
+                    <h2 class="wekenz_h mb-2">
+                        Buying a New House
+                    </h2>
+                    <p class="sub_heading mb-2">
+                        99 Months Left
+                    </p>
+                    <h4 class="wekenza_price mb-2 text_shadows">
+                        Kshs. 4,950,000.00
+                    </h4>
+                    <p class="sub_heading mt-0">
+                        Remaining
+                    </p>
+                    <div>
+                        <div class="bar_content mt-4">
+                            <p class="mb-0">
+                                Saving
+                            </p>
+                            <p class="mb-0">1%</p>
+                            <p class="mb-0">Goals</p>
+                        </div>
+                        <div class="goal_progress">
+                            <div class="inner" style="width: 3%;">
+                            </div>
+                        </div>
+
+                        <div class="bar_content mt-1">
+                            <p>
+                                Kshs. 560,000.00
+                            </p>
+                            <p>Kshs. 1,500,000.00</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <section class="creat_goals mb-5 pb-5">
+            <div class="container">
+                <div class="d-flex flex-row align-items-center justify-content-between mt-3">
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="modal" data-bs-target="#exampleModal9">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/wallet-money_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Add Funds</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="modal" data-bs-target="#exampleModal8">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/money-send_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Withdraw</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal7">
+                        <div class="person_round d-flex align-items-center justify-content-center cursot-pointer">
+                            <img src="{% static 'images/more_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">More</h4>
+                    </div>
+                </div>
+                <div
+                        class="pt-3 astimate border-top border-bottom d-flex align-items-center justify-content-between">
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Weekly Target
+                        </h5>
+                        <h4>
+                            Kshs. 15,000.00
+                        </h4>
+                    </div>
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Interest Rate
+                        </h5>
+                        <h4>
+                            6.5%
+                        </h4>
+                    </div>
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Earned Interest
+                        </h5>
+                        <h4>
+                            Kshs. 74,250.00
+                        </h4>
+                    </div>
+                </div>
+                <div class="records">
+                    <h4 class="recor_heading mb-0 mt-4">
+                        Records
+                    </h4>
+                    <div
+                            class="record_row d-flex align-items-center justify-content-between border-bottom pb-3 pt-3">
+                        <p class="mb-0">
+                            12 May 2023
+                        </p>
+                        <p class="mb-0">
+                            + Kshs. 27,000.00
+                        </p>
+                    </div>
+
+                    <button class="btn saving_btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight2"
+                            aria-controls="offcanvasRight2">
+                        All Goals
+                    </button>
+                    <button class="btn saving_btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight11"
+                            aria-controls="offcanvasRight11">
+                        Add a New Goal
+                    </button>
+                </div>
+            </div>
+        </section>
+        <footer class="mbl_footer">
+            <div class="container">
+                 <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="#" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Account</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+
+<!--group saving page canvas start from here-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRightGrp" aria-labelledby="offcanvasRightGrpLabel">
+    <div class=" weknz_header">
+        <div class="container">
+            <nav class="page_nav mob_nav">
+                <div class="brand">
+                    <a href="#">
+                        <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                    </a>
+                </div>
+                <ul class="nav-list">
+
+                    <li class="">
+
+                        <button class="btn" type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+
+                            <img src="{% static 'images/left_arrow.png' %}" alt="">
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="offcanvas-body full_page">
+        <section class="banner car_banner house_banner">
+            <div class="container">
+                <div class="wekenza_content">
+                    <h2 class="wekenz_h mb-2">
+                        Group Saving
+                        [Name]
+                    </h2>
+                    <p class="sub_heading mb-2">
+                        6 Months Left
+                    </p>
+                    <h4 class="wekenza_price mb-2 text_shadows">
+                        Kshs. 150,000.00
+                    </h4>
+                    <p class="sub_heading mt-0">
+                        Remaining
+                    </p>
+                    <div>
+                        <div class="bar_content mt-4">
+                            <p class="mb-0">
+                                Saving
+                            </p>
+                            <p class="mb-0">50%</p>
+                            <p class="mb-0">Goals</p>
+                        </div>
+                        <div class="goal_progress">
+                            <div class="inner" style="width: 60%;">
+                            </div>
+                        </div>
+
+                        <div class="bar_content mt-1">
+                            <p>
+                                Kshs. 150,000.00
+                            </p>
+                            <p>
+                                Kshs. 300,000.00
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <section class="creat_goals mb-5 pb-5">
+            <div class="container">
+                <div class="d-flex flex-row align-items-center justify-content-between mt-3">
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="modal" data-bs-target="#exampleModalSix">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/wallet-money_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Add Funds</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         data-bs-toggle="modal" data-bs-target="#exampleModalThree">
+                        <div class="person_round d-flex align-items-center justify-content-center">
+                            <img src="{% static 'images/money-send_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Withdraw</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalMemb">
+                        <div class="person_round d-flex align-items-center justify-content-center cursot-pointer">
+                            <img src="{% static 'images/grp_mrmbors.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">Add Member</h4>
+                    </div>
+                    <div class="d-flex flex-row align-items-center flex-column cursot-pointer"
+                         class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalOne">
+                        <div class="person_round d-flex align-items-center justify-content-center cursot-pointer">
+                            <img src="{% static 'images/more_.png' %}" alt="">
+                        </div>
+                        <h4 class="pesno_plus_h">More</h4>
+                    </div>
+                </div>
+                <div
+                        class="pt-3 astimate border-top border-bottom d-flex align-items-center justify-content-between">
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Weekly Target
+                        </h5>
+                        <h4>
+                            Kshs. 15,000.00
+                        </h4>
+                    </div>
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Interest Rate
+                        </h5>
+                        <h4>
+                            6.5%
+                        </h4>
+                    </div>
+                    <div class="astimate_content text-center">
+                        <h5>
+                            Earned Interest
+                        </h5>
+                        <h4>
+                            Kshs. 74,250.00
+                        </h4>
+                    </div>
+                </div>
+                <!--grp membors -->
+                <div class="grp_membors mt-3 ">
+                    <h4 class="grp-mem_heading mb-2">
+                        Group Members
+                    </h4>
+                    <div class="grp-box">
+                        <div class="d-flex align-items-center justify-content-start">
+                            <div class="image_wraper me-3">
+                                <img src="{% static 'images/solamon.png' %}" alt="">
+                            </div>
+                            <div class="grp-bx-content">
+                                <h6 class="grp-mem_heading text-center">
+                                    Solomon Ndirangu
+                                </h6>
+                                <p class="grp_inner_text">
+                                    0716642790
+                                </p>
+                                <p class="grp_inner_text">
+                                    Admin
+                                </p>
+                                <p class="grp_inner_text">
+                                    Joined 20-06-2023
+                                </p>
+                            </div>
+                        </div>
+                        <div class="astimate_content text-center">
+                            <h5>
+                                Contributions
+                            </h5>
+                            <h4>
+                                Kshs. 4,750.00
+                            </h4>
+
+
+                        </div>
+                    </div>
+                    <div class="grp-box">
+                        <div class="d-flex align-items-center justify-content-start">
+                            <div class="image_wraper me-3">
+
+                            </div>
+                            <div class="grp-bx-content">
+                                <h6 class="grp-mem_heading text-center">
+                                    [Names]
+                                </h6>
+                                <p class="grp_inner_text">
+                                    [Phone Number]
+                                </p>
+                                <p class="grp_inner_text">
+                                    [Role (admin/member)]
+                                </p>
+                                <p class="grp_inner_text">
+                                    [Date joined]
+                                </p>
+                            </div>
+                        </div>
+                        <div class="astimate_content text-center">
+                            <img src="{% static 'images/grp-s.png' %}" alt="">
+                            <h5 class="mt-2">
+                                Contributions
+                            </h5>
+                            <h4>
+                                Kshs. [total]
+                            </h4>
+
+
+                        </div>
+                    </div>
+                    <div class="grp-box">
+                        <div class="d-flex align-items-center justify-content-start">
+                            <div class="image_wraper me-3">
+
+                            </div>
+                            <div class="grp-bx-content">
+                                <h6 class="grp-mem_heading text-center">
+                                    [Names]
+                                </h6>
+                                <p class="grp_inner_text">
+                                    [Phone Number]
+                                </p>
+                                <p class="grp_inner_text">
+                                    [Role (admin/member)]
+                                </p>
+                                <p class="grp_inner_text">
+                                    [Date joined]
+                                </p>
+                            </div>
+                        </div>
+                        <div class="astimate_content text-center">
+                            <img src="{% static 'images/grp-s.png' %}" alt="">
+                            <h5 class="mt-2">
+                                Contributions
+                            </h5>
+                            <h4>
+                                Kshs. [total]
+                            </h4>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="activites">
+                    <h3 class="Goals_heading fw_600 pt-3">
+                        Activites
+                    </h3>
+                    <div class="border-bottom mb-3 pb-3">
+                        <p class="Goals_heading fw_400 pt-3 mb-0">
+                            Membor one had join the grup goals
+                        </p>
+                        <div class="ans-ddr d-flex justify-content-between align-items-center">
+                            <p class="Goals_heading fw_400 mb-0 text_invite">
+                                sunday 21 june 2023
+                            </p>
+                            <p class="Goals_heading fw_400 mb-0 text_invite">
+                                10.08 am
+                            </p>
+
+
+                        </div>
+                    </div>
+                    <div class="border-bottom mb-3 pb-3">
+                        <p class="Goals_heading fw_400 pt-3 mb-0">
+                            Membor one had join the grup goals
+                        </p>
+                        <div class="ans-ddr d-flex justify-content-between align-items-center">
+                            <p class="Goals_heading fw_400 mb-0 text_invite">
+                                sunday 21 june 2023
+                            </p>
+                            <p class="Goals_heading fw_400 mb-0 text_invite">
+                                10.08 am
+                            </p>
+                        </div>
+                    </div>
+                    <div class="border-bottom mb-3 pb-3">
+                        <p class="Goals_heading fw_400 pt-3 mb-0">
+                            Membor one had join the grup goals
+                        </p>
+                        <div class="ans-ddr d-flex justify-content-between align-items-center">
+                            <p class="Goals_heading fw_400 mb-0 text_invite">
+                                sunday 21 june 2023
+                            </p>
+                            <p class="Goals_heading fw_400 mb-0 text_invite">
+                                10.08 am
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn saving_btn " data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight2"
+                        aria-controls="offcanvasRight2">
+                    All Goals
+                </button>
+                <button class="btn saving_btn"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasRight11" aria-controls="offcanvasRight11">
+                    Add a New Goal
+                </button>
+            </div>
+        </section>
+        <footer class="mbl_footer">
+            <div class="container">
+                 <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="#" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Account</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<!--real page is start fro here-->
+<div class="wrapper">
+
+
+    <main role="main" class="main-content p-0">
+        <div class="page_header pt-3">
+            <div class="container">
+                <nav class="page_nav mob_nav show_on_mobile">
+                    <div class="brand">
+                        <a href="#">
+                            <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                        </a>
+                    </div>
+                    <ul class="nav-list">
+                        <li class="" data-toggle="modal" data-target=".modal-notif">
+                            <img src="{% static 'images/Notifications.png' %}" alt="">
+                        </li>
+                        &nbsp;&nbsp;
+                        <li class="">
+
+                            <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+                
+                                <img src="{% static 'images/menu.png' %}" class="avatar-img rounded-circle" alt="">
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="company_box d-flex flex-row justify-content-start align-items-center pt-0 mt-0">
+                    <div class="company_image">
+                        <span class="avatar avatar-sm mt-2">
+                            {% if user_profile.picture %}
+                            <img src="{{ user_profile.picture.url }}" class="avatar-img rounded-circle" alt="">
+                            {% else %}
+
+                                <img src="{% static 'assets/avatars/face-1.png' %}" class="avatar-img rounded-circle"
+                                     alt="">
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="company_content" id="greeting-container">
+                        <h6>
+                            <b>{{ user_profile.owner.first_name }} &nbsp; {{ user_profile.owner.last_name }}</b>
+                        </h6>
+                    </div>
+                </div>
+
+                <!--circule slider-->
+                <div class="circle_slider">
+
+                    <div class="swiper-container">
+                        <div class="swiper-slide">
+                            <div class="account_balnce">
+                                <h4>
+                                    Main Wallet Balance
+                                </h4>
+                                <p>
+                                    <span>KES</span>
+                                    {% if main_wallet %}
+                                        {{ main_wallet.available_balance|floatformat:2 }}
+                                    {% else %}
+                                        {{ user_wallet.available_for_withdraw|floatformat:2 }}
+                                    {% endif %}
+                                </p>
+
+                                <a href="{% url 'wallet:wallet_dashboard' %}" class="btn you_button">
+                                    View Wallet
+                                </a>
+                            </div>
+                        </div>
+
+                        </div>
+
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </div>
+        <section class="chazem_section">
+    <div class="container">
+        <div class="chazem_row d-flex flex-row justify-content-between align-items-center">
+            <div class="chazem_col">
+                <a href="/chamas-bookeeping/chamas/" class="accunt_round">
+                    <img src="{% static 'images/account_balance.png' %}" alt="">
+                </a>
+                <div class="account_content">
+                    <a href="/chamas-bookeeping/chamas/">
+                        <h5>Chamaz</h5>
+                        <p>Invest in Chamas</p>
+                    </a>
+                </div>
+            </div>
+            <div class="chazem_col">
+                <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight2" aria-controls="offcanvasRight2" class="accunt_round">
+                    <img src="{% static 'images/wakiza.png' %}" alt="">
+                </a>
+                <div class="account_content">
+                    <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight2" aria-controls="offcanvasRight2">
+                        <h5>Wekeza Goals</h5>
+                        <p>Save towards a Goal</p>
+                    </a>
+                </div>
+            </div>
+            <div class="chazem_col coming_soon">
+                <div class="accunt_round">
+                    <img src="{% static 'images/kopesha.png' %}" alt="">
+                </div>
+                <div class="account_content">
+                    <h5>Kopesha</h5>
+                    <p>Peer to peer</p>
+                </div>
+            </div>
+            <!-- NEW: Expense Tracker -->
+            <div class="chazem_col">
+                <a href="{% url 'expense_tracker:dashboard' %}" class="accunt_round">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="" style="filter: brightness(0) invert(1);">
+                </a>
+                <div class="account_content">
+                    <a href="{% url 'expense_tracker:dashboard' %}">
+                        <h5>Expense Tracker</h5>
+                        <p>Track your spending and Income</p>
+                    </a>
+                </div>
+            </div>
+            <!-- NEW: Merry-Go-Round -->
+            <div class="chazem_col">
+                <a href="{% url 'merry_go_round:dashboard' %}" class="accunt_round">
+                    <img src="{% static 'images/circle_notch.png' %}" alt="" style="filter: brightness(0) invert(1);">
+                </a>
+                <div class="account_content">
+                    <a href="{% url 'merry_go_round:dashboard' %}">
+                        <h5>Merry-Go-Round</h5>
+                        <p>Group Savings Circles</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <section class="tabs_section">
+            <div class="container">
+                <div class="tabs_section">
+                    <nav>
+                        <div class="nav nav-tabs trans_section_tabs new-nack" id="nav-tab" role="tablist">
+                            NOTIFICATIONS
+                        </div>
+                    </nav>
+                </div>
+                <div class="tab-content" id="nav-tabContent">
+
+                    <div class="tab-pane fade show active" id="nav-profile" role="tabpanel"
+                         aria-labelledby="nav-profile-tab">
+                        <div class="tab_content">
+                            <h5 class="tab_heading">
+                                Today
+                            </h5>
+                            {% for item in user_notifications %}
+                            <p class="tab-text">
+                                {{ item.notification_body|safe }} <br> {{ item.created_at }}
+                            </p>
+                            <hr>
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        <footer class="mbl_footer">
+            <div class="container">
+                <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="#" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Account</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- .container-fluid -->
+        <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog"
+             aria-labelledby="defaultModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <br>
+
+                    <div class="modal-body">
+                        <div class="list-group list-group-flush my-n3">
+                            {% for item in user_notifications %}
+                            <div class="list-group-item bg-transparent">
+                                <div class="row align-items-center">
+                                    <br>
+                                    <br>
+                                    <div class="col">
+                                        <small><strong>{{ item.notification_title }}
+                                        </strong></small>
+                                        <div class="my-0 text-muted small">{{ item.notification_body|safe }}
+                                        </div>
+                                        <small class="badge badge-pill badge-light text-muted">{{ item.created_at
+                                            }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear
+                            All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- put this just before </body> -->
+<div id="comingSoonModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" aria-label="Close">&times;</button>
+
+    <!-- inline SVG clock icon -->
+    <div class="modal-icon">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="64" height="64"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#333"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h2>Coming Soon!</h2>
+    <p>We’re busy cooking up something great for this feature. Stay tuned!</p>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+
+
+<!-- .wrapper -->
+<script>
+    // Get references to the checkbox and the end_date field
+    const justWantToSaveCheckbox = document.getElementById("just_want_to_save");
+    const issavingorgoal = document.getElementById("is_saving_or_goal");
+    const endDateField = document.getElementById("end_date");
+    const target_amount = document.getElementById("target-amount");
+
+
+    const amountToSaveField = document.getElementById("calculated-amount");
+
+    // Add an event listener to the checkbox
+    justWantToSaveCheckbox.addEventListener("change", function () {
+        // If the checkbox is checked, disable the end_date field; otherwise, enable it
+        endDateField.disabled = this.checked;
+
+        // Clear the end_date field's value if disabling
+        if (this.checked) {
+            endDateField.value = "";
+            amountToSaveField.removeAttribute("readonly");
+        } else {
+            amountToSaveField.setAttribute("readonly", "");
+        }
+    });
+    issavingorgoal.addEventListener("change", function () {
+        // If the checkbox is checked, disable the end_date field; otherwise, enable it
+        target_amount.disabled = this.checked;
+
+        // Clear the end_date field's value if disabling
+        if (this.checked) {
+            target_amount.value = "";
+            amountToSaveField.removeAttribute("readonly");
+        } else {
+            amountToSaveField.setAttribute("readonly", "");
+        }
+    });
+</script>
+
+
+<script>
+    // Function to calculate the difference in months between two dates
+    function monthsDifference(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const months = (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth();
+
+        return months;
+    }
+
+    function weeksDifference(startDate, endDate) {
+        const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const differenceInMilliseconds = Math.abs(end - start);
+        const weeks = Math.floor(differenceInMilliseconds / (7 * oneDayInMilliseconds));
+
+        return weeks;
+    }
+
+    function daysDifference(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const oneDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+        const diffInMilliseconds = Math.abs(end - start);
+
+        const diffInDays = Math.round(diffInMilliseconds / oneDay);
+
+        return diffInDays;
+    }
+
+
+    // Function to calculate the monthly amount
+    function calculateMonthlyAmount() {
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+        const payment_frequency = document.getElementById("select_payment_frequency").value;
+        const targetAmount = parseFloat(document.getElementById("target-amount").value);
+        console.log('Target Amount:', targetAmount)
+        console.log('payment_frequency:', payment_frequency)
+        console.log('start and end date:', startDate, endDate)
+        if (payment_frequency === 'monthly') {
+            const months = monthsDifference(startDate, endDate);
+
+
+            if (months > 0) {
+                const calculatedAmount = Math.ceil(targetAmount / months);
+                console.log('Line no 2297', calculatedAmount)
+                document.getElementById("calculated-amount").value = calculatedAmount.toFixed(2);
+            } else {
+                document.getElementById("calculated-amount").value = "";
+            }
+
+        }
+        if (payment_frequency === 'weekly') {
+            const weeks = weeksDifference(startDate, endDate);
+
+            if (weeks > 0) {
+                const calculatedAmount = Math.ceil(targetAmount / weeks);
+                console.log('Line no 2437', calculatedAmount)
+                document.getElementById("calculated-amount").value = calculatedAmount.toFixed(2);
+            } else {
+                document.getElementById("calculated-amount").value = "";
+            }
+
+        }
+        if (payment_frequency === 'daily') {
+            const days = daysDifference(startDate, endDate);
+
+            if (days > 0) {
+                const calculatedAmount = Math.ceil(targetAmount / days);
+                console.log('Line no 2437', calculatedAmount)
+                document.getElementById("calculated-amount").value = calculatedAmount.toFixed(2);
+            } else {
+                document.getElementById("calculated-amount").value = "";
+            }
+
+        }
+
+
+    }
+
+    // Attach the calculateMonthlyAmount function to the change event of start_date, end_date, and target-amount fields
+    document.getElementById("start_date").addEventListener("change", calculateMonthlyAmount);
+    document.getElementById("end_date").addEventListener("change", calculateMonthlyAmount);
+    document.getElementById("select_payment_frequency").addEventListener("change", calculateMonthlyAmount);
+    document.getElementById("target-amount").addEventListener("input", calculateMonthlyAmount);
+</script>
+
+
+<script>
+    $('#personal_goals_created').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Personal Goals created ajax fun calling')
+
+        // Get the value of the selected radio button
+        var savingInputType = $('input[name="saving_input_type"]:checked').val();
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'create_personal_goals' %}",
+            data: {
+                saving_input_type: savingInputType,  // Use the selected value
+                goal_title: $('#goal_title').val(),
+                target_amount: $('#target-amount').val(),
+                amount_to_save: $('#calculated-amount').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+                just_want_to_save: $('#just_want_to_save').is(':checked') ? 'on' : 'off', // Check if checkbox is checked
+                reminder_frequency: $('#reminder_frequency').val(),
+                select_payment_frequency: $('#select_payment_frequency').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+            success: function (response) {
+                if (response.success === '1') {
+                    console.log("Inside success response:", response.success)
+
+                    // Hide the firstInnerHowmuch popup
+                    $('#offcanvasRight11').hide();
+
+                    // Show the secondInnerHowmuch popup
+                    $('#goal_created_success').modal('show');
+
+                    setTimeout(function () {
+                        url = window.location.pathname + 'goal_details/' + response.goal_id;
+                        window.location.href = url;
+                    }, 5000); // 40 seconds in milliseconds
+                } else {
+                    url = window.location.pathname;
+                    window.location.href = url;
+                }
+            }
+        });
+    });
+
+    $('#group_goal_id').on('submit', function (e) {
+        e.preventDefault();
+        console.log('Group Goals created ajax fun calling')
+
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'create_group_goal' %}",
+            data: {
+
+                goal_name: $('#goal_name').val(),
+                goal_mission: $('#goal_mission').val(),
+                start_date: $('#start_date_group').val(),
+                end_date: $('#end_date_group').val(),
+                target_amount: $('#target_amount').val(),
+                saving_type_input: $('#saving_type_input').val(),
+
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+            success: function (response) {
+                if (response.success === '1') {
+                    console.log("Inside success response:", response.success)
+
+                    // Hide the firstInnerHowmuch popup
+                    $('#offcanvasRight3').hide();
+
+                    // Show the secondInnerHowmuch popup
+                    $('#goal_created_success').modal('show');
+
+                    setTimeout(function () {
+
+                        url = window.location.pathname + 'group_goal_details/' + response.goal_id;
+                        window.location.href = url;
+                    }, 5000); // 40 seconds in milliseconds
+                } else {
+                    url = window.location.pathname;
+                    window.location.href = url;
+                }
+            }
+        });
+    });
+</script>
+
+
+<script>
+    // Function to get the time of day greeting
+    function getTimeOfDayGreeting() {
+        var currentHour = new Date().getHours();
+
+        if (currentHour >= 5 && currentHour < 12) {
+            return "Good Morning";
+        } else if (currentHour >= 12 && currentHour < 17) {
+            return "Good Afternoon";
+        } else if (currentHour >= 17 && currentHour < 21) {
+            return "Good Evening";
+        } else {
+            return "Good Night";
+        }
+    }
+
+    // Update the greeting dynamically
+    var greetingContainer = document.getElementById("greeting-container");
+    if (greetingContainer) {
+        var greeting = getTimeOfDayGreeting();
+        greetingContainer.innerHTML = '<h6>' + greeting + '<br><b>{{ user_profile.owner.first_name }} &nbsp; {{ user_profile.owner.last_name }}</b></h6>';
+    }
+</script>
+
+
+    <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    // Show modal helper
+    function showComingSoon() {
+      modal.classList.add('show');
+    }
+
+    // Hide modal helper
+    function hideComingSoon() {
+      modal.classList.remove('show');
+    }
+
+    // Attach click handler to each feature tile
+    document.querySelectorAll('.coming_soon').forEach(tile => {
+      tile.addEventListener('click', showComingSoon);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', hideComingSoon);
+
+    // Also close if user clicks outside the content box
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideComingSoon();
+    });
+  });
+</script>
+
+{% endblock %}

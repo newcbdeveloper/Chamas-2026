@@ -1,0 +1,76 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Articles tagged "{{ tag.name }}" - ChamaSpace Blog{% endblock %}
+
+{# Optional: hide tag name from visible heading #}
+{% block page_title %}Tagged Articles{% endblock %}
+{% block page_subtitle %}{{ page_obj.paginator.count }} article{{ page_obj.paginator.count|pluralize }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/tag_articles.css' %}">
+{% endblock %}
+
+{# Remove breadcrumbs #}
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+<div class="articles-grid">
+    {% for article in page_obj %}
+    <article class="article-card">
+        {% if article.featured_image %}
+            <div class="article-image">
+                <img src="{{ article.featured_image.url }}" alt="{{ article.title }}">
+            </div>
+        {% else %}
+            <div class="article-image"></div>
+        {% endif %}
+        
+        <div class="article-content">
+            <div class="article-meta">
+                <span><i class="far fa-calendar"></i> {{ article.published_at|date:"M d, Y" }}</span>
+                {% if article.category %}
+                <a href="{% url 'blog:category_articles' article.category.slug %}" class="article-category">
+                    {{ article.category.name }}
+                </a>
+                {% endif %}
+                <span><i class="far fa-eye"></i> {{ article.views }} views</span>
+            </div>
+            
+            <h2 class="article-title">
+                <a href="{% url 'blog:article_detail' article.slug %}">{{ article.title }}</a>
+            </h2>
+            
+            <p class="article-excerpt">{{ article.excerpt|striptags|truncatewords:25 }}</p>
+            
+            <a href="{% url 'blog:article_detail' article.slug %}" class="read-more">
+                Read More <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </article>
+    {% empty %}
+    <div class="empty-state">
+        <i class="far fa-newspaper"></i>
+        <h3>No articles with this tag yet.</h3>
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination-wrapper">
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" title="First Page"><i class="fas fa-angle-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" title="Previous"><i class="fas fa-angle-left"></i></a>
+        {% endif %}
+        
+        <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" title="Next"><i class="fas fa-angle-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" title="Last Page"><i class="fas fa-angle-double-right"></i></a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

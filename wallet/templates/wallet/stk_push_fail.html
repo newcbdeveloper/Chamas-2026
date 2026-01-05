@@ -1,0 +1,55 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block title %}Payment Failed{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <main role="main" class="main-content">
+        <div class="container-fluid">
+            <section class="wallet-banner">
+                <div class="container">
+                    <nav class="page_nav mob_nav show_on_mobile">
+                        <div class="brand">
+                            <a href="#">
+                                <img src="{% static 'images/Chama-Bora_clrd.png' %}" alt="">
+                            </a>
+                        </div>
+                        <ul class="nav-list">
+                            <li class="">
+                                <img src="{% static 'images/Notifications.png' %}" alt="">
+                            </li>
+                            <li class="">
+                                <button class="btn navbar-toggler text-muted collapseSidebar" type="button">
+                                    <img src="{% static 'images/menu.png' %}" alt="">
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="c-o-b-e-dwrapper">
+                        <div class="wallet-content text-center">
+                            <div class="mb-4">
+                                <i class="fas fa-times-circle text-danger" style="font-size: 80px;"></i>
+                            </div>
+                            <h5 class="h-heding">
+                                Sorry, we are unable to process your request at the moment.
+                            </h5>
+                            <p class="mt-3">Please check your phone number and try again.</p>
+                            <p>If the problem persists, please contact our support team.</p>
+                            
+                            <div class="mt-4">
+                                <a href="{% url 'wallet:deposit_mpesa' %}" class="btn btn-primary me-2">
+                                    Try Again
+                                </a>
+                                <a href="{% url 'wallet:wallet_dashboard' %}" class="btn btn-secondary">
+                                    Back to Wallet
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

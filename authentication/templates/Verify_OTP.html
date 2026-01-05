@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Verify OTP
+{% endblock %}
+
+{% block content %}
+
+<body>
+    <div class="app-container">
+                
+        <main class="main-content">
+            <div class="card login-card">
+                <div class="logo-center">
+                    <img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="ChamaSpace">
+                </div>
+
+                <p class="card-instruction">Verify Your Phone Number</p>
+                <p class="card-instruction">A verification code has been sent to your WhatsApp.</p>
+
+                <h5 style="text-decoration:#00a65a">{% include '_messages.html' %}</h5>
+                
+                <div class="divider"></div>
+                
+                <form id="loginForm" method="post" action="{% url 'verify_otp' %}" class="login-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="label">Verification Code</label>
+                        <input class="input" type="text" name="otp" id="otp" placeholder="Enter OTP" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" />                                            
+                    </div>                  
+                    
+                                        
+                    <button type="submit" name="button" class="primary-btn">Verify</button>                    
+                    
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+
+
+{% endblock %}

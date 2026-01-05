@@ -1,0 +1,81 @@
+/* ===== ABOUT PAGE STYLES ===== */
+
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2291a5;
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #2291a5 0%, #1a7a8a 100%);
+  color: white;
+  border-radius: 20px;
+}
+
+.content-section {
+  background: white;
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+.founders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.founder-card {
+  background: #f8fffe;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid #2291a5;
+}
+
+ul {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+li {
+  margin-bottom: 0.6rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1.5rem;
+  }
+
+  .page-header {
+    padding: 2.5rem 0;
+  }
+
+  .content-section {
+    padding: 2rem;
+  }
+
+  .founders-grid {
+    grid-template-columns: 1fr;
+  }
+}

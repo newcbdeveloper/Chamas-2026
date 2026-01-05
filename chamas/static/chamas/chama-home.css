@@ -1,0 +1,705 @@
+/* Full Width Layout Styles */
+.chama-home-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Override base layout for full-width experience on chamas home page */
+.chama-home-page .app-layout {
+    display: block !important;
+}
+
+.chama-home-page .desktop-sidebar {
+    display: none !important;
+}
+
+.chama-home-page .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+.chama-home-page .page-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+/* Desktop Header Styles */
+.chama-home-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    max-width: none;
+}
+
+.header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.header-center {
+    flex: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.chama-home-page .header-center {
+    display: none;
+}
+
+.header-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+}
+
+/* Back to Dashboard Button */
+.back-to-dashboard-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #2291A5;
+    color: #FFFFFF !important;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.back-to-dashboard-btn:hover {
+    background: #1B7A8B;
+    color: #FFFFFF !important;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(34, 145, 165, 0.3);
+}
+
+.back-to-dashboard-btn span {
+    color: #FFFFFF !important;
+}
+
+.back-to-dashboard-btn i {
+    font-size: 18px;
+    color: #FFFFFF !important;
+}
+
+/* Page Title - Hidden on chamas home page */
+.chama-home-page .page-title {
+    display: none;
+}
+
+/* Theme Toggles */
+.theme-toggles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Profile Section */
+.profile {
+    position: relative;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.profile-info:hover {
+    background: #F8FAFC;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #E2E8F0;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar i {
+    color: #64748B;
+    font-size: 16px;
+}
+
+.profile-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+/* Mobile Header */
+.mobile-header-chama {
+    display: none;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.mobile-header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mobile-back-btn {
+    color: #2291A5;
+    font-size: 24px;
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-back-btn:hover {
+    background: #F0F9FF;
+    color: #2291A5;
+}
+
+.mobile-page-title {
+    color: #2291A5;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.mobile-profile .avatar {
+    width: 28px;
+    height: 28px;
+}
+
+/* Main Content */
+.chama-home-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Welcome Header Section */
+.welcome-section {
+    background: linear-gradient(135deg, #2291A5 0%, #1B7A8B 100%);
+    padding: 60px 0;
+    margin: 0 !important;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #FFFFFF;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin: 0;
+    color: #FFFFFF;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Chama Types Section */
+.chama-types-container {
+    margin-top: -30px;
+    position: relative;
+    z-index: 3;
+    padding: 0 15px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chama-types-section {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 20px 40px rgba(34, 145, 165, 0.1);
+    border: 1px solid rgba(34, 145, 165, 0.1);
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #2291A5;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #64748B;
+    text-align: center;
+    margin-bottom: 40px;
+    opacity: 0.8;
+}
+
+/* Chama Option Cards */
+.chama-options-row {
+    justify-content: center;
+    gap: 20px;
+    display: flex !important;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.chama-options-row .col-lg-4 {
+    flex: 0 0 auto;
+    width: 33.333333%;
+    max-width: 400px;
+    padding: 0 10px;
+    display: flex;
+}
+
+.chama-options-row .col-lg-4 .chama-option-card {
+    flex: 1;
+}
+
+.chama-option-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 2px solid #E2E8F0;
+    padding: 30px 24px;
+    height: 100%;
+    min-height: 320px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.chama-option-card.available {
+    background: linear-gradient(135deg, #2291A5 0%, #1B7A8B 100%);
+    border-color: #2291A5;
+    color: white;
+}
+
+.chama-option-card.coming-soon {
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.chama-option-card.available:hover,
+.chama-option-card.hover-effect {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(34, 145, 165, 0.2);
+    border-color: #2291A5;
+}
+
+.chama-option-card.coming-soon:hover {
+    transform: none;
+    cursor: not-allowed;
+}
+
+.card-content {
+    flex: 1;
+    text-align: center;
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chama-option-card.available .card-icon {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.chama-option-card.coming-soon .card-icon {
+    background: rgba(148, 163, 184, 0.1);
+}
+
+.card-icon.disabled svg {
+    opacity: 0.5;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: inherit;
+}
+
+.chama-option-card.available .card-title {
+    color: #FFFFFF;
+}
+
+.chama-option-card.coming-soon .card-title {
+    color: #475569;
+}
+
+.card-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: inherit;
+    opacity: 0.9;
+}
+
+.chama-option-card.available .card-description {
+    color: #FFFFFF;
+    opacity: 0.95;
+}
+
+.chama-option-card.coming-soon .card-description {
+    color: #64748B;
+    opacity: 0.8;
+}
+
+/* Status Badges */
+.card-status {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.available-status {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.coming-soon-status {
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FCD34D;
+}
+
+/* Responsive Design */
+@media (max-width: 1199px) {
+    .chama-options-row {
+        gap: 15px;
+        margin: 0 -7px;
+    }
+    
+    .chama-options-row .col-lg-4 {
+        padding: 0 7px;
+    }
+    
+    .chama-option-card {
+        min-height: 300px;
+        padding: 25px 20px;
+    }
+    
+    .header-container {
+        padding: 16px 20px;
+    }
+}
+
+/* Medium and large desktop screens */
+@media (min-width: 992px) {
+    .chama-options-row {
+        justify-content: center;
+        align-items: stretch;
+    }
+    
+    .chama-options-row .col-lg-4 {
+        width: 33.333333%;
+        flex: 0 0 33.333333%;
+        display: flex;
+    }
+}
+
+/* Large screens - better spacing */
+@media (min-width: 1200px) {
+    .chama-options-row {
+        gap: 30px;
+        margin: 0 -15px;
+    }
+    
+    .chama-options-row .col-lg-4 {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 991px) {
+    /* Hide desktop header, show mobile header */
+    .chama-home-header {
+        display: none;
+    }
+    
+    .mobile-header-chama {
+        display: block;
+    }
+    
+    .welcome-section {
+        padding: 50px 0;
+    }
+    
+    .welcome-title {
+        font-size: 2.25rem;
+    }
+    
+    .welcome-description {
+        font-size: 1rem;
+    }
+    
+    .chama-types-section {
+        padding: 35px 25px;
+        margin-top: -25px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .chama-options-row {
+        gap: 20px;
+        flex-direction: column;
+        margin: 0;
+    }
+    
+    .chama-options-row .col-lg-4 {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+    }
+    
+    .chama-option-card {
+        min-height: 280px;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .welcome-section {
+        padding: 40px 0;
+    }
+    
+    .welcome-title {
+        font-size: 1.875rem;
+        margin-bottom: 16px;
+    }
+    
+    .welcome-description {
+        font-size: 0.95rem;
+        padding: 0 10px;
+    }
+    
+    .chama-types-container {
+        margin-top: -20px;
+        padding: 0 10px;
+    }
+    
+    .chama-types-section {
+        padding: 30px 20px;
+        border-radius: 16px;
+    }
+    
+    .section-title {
+        font-size: 1.375rem;
+        margin-bottom: 8px;
+    }
+    
+    .section-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+    
+    .chama-options-row {
+        gap: 16px;
+    }
+    
+    .chama-option-card {
+        min-height: 260px;
+        padding: 24px 20px;
+        margin-bottom: 16px;
+    }
+    
+    .card-icon {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+    }
+    
+    .card-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .card-title {
+        font-size: 1.125rem;
+        margin-bottom: 10px;
+    }
+    
+    .card-description {
+        font-size: 0.8rem;
+        margin-bottom: 16px;
+    }
+    
+    .mobile-header-container {
+        padding: 8px 0;
+    }
+    
+    .mobile-page-title {
+        font-size: 1.125rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .welcome-section {
+        padding: 35px 0;
+    }
+    
+    .welcome-title {
+        font-size: 1.625rem;
+    }
+    
+    .welcome-description {
+        font-size: 0.9rem;
+    }
+    
+    .chama-types-container {
+        padding: 0 8px;
+    }
+    
+    .chama-types-section {
+        padding: 25px 16px;
+    }
+    
+    .chama-option-card {
+        min-height: 240px;
+        padding: 20px 16px;
+    }
+    
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 14px;
+    }
+    
+    .card-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .header-container {
+        padding: 12px 16px;
+    }
+    
+    .back-to-dashboard-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .back-to-dashboard-btn span {
+        display: none;
+    }
+    
+    .page-title {
+        font-size: 1.25rem;
+    }
+}
+
+/* Animation for smooth transitions */
+* {
+    box-sizing: border-box;
+}
+
+.chama-option-card * {
+    transition: all 0.3s ease;
+}
+
+/* Remove margin and padding reset conflicts */
+p {
+    margin-bottom: 0;
+}
+
+/* Ensure proper spacing */
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Override base layout constraints for this page */
+.page-content {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Ensure full width for welcome section */
+.chama-home-page .page-content {
+    overflow-x: hidden;
+}
+
+/* Reset any container constraints */
+.chama-home-page .container,
+.chama-home-page .container-fluid {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+}

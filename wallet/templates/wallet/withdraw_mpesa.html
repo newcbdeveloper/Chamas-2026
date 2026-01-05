@@ -1,0 +1,247 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --brand-primary: #2191a5;
+        --brand-primary-light: #2ba6bd;
+        --brand-primary-dark: #1a7589;
+        --brand-primary-hover: #1e8396;
+    }
+
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .main-content {
+        padding-top: 20px;
+        padding-bottom: 80px;
+    }
+
+    .wallet-header-card {
+        background: linear-gradient(135deg, #2191a5 0%, #2191a5 100%);
+        color: white;
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: -50px;
+        position: relative;
+        z-index: 1;
+        box-shadow: var(--card-shadow);
+    }
+
+    .withdrawal-container {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 60px 25px 30px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        z-index: 0;
+    }
+
+    .balance-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .balance-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 0.2rem rgba(33, 145, 165, 0.1);
+    }
+
+    .alert-custom-warning {
+        background-color: #fff9e6;
+        border-left: 4px solid #ffc107;
+        color: #856404;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    .btn-withdraw {
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .wallet-header-card {
+            padding: 1.5rem;
+        }
+        .withdrawal-container {
+            margin-top: 10px;
+            border-radius: 20px 20px 0 0;
+        }
+        .btn-stack-mobile {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="wrapper">
+    <main role="main" class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="row mb-3">
+                        <div class="col-md-6 col-lg-5 mx-auto">
+                            <a href="{% url 'wallet:wallet_dashboard' %}" class="text-decoration-none text-dark d-inline-flex align-items-center">
+                                <i class="fas fa-chevron-left mr-2"></i>
+                                <span style="font-weight: 600;">Back to Wallet</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-header-card text-center">
+                        <p class="balance-label">Available Balance</p>
+                        <h2 class="balance-amount">KES {{ wallet.available_balance|floatformat:2 }}</h2>
+                    </div>
+
+                    <div class="withdrawal-container">
+                        <h5 class="text-center mb-4" style="font-weight: 700; color: #333;">Withdraw to M-Pesa</h5>
+                        
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- KYC Warning -->
+                        {% if not is_kyc_verified %}
+                        <div class="alert alert-warning mb-4">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            KYC verification is required before you can withdraw funds.
+                            <a href="{% url 'user_dashboard:kyc:dashboard' %}" class="alert-link">Complete verification now</a>.
+                        </div>
+                        {% endif %}
+
+                        <form id="withdrawalForm" method="post">
+                            {% csrf_token %}
+
+                            <div class="form-group mb-4">
+                                <label for="phone">M-Pesa Phone Number</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light"><i class="fas fa-phone-alt"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" 
+                                           value="{{ phone_number }}" 
+                                           readonly>
+                                </div>
+                                <small class="text-muted">Funds will be sent to this verified number only.</small>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="amount">Amount to Withdraw</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light">KES</span>
+                                    </div>
+                                    <input type="number" name="amount" id="amount" 
+                                           class="form-control" placeholder="0.00" 
+                                           min="50" max="{{ wallet.available_balance }}" step="10" required>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted">Min: KES 50</small>
+                                    <small class="text-muted">Max: KES {{ wallet.available_balance|floatformat:2 }}</small>
+                                </div>
+                            </div>
+
+                            <!-- Threshold Info -->
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <strong>Withdrawal Policy:</strong><br>
+                                • Amounts <strong>≤ KES 2,000</strong> are auto-approved<br>
+                                • Amounts <strong>> KES 2,000</strong> require admin approval (within 24 hours)
+                            </div>
+
+                            <div class="btn-stack-mobile d-md-flex justify-content-between">
+                                <a href="{% url 'wallet:wallet_dashboard' %}" class="btn btn-light btn-withdraw flex-grow-1 mr-md-2">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-withdraw flex-grow-1 ml-md-2">
+                                    Continue to Verification
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mbl_footer fixed-bottom bg-white border-top py-2">
+        <div class="container">
+            <div class="d-flex justify-content-around align-items-center text-center">
+                <a href="{% url 'user_dashboard:home' %}" class="text-muted small text-decoration-none">
+                    <img src="{% static 'images/home_white.png' %}" style="filter: brightness(0); width: 20px;" alt=""><br>Home
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="text-primary small text-decoration-none">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" style="width: 20px;" alt=""><br>Wallet
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="text-muted small text-decoration-none">
+                    <img src="{% static 'images/setting.png' %}" style="filter: brightness(0); width: 20px;" alt=""><br>Settings
+                </a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('withdrawalForm');
+    const amountInput = document.getElementById('amount');
+    
+    // Simple client-side validation before form submission
+    form.addEventListener('submit', function(e) {
+        const amount = parseFloat(amountInput.value);
+        const maxBalance = parseFloat('{{ wallet.available_balance }}');
+        
+        if (!amount || amount < 50) {
+            e.preventDefault();
+            alert('Minimum withdrawal amount is KES 50');
+            return false;
+        }
+        
+        if (amount > maxBalance) {
+            e.preventDefault();
+            alert(`Insufficient balance. Available: KES ${maxBalance.toFixed(2)}`);
+            return false;
+        }
+        
+        // Form will submit normally to server
+        // Server will create PendingTransfer and redirect to password verification
+        return true;
+    });
+});
+</script>
+{% endblock %}

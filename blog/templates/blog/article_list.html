@@ -1,0 +1,90 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Blog Articles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/article_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="articles-grid">
+    {% for article in page_obj %}
+    <article class="article-card">
+        {% if article.featured_image %}
+        <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="article-image">
+        {% else %}
+        <div class="article-image"></div>
+        {% endif %}
+        
+        <div class="article-content">
+            <div class="article-meta">
+                <span>
+                    <i class="far fa-calendar"></i>
+                    {{ article.published_at|date:"M d, Y" }}
+                </span>
+                {% if article.category %}
+                <a href="{% url 'blog:category_articles' article.category.slug %}" class="article-category">
+                    {{ article.category.name }}
+                </a>
+                {% endif %}
+                <span>
+                    <i class="far fa-eye"></i>
+                    {{ article.views }} views
+                </span>
+            </div>
+            
+            <h2 class="article-title">
+                <a href="{% url 'blog:article_detail' article.slug %}">{{ article.title }}</a>
+            </h2>
+            
+            <!-- Strip HTML tags from excerpt to remove <p> tags -->
+            <p class="article-excerpt">{{ article.excerpt|striptags }}</p>
+            
+            <div class="article-footer">
+                <div class="article-tags">
+                    {% for tag in article.tags.all|slice:":3" %}
+                    <span class="tag">#{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'blog:article_detail' article.slug %}" class="read-more">
+                    Read More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="empty-state">
+        <i class="far fa-newspaper"></i>
+        <h3>No Articles Yet</h3>
+        <p>Check back soon for exciting content!</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination-wrapper">
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" title="First Page">
+            <i class="fas fa-angle-double-left"></i>
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}" title="Previous">
+            <i class="fas fa-angle-left"></i>
+        </a>
+        {% endif %}
+        
+        <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" title="Next">
+            <i class="fas fa-angle-right"></i>
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" title="Last Page">
+            <i class="fas fa-angle-double-right"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

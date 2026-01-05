@@ -1,0 +1,157 @@
+# 1. Create a test round with 2-3 members in the UI
+#    - 3 members
+#    - KES 1000 contribution
+#    - Weekly frequency
+#    - Start the round
+
+# 2. Fast-forward dates to make contributions due today
+python manage.py mgr_fastforward
+
+# Or fast-forward a specific round
+python manage.py mgr_fastforward --round-id=YOUR_ROUND_ID
+
+# Or move dates back by 1 day (yesterday)
+python manage.py mgr_fastforward --days=1
+
+# 3. Run all simulation tasks
+python manage.py mgr_simulate --verbose
+
+# Or run specific tasks
+python manage.py mgr_simulate --task=contributions --verbose
+python manage.py mgr_simulate --task=payouts --verbose
+python manage.py mgr_simulate --task=interest --verbose
+
+# 4. Check results in Django admin or shell
+python manage.py shell
+
+
+
+Django shell for checking results:
+
+python manage.py shell
+
+# Check contributions
+from merry_go_round.models import *
+from django.db.models import Sum
+
+# See completed contributions today
+Contribution.objects.filter(
+    status='completed',
+    payment_date__date=timezone.now().date()
+).values('membership__user__username', 'amount', 'cycle_number')
+
+# Check interest accrued
+RoundMembership.objects.filter(
+    round__status='active'
+).values('user__username', 'interest_earned', 'total_contributed')
+
+# Check wallet balances
+MGRWallet.objects.values(
+    'user__username', 
+    'balance', 
+    'available_balance', 
+    'locked_balance'
+)
+
+# Check payouts
+Payout.objects.filter(
+    status='completed',
+    payout_date__date=timezone.now().date()
+).values(
+    'recipient_membership__user__username',
+    'amount',
+    'principal_amount',
+    'interest_amount'
+)
+
+# Check trust scores
+UserProfile.objects.values('user__username', 'trust_score', 'missed_payments')
+```
+
+---
+
+## **Step 5: Expected Output**
+
+When you run `python manage.py mgr_simulate --verbose`, you should see:
+```
+============================================================
+  MGR TASK SIMULATION: ALL
+  Date: 2025-01-15 10:30:00
+============================================================
+
+[1/7] Processing Due Contributions...
+  ✓ Processed: 3 | Failed: 0
+    - john_doe: KES 1000.00 for Weekly Savings
+    - jane_smith: KES 1000.00 for Weekly Savings
+    - bob_jones: KES 1000.00 for Weekly Savings
+
+[2/7] Marking Missed Contributions...
+  ✓ Missed: 0
+
+[3/7] Sending Contribution Reminders...
+  ✓ Reminders sent: 2 | Needs deposit: 1
+
+[4/7] Processing Due Payouts...
+  ✓ Processed: 0 | Failed: 0 | Deferred: 0
+
+[5/7] Calculating Daily Interest...
+  ✓ Interest calculated
+    - Active rounds: 1 | Total interest accrued: KES 45.50
+
+[6/7] Updating Trust Scores...
+  ✓ Trust scores updated
+
+[7/7] Checking for Completed Rounds...
+  ✓ Rounds completed: 0
+
+============================================================
+  SIMULATION SUMMARY
+============================================================
+  CONTRIBUTIONS: ✓
+  MISSED: ✓
+  REMINDERS: ✓
+  PAYOUTS: ✓
+  INTEREST: ✓
+  TRUST: ✓
+  COMPLETE: ✓
+============================================================
+
+=== CURRENT SYSTEM STATS ===
+
+Rounds: Active=1, Open=2, Completed=0
+Contributions: Due Today=3, Completed Today=3, Total Missed=0
+Payouts: Due=0, Completed Today=0
+Wallets: Locked=KES 3000.00, Available=KES 7500.00
+
+
+
+List all rounds
+
+python manage.py mgr_list_rounds
+
+List only active rounds
+python manage.py mgr_list_rounds --status=active
+
+# 2. Fast-forward using the name (easier!)
+python manage.py mgr_fastforward --round-name="Pio" --days=0 --max-contributions=2 --direction=backward
+
+# 3. Run simulation
+python manage.py mgr_simulate --verbose
+
+This is the ultimate test
+# Reset the round
+python manage.py mgr_reset_round --round-name="Pio" --fund-wallets
+
+# Run the automated full test
+python manage.py mgr_test_full_cycle --round-name="Pio"
+
+
+python manage.py simulate_time_passage --days 365
+
+python manage.py simulate_time_passage --start-date 2025-12-13 --days 90
+
+
+python manage.py simulate_time_passage --start-date 2025-12-13 --days 100 --verbose
+
+
+python manage.py mgr_fastforward --days 100 --auto-fund

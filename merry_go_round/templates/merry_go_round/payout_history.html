@@ -1,0 +1,199 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+{% block title %}Payout History{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- Header & Breadcrumbs -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a href="{% url 'merry_go_round:dashboard' %}"
+                            class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Payouts</li>
+                </ol>
+            </nav>
+            <h2 class="h3 fw-bold text-slate-900 mb-0">Payout History</h2>
+            <p class="text-muted mb-0">Track all your received and scheduled round payments.</p>
+        </div>
+        <div>
+            <a href="{% url 'merry_go_round:wallet_dashboard' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-wallet me-2"></i> View Wallet
+            </a>
+        </div>
+    </div>
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm overflow-hidden h-100 position-relative">
+                <div class="card-body p-4 position-relative" style="z-index: 2;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success"
+                            style="width: 48px; height: 48px;">
+                            <i class="fas fa-hand-holding-usd fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem;">Total
+                                Received</h6>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold text-slate-900 mb-0">KES {{ total_received|floatformat:2 }}</div>
+                </div>
+                <!-- Abstract BG Decoration -->
+                <div class="position-absolute bottom-0 end-0 opacity-10"
+                    style="margin-right: -20px; margin-bottom: -20px;">
+                    <i class="fas fa-coins fa-5x text-success"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm overflow-hidden h-100 position-relative">
+                <div class="card-body p-4 position-relative" style="z-index: 2;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center text-info"
+                            style="width: 48px; height: 48px;">
+                            <i class="fas fa-chart-line fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem;">Interest
+                                Earned</h6>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold text-slate-900 mb-0">KES {{ total_interest|floatformat:2 }}</div>
+                </div>
+                <!-- Abstract BG Decoration -->
+                <div class="position-absolute bottom-0 end-0 opacity-10"
+                    style="margin-right: -20px; margin-bottom: -20px;">
+                    <i class="fas fa-chart-pie fa-5x text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Payouts Table -->
+    <div class="card border-0 shadow-sm">
+        <div
+            class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0 text-slate-800">Payout Transactions</h6>
+            <div class="dropdown">
+                <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-filter me-1 text-muted"></i> Filter
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                    <li><a class="dropdown-item small" href="#">All Payouts</a></li>
+                    <li><a class="dropdown-item small" href="#">Completed</a></li>
+                    <li><a class="dropdown-item small" href="#">Scheduled</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted">
+                    <tr>
+                        <th class="ps-4 text-uppercase small fw-bold border-0 py-3" scope="col">Round Name</th>
+                        <th class="text-uppercase small fw-bold border-0 py-3" scope="col">Cycle</th>
+                        <th class="text-uppercase small fw-bold border-0 py-3" scope="col">Date</th>
+                        <th class="text-uppercase small fw-bold border-0 py-3" scope="col">Breakdown</th>
+                        <th class="text-uppercase small fw-bold border-0 py-3" scope="col">Total Amount</th>
+                        <th class="pe-4 text-uppercase small fw-bold border-0 py-3 text-end" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for payout in page_obj %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-dark">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold text-secondary"
+                                    style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ payout.round.name|slice:":1" }}
+                                </div>
+                                <a href="{% url 'merry_go_round:round_detail' payout.round.id %}"
+                                    class="text-dark text-decoration-none hover-primary">
+                                    {{ payout.round.name }}
+                                </a>
+                            </div>
+                        </td>
+                        <td class="text-muted small">Cycle #{{ payout.payout_cycle }}</td>
+                        <td class="text-muted small">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold">{{ payout.scheduled_date|date:"M d, Y" }}</span>
+                                <span class="text-xs text-muted">{{ payout.scheduled_date|time:"H:i A" }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column small">
+                                <span class="text-muted">Principal: <span class="text-dark">KES {{payout.principal_amount|floatformat:0 }}</span></span>
+                                <span class="text-muted">Interest: <span class="text-success">+ KES {{payout.interest_amount|floatformat:0 }}</span></span>
+                            </div>
+                        </td>
+                        <td class="fw-bold text-success">KES {{ payout.amount|floatformat:2 }}</td>
+                        <td class="pe-4 text-end">
+                            {% if payout.status == 'completed' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill">Received</span>
+                            {% elif payout.status == 'scheduled' %}
+                            <span
+                                class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill">Scheduled</span>
+                            {% elif payout.status == 'processing' %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill">Processing</span>
+                            {% else %}
+                            <span
+                                class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill">{{
+                                payout.status|title }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted opacity-50 mb-2">
+                                <i class="fas fa-receipt fa-3x"></i>
+                            </div>
+                            <h6 class="fw-normal text-muted">No payout history found</h6>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white border-top border-light py-3">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                    {% endif %}
+                    {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

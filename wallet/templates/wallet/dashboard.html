@@ -1,0 +1,239 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'wallet/css/wallet_dashboard.css' %}">
+<style>
+    .pending-withdrawals-alert {
+        background: linear-gradient(135deg, #fff3cd 0%, #fff9e6 100%);
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .pending-badge {
+        background-color: #ffc107;
+        color: #000;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-pending {
+        color: #ffc107 !important;
+    }
+    
+    .status-completed {
+        color: #28a745 !important;
+    }
+    
+    .status-failed {
+        color: #dc3545 !important;
+    }
+    
+    .status-processing {
+        color: #17a2b8 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <main role="main" class="main-content">
+        <div class="container-fluid px-4">
+
+            <!-- Wallet Header -->
+            <section class="wallet-header text-center text-md-start">
+                <div class="container">
+                    <h4 class="wallet-title">My Wallet</h4>
+                    <p class="balance-label">Available Balance</p>
+                    <h1 class="balance-amount">KES {{ available_balance|floatformat:2 }}</h1>
+
+                    <div class="quick-actions">
+                        <a href="{% url 'wallet:deposit_mpesa' %}" class="action-btn">
+                            <div class="action-icon">
+                                <img src="{% static 'images/wallet-money_.png' %}" alt="Load Money">
+                            </div>
+                            <span class="action-label">Load Money</span>
+                        </a>
+
+                        <a href="{% url 'wallet:withdraw_mpesa' %}" class="action-btn">
+                            <div class="action-icon">
+                                <img src="{% static 'images/money-send_.png' %}" alt="Withdraw">
+                            </div>
+                            <span class="action-label">Withdraw</span>
+                        </a>
+
+                        <a href="{% url 'wallet:transaction_history' %}" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-history fa-lg"></i>
+                            </div>
+                            <span class="action-label">History</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PENDING WITHDRAWALS ALERT (NEW) -->
+            {% if pending_withdrawals %}
+            <section class="container mb-4">
+                <div class="pending-withdrawals-alert">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-clock fa-lg text-warning me-2"></i>
+                        <strong>Pending Withdrawals</strong>
+                    </div>
+                    <p class="mb-2">You have {{ pending_withdrawals|length }} withdrawal(s) pending approval:</p>
+                    {% for pw in pending_withdrawals %}
+                    <div class="d-flex justify-content-between align-items-center py-2 border-top">
+                        <div>
+                            <strong>KES {{ pw.amount|floatformat:2 }}</strong>
+                            <small class="text-muted d-block">
+                                To: {{ pw.metadata.phone_number }} • 
+                                {{ pw.initiated_at|date:"M d, Y" }}
+                            </small>
+                        </div>
+                        <span class="pending-badge">{{ pw.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                    <p class="mb-0 mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Withdrawals over KES 2,000 require admin approval (usually within 24 hours)
+                    </p>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Summary Cards -->
+            <section class="container mb-4">
+                <div class="summary-grid">
+                    <div class="summary-card total">
+                        <h6>Total Balance</h6>
+                        <h3>KES {{ balance|floatformat:2 }}</h3>
+                        <small>Available + Locked</small>
+                    </div>
+                    <div class="summary-card available">
+                        <h6>Available Balance</h6>
+                        <h3>KES {{ available_balance|floatformat:2 }}</h3>
+                        <small>Ready to use</small>
+                    </div>
+                    <div class="summary-card locked">
+                        <h6>Locked Balance</h6>
+                        <h3>KES {{ locked_balance|floatformat:2 }}</h3>
+                        <small>Reserved for pending actions</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Total Deposited & Withdrawn -->
+            <section class="container mb-4">
+                <div class="stats-row">
+                    <div class="stat-card deposited">
+                        <h6>Total Deposited</h6>
+                        <h4>KES {{ total_deposited|floatformat:2 }}</h4>
+                    </div>
+                    <div class="stat-card withdrawn">
+                        <h6>Total Withdrawn</h6>
+                        <h4>KES {{ total_withdrawn|floatformat:2 }}</h4>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Transactions -->
+            <section class="container mb-5">
+                <div class="transactions-header">
+                    <h3>Recent Transactions</h3>
+                    <a href="{% url 'wallet:transaction_history' %}" class="text-primary">
+                        View All
+                    </a>
+                </div>
+
+                {% if recent_transactions %}
+                {% for txn in recent_transactions %}
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <div class="d-flex align-items-center gap-2">
+                            <strong>{{ txn.get_transaction_type_display }}</strong>
+                            <!-- STATUS BADGE (NEW) -->
+                            {% if txn.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending Approval</span>
+                            {% elif txn.status == 'processing' %}
+                                <span class="badge bg-info text-white">Processing</span>
+                            {% elif txn.status == 'failed' %}
+                                <span class="badge bg-danger text-white">Failed</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ txn.description }}</small>
+                        <div class="transaction-meta">
+                            <span>{{ txn.created_at|date:"D, d M Y" }}</span>
+                            <span>{{ txn.created_at|time:"h:i A" }}</span>
+                        </div>
+                    </div>
+                    <div class="transaction-amount status-{{ txn.status }}">
+                        {% if txn.transaction_type in 'mpesa_deposit,transfer_from_mgr,transfer_from_goals,unlock' %}
+                            +KES {{ txn.amount|floatformat:2 }}
+                        {% else %}
+                            -KES {{ txn.amount|floatformat:2 }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-receipt fa-3x mb-3"></i>
+                    <p>No transactions yet</p>
+                    <a href="{% url 'wallet:deposit_mpesa' %}" class="btn btn-primary mt-2">
+                        Make Your First Deposit
+                    </a>
+                </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <footer class="mbl_footer">
+        <div class="container">
+            <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                    <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                    <p>Home</p>
+                </a>
+                <a href="#" class="footer_button btn">
+                    <img src="{% static 'images/filter_active.png' %}" alt="">
+                    <p>Features</p>
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn coming_soon">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                    <p>Wallet</p>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                    <img src="{% static 'images/setting.png' %}" alt="">
+                    <p>Settings</p>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Auto-refresh balance every 30 seconds
+        setInterval(function () {
+            $.get('{% url "wallet:api_balance" %}', function (data) {
+                if (data.success) {
+                    console.log('Balance refreshed:', data);
+                }
+            }).fail(function () {
+                console.log('Balance refresh failed');
+            });
+        }, 30000);
+    });
+</script>
+{% endblock %}

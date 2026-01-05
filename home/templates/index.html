@@ -1,0 +1,80 @@
+{% extends 'home_base.html' %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock %}
+{% block content %}
+
+<!-- Updated to split layout with videos on left, content on right -->
+<div class="container">
+    <div class="main-content">  
+        
+        <!-- Left side: Videos -->
+        <div class="videos-side">
+            <div class="videos-section">
+                <div class="video-grid">
+                    <div class="video-item" onclick="openVideoModal('')">
+                        <iframe width="100%" height="482" src="https://www.youtube.com/embed/1vDueYiSXyk" title="Introducing ChamaSpace Bookkeeping app" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>                       
+                        <p>Getting Started with ChamaSpace</p>
+                    </div>
+                    <!--
+                    <div class="video-item" onclick="openVideoModal('mEoBwBACmXs')">
+                        
+                        <p>Managing Your Chama</p>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right side: Content and Sign Up -->
+        <div class="content-side">
+            <div class="hero-section">
+                <!-- Added ChamaSpace branding above the main messaging -->
+                <div class="brand-section">
+                    <img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="ChamaSpace">
+                </div>
+                <h1>Save Smart... Grow Together</h1>
+                <p class="hero-subtitle">The simple, safe and secure way to perfect your journey of saving and growing wealth with your chama.</p>
+            </div>
+
+            <!-- Sign Up Section -->
+            <div class="signup-section">
+                <div class="signup-buttons">
+                    <button class="btn-primary" onclick="window.location.href='{% url 'Sign_up' %}'">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.58L19 8l-9 9z" fill="currentColor"/>
+                        </svg>
+                        Create account
+                    </button>
+                    
+                    <div class="existing-user-inline">
+                        <p>Already have an account?</p>
+                        <button class="btn-outline" onclick="window.location.href='{% url 'Login' %}'">
+                            Login
+                        </button>
+                    </div>
+                </div>
+
+                <p class="terms">
+                    By signing up, you agree to the 
+                    <a target="_blank" href="{% url 'term_conditions' %}">Terms & Conditions</a> and 
+                    <a target="_blank" href="{% url 'privacy_policies' %}">Privacy Policy</a>, including 
+                    <a target="_blank" href="{% url 'cookies' %}">Cookie Use</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'features' %}">Features</a>
+        <a href="{% url 'contact_us' %}">Contact</a>
+        <a href="{% url 'blog:article_list' %}">Blog</a>  <!-- NEW: Added blog link -->
+        <a target="_blank" href="{% url 'term_conditions' %}">Terms & Conditions</a>
+        <a target="_blank" href="{% url 'privacy_policies' %}">Privacy Policy</a>
+    </div>
+</div>
+
+{% endblock %}

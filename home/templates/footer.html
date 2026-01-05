@@ -1,0 +1,30 @@
+{% load static %}
+<!-- Footer -->
+<section>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="{% static 'images/ChamaSpace_Logo2.png' %}" alt="ChamaSpace" class="footer-logo">                    
+                </div>
+
+                <div>
+                    <p>ChamaSpace is the simple, safe and secure way to help you run your Chama, perfect your journey of saving and growing your wealth together and create a saving culture.</p>
+                </div>
+
+                <div>
+                    <div class="footer-links">
+                        <a href="{% url 'about' %}">About</a>
+                        <a href="{% url 'features' %}">Features</a>
+                        <a href="{% url 'contact_us' %}">Contact</a>
+                        <a href="{% url 'blog:article_list' %}">Blog</a>
+                        <a href="{% url 'term_conditions' %}">Terms & Conditions</a>
+                        <a href="{% url 'privacy_policies' %}">Privacy Policy</a>
+                    </div> 
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Copyright © All rights reserved: ChamaSpace by Jeld Investment LTD</p>
+            </div>
+        </footer>        
+    </section>

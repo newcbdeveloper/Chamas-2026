@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <div class="messages" id="messages">
+
+    </div>
+
+
+    <div class="chamas" id="chamas">
+      <h3>Groups</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">name</th>
+            <th scope="col">type</th>
+            <th scope="col">created on</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for chama in chamas%}
+          <tr class="group-row">
+            <th class="row group-id" scope="row">{{chama.id}}</th>
+
+            <td> <a href="{%url 'chamas:members' chama.id%}?group={{chama.id}}">{{chama.name}}</a></td>
+
+            <td>{{chama.type.name}}</td>
+            <td>{{chama.created_on}}</td>
+          </tr>
+
+          {%endfor%}
+        </tbody>
+      </table>
+
+    </div>
+
+
+    <div class="new-type" id="new-type">
+      <h3>Create new group type</h3>
+      <form action="{%url 'chamas:new-chama-type'%}" id="new-chama-type" method="post">
+        {%csrf_token%}
+        <div class="mb-3">
+          <label for="name" class="form-label">name</label>
+          <input type="text" name="name" class="form-control" id="name">
+        </div>
+
+        <button class="btn btn-primary btn-sm" type="submit">add type</button>
+
+      </form>
+    </div>
+
+
+    <div class="new-group" id="new-group">
+      <h3>Create new group</h3>
+
+      <form action="{%url 'chamas:new-chama'%}" method="post" id="new-chama-form">
+        {%csrf_token%}
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" name="name" class="form-control" id="name">
+        </div>
+
+        <div class="mb-3">
+          <label for="amount" class="form-label">Amount</label>
+          <input type="text" name="amount" class="form-control" id="amount">
+        </div>
+
+        <div class="mb-3">
+          <label for="date" class="form-label">Start date</label>
+          <input type="date" name="date" class="form-control" id="date">
+        </div>
+
+        <div class="input-group mb-3">
+          <label class="input-group-text" for="inputGroupSelect01">type</label>
+          <select class="form-select" id="type" name="type">
+            {%for type in types%}
+            <option value="{{type.id}}">{{type.name}}</option>\
+            {%endfor%}
+          </select>
+        </div>
+
+        <button class="btn btn-primary btn-sm" type="button" onclick="submitNewChamaForm()">Create</button>
+
+      </form>
+    </div>
+
+    <div class="add-members" id="add-members" style="display: block;">
+      <h3>Add group members</h3>
+      <form action="{%url 'chamas:add-member'%}" id="add-members-form" method="post">
+        {%csrf_token%}
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" name="name" class="form-control" id="name">
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" id="email">
+        </div>
+
+        <div class="mb-3">
+          <label for="mobile" class="form-label">Mobile</label>
+          <input type="number" name="phone" class="form-control" id="mobile">
+        </div>
+
+        <div class="mb-3">
+          <input type="hidden" name="group" class="form-control" id="group_id">
+        </div>
+
+        <div class="input-group mb-3">
+          <label class="input-group-text" for="role">role</label>
+          <select class="form-select" id="role" name="role">
+            {%for role in roles%}
+            <option value="{{role.id}}">{{role.name}}</option>\
+            {%endfor%}
+          </select>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary btn-sm" type="button" onclick="submitAddMembersForm(false)">save &
+            finish</button>
+          <button class="btn btn-primary btn-sm" type="button" onclick="submitAddMembersForm(true)">save & add
+            another</button>
+        </div>
+
+      </form>
+
+
+    </div>
+    <div class="add-members" id="add-members" style="display: block;">
+      <h3>Add group members</h3>
+      <form action="{%url 'chamas:add-member'%}" id="add-members-form" method="post">
+        {%csrf_token%}
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" name="name" class="form-control" id="name">
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" id="email">
+        </div>
+
+        <div class="mb-3">
+          <label for="mobile" class="form-label">Mobile</label>
+          <input type="number" name="phone" class="form-control" id="mobile">
+        </div>
+
+        <div class="input-group mb-3">
+          <label class="input-group-text" for="role">Group</label>
+          <select class="form-select" id="role" name="group">
+            {%for chama in chamas%}
+            <option value="{{chama.id}}">{{chama.name}}</option>
+            {%endfor%}
+          </select>
+        </div>
+
+
+        <div class="input-group mb-3">
+          <label class="input-group-text" for="role">role</label>
+          <select class="form-select" id="role" name="role">
+            {%for role in roles%}
+            <option value="{{role.id}}">{{role.name}}</option>\
+            {%endfor%}
+          </select>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary btn-sm" type="button" onclick="submitAddMembersForm(false)">save &
+            finish</button>
+          <button class="btn btn-primary btn-sm" type="button" onclick="submitAddMembersForm(true)">save & add
+            another</button>
+        </div>
+
+      </form>
+
+
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var groupRows = document.getElementsByClassName('group-row');
+
+      for (var i = 0; i < groupRows.length; i++) {
+        groupRows[i].addEventListener('click', function () {
+          var id = this.getElementsByClassName('group-id')[0].textContent.trim();
+          console.log(id);
+          localStorage.setItem('groupId', id);
+        });
+      }
+    });
+
+
+
+
+
+    function submitNewChamaForm() {
+      const form = document.getElementById('new-chama-form');
+
+      if (!form || !(form instanceof HTMLFormElement)) {
+        console.error('Form element not found or is not an HTMLFormElement.');
+        return;
+      }
+
+      const formData = new FormData(form);
+
+      fetch('{% url "chamas:new-chama" %}', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            document.getElementById('new-group').style.display = 'none';
+            document.getElementById('add-members').style.display = 'block';
+            document.getElementById('messages').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            document.getElementById('group_id').value = data.chama.id;
+
+          } else {
+            document.getElementById('messages').innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+
+    function submitAddMembersForm(redirectToTestPage) {
+      const form = document.getElementById('add-members-form');
+      const formData = new FormData(form);
+
+      fetch('{% url "chamas:add-member" %}', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            document.getElementById('add-members').style.display = 'none';
+            document.getElementById('messages').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            if (redirectToTestPage) {
+              window.location.href = '{% url "chamas:test-page" %}';
+            }
+          } else {
+            document.getElementById('messages').innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

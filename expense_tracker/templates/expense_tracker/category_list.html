@@ -1,0 +1,225 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+
+{% block title %}Manage Categories{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-tags me-2"></i>Manage Categories</h2>
+            <p class="text-muted">Organize your transactions with custom categories</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'expense_tracker:category_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Category
+            </a>
+        </div>
+    </div>
+
+    <!-- Expense Categories -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-arrow-down me-2"></i>Expense Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if expense_categories %}
+                        <div class="row g-3">
+                            {% for category in expense_categories %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="category-item" style="border-left-color: {{ category.color }};">
+                                        <div class="category-icon" style="background-color: {{ category.color }}20;">
+                                            <span style="font-size: 24px;">{{ category.icon }}</span>
+                                        </div>
+                                        <div class="category-info">
+                                            <h6>{{ category.name }}</h6>
+                                            {% if not category.is_default %}
+                                                <small class="text-muted">Custom</small>
+                                            {% else %}
+                                                <small class="text-muted">Default</small>
+                                            {% endif %}
+                                        </div>
+                                        {% if not category.is_default %}
+                                            <div class="category-actions">
+                                                <a href="{% url 'expense_tracker:category_edit' category.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteModal{{ category.pk }}"
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                {% if not category.is_default %}
+                                <div class="modal fade" id="deleteModal{{ category.pk }}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete Category</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this category?</p>
+                                                <div class="alert alert-warning">
+                                                    <strong>{{ category.icon }} {{ category.name }}</strong>
+                                                    <p class="mb-0 mt-2"><small>Note: Transactions using this category will become uncategorized.</small></p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form method="post" action="{% url 'expense_tracker:category_delete' category.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No expense categories yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Income Categories -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-arrow-up me-2"></i>Income Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if income_categories %}
+                        <div class="row g-3">
+                            {% for category in income_categories %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="category-item" style="border-left-color: {{ category.color }};">
+                                        <div class="category-icon" style="background-color: {{ category.color }}20;">
+                                            <span style="font-size: 24px;">{{ category.icon }}</span>
+                                        </div>
+                                        <div class="category-info">
+                                            <h6>{{ category.name }}</h6>
+                                            {% if not category.is_default %}
+                                                <small class="text-muted">Custom</small>
+                                            {% else %}
+                                                <small class="text-muted">Default</small>
+                                            {% endif %}
+                                        </div>
+                                        {% if not category.is_default %}
+                                            <div class="category-actions">
+                                                <a href="{% url 'expense_tracker:category_edit' category.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteModal{{ category.pk }}"
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                {% if not category.is_default %}
+                                <div class="modal fade" id="deleteModal{{ category.pk }}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete Category</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this category?</p>
+                                                <div class="alert alert-warning">
+                                                    <strong>{{ category.icon }} {{ category.name }}</strong>
+                                                    <p class="mb-0 mt-2"><small>Note: Transactions using this category will become uncategorized.</small></p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form method="post" action="{% url 'expense_tracker:category_delete' category.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No income categories yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .category-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        border-left: 4px solid;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+    
+    .category-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    
+    .category-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .category-info {
+        flex: 1;
+    }
+    
+    .category-info h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .category-actions {
+        display: flex;
+        gap: 5px;
+    }
+</style>
+{% endblock %}

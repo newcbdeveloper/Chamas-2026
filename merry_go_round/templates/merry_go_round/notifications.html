@@ -1,0 +1,331 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+    <!-- Header-->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="h4 fw-bold text-dark mb-1">
+                <i class="fas fa-bell text-primary me-2"></i> Notifications
+            </h2>
+            <p class="text-muted small mb-0">Stay updated with your merry-go-round activities</p>
+        </div>
+        <button onclick="markAllAsRead()" class="btn btn-sm btn-outline-primary px-3 flex-shrink-0">
+            <i class="fas fa-check-double me-1"></i>
+            <span class="d-none d-sm-inline">Mark all as read</span>
+            <span class="d-inline d-sm-none">All read</span>
+        </button>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="get" class="mb-4">
+        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+            <input type="text" name="q" class="form-control border-0 py-2 px-3" 
+                   placeholder="Search notifications..." 
+                   value="{{ request.GET.q|default:'' }}">
+            <button class="btn btn-white border-0 px-3" type="submit">
+                <i class="fas fa-search text-muted"></i>
+            </button>
+            {% if request.GET.filter %}
+                <input type="hidden" name="filter" value="{{ request.GET.filter }}">
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- Tabs (Horizontal Scroll on Mobile) -->
+    <div class="d-flex gap-4 mb-4 border-bottom pb-3 overflow-x-auto hide-scrollbar">
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}filter=all" 
+           class="text-decoration-none fw-medium pb-2 border-bottom-2 {% if not request.GET.filter or request.GET.filter == 'all' %}text-primary border-primary{% else %}text-muted{% endif %} whitespace-nowrap">
+            All <span class="badge bg-primary rounded-pill ms-1 small">{{ page_obj.paginator.count }}</span>
+        </a>
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}filter=unread" 
+           class="text-decoration-none fw-medium pb-2 border-bottom-2 {% if request.GET.filter == 'unread' %}text-primary border-primary{% else %}text-muted{% endif %} whitespace-nowrap">
+            Unread <span class="badge bg-warning text-dark rounded-pill ms-1 small">{{ unread_count }}</span>
+        </a>
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}filter=invitation" 
+           class="text-decoration-none fw-medium pb-2 border-bottom-2 {% if request.GET.filter == 'invitation' %}text-primary border-primary{% else %}text-muted{% endif %} whitespace-nowrap">
+            Invitations <span class="badge bg-info rounded-pill ms-1 small">{{ invitation_count|default:"0" }}</span>
+        </a>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="d-flex flex-column gap-3">
+        {% for notification in page_obj %}
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden
+                    {% if not notification.is_read %}border-start border-4 border-primary{% endif %}"
+             id="notification-{{ notification.id }}"
+             style="transition: all 0.3s ease;">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex gap-3">
+                    <!-- Icon + Badge -->
+                    <div class="flex-shrink-0">
+                        <span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2
+                                     {% if notification.notification_type == 'funds_locked' %}bg-primary text-white
+                                     {% elif notification.notification_type == 'round_started' %}bg-success text-white
+                                     {% elif notification.notification_type == 'invitation_received' %}bg-info text-white
+                                     {% elif notification.notification_type == 'round_completed' %}bg-dark text-white
+                                     {% elif notification.notification_type == 'payout_received' %}bg-teal text-white
+                                     {% else %}bg-secondary text-white{% endif %}">
+                            {% if notification.notification_type == 'invitation_received' %}
+                                <i class="fas fa-envelope-open"></i>
+                            {% elif notification.notification_type == 'round_completed' %}
+                                <i class="fas fa-trophy"></i>
+                            {% else %}
+                                <i class="fas fa-bell"></i>
+                            {% endif %}
+                            <span class="d-none d-md-inline ms-1">{{ notification.get_notification_type_display }}</span>
+                            <span class="d-inline d-md-none">●</span>
+                        </span>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-grow-1 min-width-0">
+                        <h6 class="fw-bold mb-1 text-dark text-truncate">
+                            {{ notification.title }}
+                        </h6>
+                        <p class="text-muted small mb-2 lh-sm text-break">
+                            {{ notification.message }}
+                        </p>
+                        <small class="text-primary d-flex align-items-center gap-1">
+                            <i class="far fa-clock"></i>
+                            {{ notification.created_at|naturaltime }}
+                        </small>
+                    </div>
+
+                    <!-- Actions (Stack on Mobile) -->
+                    <div class="d-flex flex-column gap-2 align-items-end flex-shrink-0">
+                        {% if notification.action_url %}
+                        <a href="{{ notification.action_url }}" 
+                           class="btn btn-success btn-sm rounded-pill px-3 text-white">
+                            <i class="fas fa-eye me-1"></i>
+                            <span class="d-none d-sm-inline">View</span>
+                            <span class="d-inline d-sm-none">Open</span>
+                        </a>
+                        {% endif %}
+
+                        {% if not notification.is_read %}
+                        <button onclick="event.stopPropagation(); markAsRead('{{ notification.id }}')"
+                                class="btn btn-outline-secondary btn-sm rounded-pill" title="Mark as read">
+                            <i class="fas fa-envelope-open"></i>
+                        </button>
+                        {% endif %}
+
+                        <button onclick="event.stopPropagation(); deleteNotification('{{ notification.id }}')"
+                                class="btn btn-outline-danger btn-sm rounded-pill" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-5">
+            <i class="fas fa-bell-slash fa-4x text-muted mb-3 opacity-50"></i>
+            <h5 class="text-muted">No notifications</h5>
+            <p class="text-muted small">You're all caught up!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center flex-wrap gap-2">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link rounded-pill px-4" href="?page={{ page_obj.previous_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link rounded-pill bg-primary border-0">{{ page_obj.number }}</span>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link rounded-pill px-4" href="?page={{ page_obj.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                        Next
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --radius: 1.25rem;
+        --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .card {
+        border-radius: var(--radius) !important;
+        box-shadow: var(--shadow);
+    }
+
+    /* Hide scrollbar but keep scrolling */
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Responsive badge text */
+    @media (max-width: 480px) {
+        .badge span.d-none.d-md-inline { display: none !important; }
+        .badge span.d-inline.d-md-none { display: inline !important; }
+    }
+
+    /* Button text on mobile */
+    @media (max-width: 480px) {
+        .btn-sm .d-none.d-sm-inline { display: none !important; }
+        .btn-sm .d-inline.d-sm-none { display: inline !important; }
+    }
+
+    /* Prevent text overflow */
+    .text-break { word-break: break-word; }
+    .min-width-0 { min-width: 0; }
+    .whitespace-nowrap { white-space: nowrap; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-bg-${type} border-0`;
+    toast.role = 'alert';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body fw-medium">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>`;
+    document.querySelector('.toast-container').appendChild(toast);
+    new bootstrap.Toast(toast, {delay: 3000}).show();
+}
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function markAsRead(notificationId) {
+    fetch(`{% url 'merry_go_round:mark_notification_read' notification_id='00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', notificationId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const notificationElement = document.getElementById(`notification-${notificationId}`);
+            if (notificationElement) {
+                notificationElement.classList.remove('bg-light', 'border-info');
+                const title = notificationElement.querySelector('h6');
+                if (title) title.classList.remove('fw-bold');
+                const readBtn = notificationElement.querySelector('button[title="Mark as Read"]');
+                if (readBtn) readBtn.remove();
+            }
+            showToast('Marked as read', 'success');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error marking as read', 'danger');
+    });
+}
+
+function markAllAsRead() {
+    if (confirm('Mark all notifications as read?')) {
+        fetch(`{% url 'merry_go_round:mark_all_notifications_read' %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelectorAll('.list-group-item.bg-light.border-info').forEach(el => {
+                    el.classList.remove('bg-light', 'border-info');
+                    const title = el.querySelector('h6');
+                    if (title) title.classList.remove('fw-bold');
+                    const readBtn = el.querySelector('button[title="Mark as Read"]');
+                    if (readBtn) readBtn.remove();
+                });
+                const unreadBadge = document.querySelector('.nav-link[onclick="filterNotifications(\'unread\')"] .badge');
+                if (unreadBadge) unreadBadge.textContent = '0';
+                showToast('All notifications marked as read', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error marking all as read', 'danger');
+        });
+    }
+}
+
+function deleteNotification(notificationId) {
+    if (confirm('Delete this notification?')) {
+        fetch(`{% url 'merry_go_round:delete_notification' notification_id='00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', notificationId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const notificationElement = document.getElementById(`notification-${notificationId}`);
+                if (notificationElement) {
+                    notificationElement.style.transition = 'opacity 0.3s ease';
+                    notificationElement.style.opacity = '0';
+                    setTimeout(() => notificationElement.remove(), 300);
+                }
+                showToast('Notification deleted', 'info');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error deleting notification', 'danger');
+        });
+    }
+}
+
+function filterNotifications(filter) {
+    const currentUrl = new URL(window.location.href);
+    if (filter === 'all') {
+        currentUrl.searchParams.delete('filter');
+    } else {
+        currentUrl.searchParams.set('filter', filter);
+    }
+    currentUrl.searchParams.delete('page'); // Reset to page 1
+    window.location.href = currentUrl.toString();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - ChamaSpace</title>
+    <link rel="stylesheet" href="{%static 'css/styles_new.css'%}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #2291a5 0%, #1a7a8a 100%);
+            color: white;
+            border-radius: 20px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: #2291a5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2291a5;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <a href="{%url 'homepage'%}" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M19 12H5m7-7l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Home
+        </a>
+        
+        <div class="page-header">
+            <h1>ChamaSpace Features</h1>
+            <p>Everything you need to save money and manage your Chama</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Personal Goals</h3>
+                <p>Create personal savings goals, give them names, and track your progress towards achieving them.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Group Goals</h3>
+                <p>Create group savings goals, invite members, and save together towards common objectives.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Earn Interest</h3>
+                <p>Earn 12% annual interest on fixed goals and 10% on regular goals, compounded daily.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Track Progress</h3>
+                <p>Monitor deposits, interests, and download statements easily from your dashboard.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Smart Reminders</h3>
+                <p>Get reminders for your saving commitments to help build a consistent saving culture.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🏦</div>
+                <h3>Chama Management</h3>
+                <p>Create and manage Chamas with features for contributions, loans, expenses, and investments.</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="btn-primary" onclick="window.location.href='signup.html'">
+                Start Saving Now
+            </button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Settings{% endblock %} - ChamaSpace</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    
+<style>
+    :root {
+        --primary: #2291A5;
+        --primary-light: #f0f8fa;
+        --gray-100: #f8f9fa;
+        --gray-300: #dee2e6;
+        --gray-600: #6c757d;
+        --gray-800: #343a40;
+        --danger: #dc3545;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #f5f7fa;
+        font-size: 0.9375rem; /* 15px base */
+        line-height: 1.5;
+    }
+
+    /* Header – smaller and cleaner */
+    .settings-header {
+        background: linear-gradient(135deg, var(--primary), #1a7a8c);
+        color: white;
+        border-radius: 0 0 28px 28px;
+        padding: 1.5rem 0 2.5rem;
+        margin-bottom: -2rem;
+    }
+    .settings-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .avatar-upload img {
+        width: 96px;
+        height: 96px;
+        border: 4px solid white;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    }
+    .avatar-upload label {
+        width: 36px;
+        height: 36px;
+        bottom: 4px;
+        right: 4px;
+        font-size: 0.9rem;
+    }
+    .settings-header h4 {
+        font-size: 1.35rem;
+        margin: 0.75rem 0 0.25rem;
+    }
+    .settings-header p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin: 0.25rem 0;
+    }
+    .badge {
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+    }
+
+    /* Tabs – compact & modern */
+    .nav-pills .nav-link {
+        color: var(--gray-600);
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 12px;
+        padding: 0.65rem 1rem;
+        transition: all 0.2s;
+    }
+    .nav-pills .nav-link.active {
+        background: var(--primary) !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(34,145,165,0.3);
+    }
+
+    /* Forms – clean and compact */
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.4rem;
+    }
+    .form-control,
+    .form-control-lg {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1.5px solid var(--gray-300);
+        background: white;
+    }
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(34,145,165,0.15);
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: var(--primary);
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 4px 12px rgba(34,145,165,0.3);
+    }
+    .btn-outline-danger {
+        border: 1.5px solid var(--danger);
+        color: var(--danger);
+        border-radius: 12px;
+        padding: 0.7rem 2rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    /* Spacing improvements */
+    .mb-3 { margin-bottom: 1rem !important; }
+    .mb-4 { margin-bottom: 1.25rem !important; }
+    .mt-5 { margin-top: 2rem !important; }
+
+    /* Logout always visible on mobile */
+    .logout-mobile {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .settings-header { padding: 1.2rem 0 2rem; margin-bottom: -1.5rem; }
+        .avatar-upload img { width: 84px; height: 84px; }
+        .settings-header h2 { font-size: 1.4rem; }
+        .settings-header h4 { font-size: 1.25rem; }
+
+        /* Show compact logout button on mobile */
+        .logout-desktop { display: none; }
+        .logout-mobile { 
+            display: block; 
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+    }
+</style>
+
+</head>
+<body>
+
+    <!-- Header with Avatar -->
+    <div class="settings-header text-center text-white">
+        <div class="container">
+            <h2 class="fw-bold mb-4">Settings</h2>
+            
+            <div class="avatar-upload mb-4">
+                {% if user.profile.picture %}
+                    <img src="{{ user.profile.picture.url }}" alt="Profile" class="rounded-circle">
+                {% else %}
+                    <img src="{% static 'assets/avatars/face-1.png' %}" alt="Profile" class="rounded-circle">
+                {% endif %}
+                <label for="id_picture"><i class="fas fa-camera"></i></label>
+            </div>
+
+            <h4 class="fw-bold">{{ user.get_full_name }}</h4>
+            <p class="mb-1 opacity-90">{{ user.profile.phone|default:"+254 700 000 000" }}</p>
+            <p class="small opacity-80">{{ user.email }}</p>
+            <span class="badge bg-white text-success px-3 py-2 mt-2">Active Account</span>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+
+                <!-- Tabs -->
+                <ul class="nav nav-pills nav-justified mb-5" style="gap: 10px;">
+                    <li class="nav-item flex-fill">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'Setting' %}active{% endif %}" href="{% url 'user_dashboard:settings' %}">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item flex-fill">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'setting_security' %}active{% endif %}" href="{% url 'setting_security' %}">
+                            <i class="fas fa-shield-alt me-2"></i> Security
+                        </a>
+                    </li>
+                    <li class="nav-item flex-fill">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-bell me-2"></i> Notifications
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Main Content Block -->
+                {% block settings_content %}
+                {% endblock %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer (same as rest of app) -->
+    <footer class="mbl_footer d-md-none" style="background: #2291A5; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 12px 0;">
+        <div class="container">
+            <div class="d-flex justify-content-around">
+                <a href="{% url 'user_dashboard:home' %}" class="text-white text-center">
+                    <img src="{% static 'images/home_white.png' %}" width="24"><br><small>Home</small>
+                </a>
+                <a href="#" id="featuresBtn" class="text-white text-center">
+                    <img src="{% static 'images/filter_active.png' %}" width="24"><br><small style="font-weight:600;">Features</small>
+                </a>
+                <a href="#" class="text-white text-center coming_soon">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" width="24"><br><small>Account</small>
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="text-white text-center">
+                    <img src="{% static 'images/setting.png' %}" width="24"><br><small>Settings</small>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Features Drawer Trigger (uses global openDrawer() if available) -->
+    <script>
+        document.getElementById('featuresBtn')?.addEventListener('click', e => {
+            e.preventDefault();
+            if (typeof openDrawer === 'function') openDrawer();
+        });
+    </script>
+</body>
+</html>

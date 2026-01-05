@@ -1,0 +1,1996 @@
+{%extends 'chamas/base.html'%} {%load static%} {% load humanize %} {%block head%}
+<title>Finances</title>
+<link rel="stylesheet" href="{%static 'chamas/brand-colors.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/reports.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/loans.css'%}" />
+<link rel="stylesheet" href="{%static 'chamas/finances.css'%}" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    .fab-label {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+</style>
+
+{%endblock%} {%block body%}
+
+<div class="reports-container full-width">
+    <!-- Page Header -->
+    <div class="reports-header">
+        <div class="reports-header-content">
+            <h1 class="reports-title text-brand-primary">Finance Management</h1>
+            <p class="reports-subtitle">Manage savings, investments, and income tracking</p>
+        </div>
+    </div>
+    
+    <!-- CSRF Token for JavaScript -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- Desktop Floating Action Buttons -->
+    <div class="floating-actions desktop-floating">
+        <button class="btn-floating admin" data-bs-toggle="modal" data-bs-target="#createSavingModal" title="Create Savings">
+            <i class='bx bx-wallet'></i>
+            <span>Create Savings</span>
+        </button>
+        <button class="btn-floating admin" data-bs-toggle="modal" data-bs-target="#createInvestmentModal" title="Create Investment">
+            <i class='bx bx-trending-up'></i>
+            <span>Create Investment</span>
+        </button>
+        <button class="btn-floating admin" data-bs-toggle="modal" data-bs-target="#createIncomeModal" title="Create Income">
+            <i class='bx bx-money'></i>
+            <span>Create Income</span>
+        </button>
+    </div>
+
+    <!-- Mobile FAB Container -->
+    <div class="fab-backdrop admin" id="fabBackdrop"></div>
+    <div class="fab-container admin">
+        <button class="fab-create admin" id="fabCreate">
+            <i class='bx bx-plus'></i>
+        </button>
+        
+        <button class="mini-fab mini-fab-savings admin" data-bs-toggle="modal" data-bs-target="#createSavingModal">
+            <i class='bx bx-wallet'></i>
+            <span class="fab-label">Create Savings</span>
+        </button>
+        
+        <button class="mini-fab mini-fab-investment admin" data-bs-toggle="modal" data-bs-target="#createInvestmentModal">
+            <i class='bx bx-trending-up'></i>
+            <span class="fab-label">Create Investment</span>
+        </button>
+        
+        <button class="mini-fab mini-fab-income admin" data-bs-toggle="modal" data-bs-target="#createIncomeModal">
+            <i class='bx bx-money'></i>
+            <span class="fab-label">Create Income</span>
+        </button>
+    </div>
+
+    <!-- Finance Tabs Navigation -->
+    <div class="reports-tabs-wrapper">
+        <ul class="reports-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active member" id="my-savings-tab" data-bs-toggle="tab" href="#tab-my-savings" role="tab">
+                    <i class="bx bx-wallet"></i>
+                    My Savings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin" id="individual-savings-tab" data-bs-toggle="tab" href="#tab-individual-savings" role="tab">
+                    <i class="bx bx-user"></i>
+                    Individual Savings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin member" id="group-savings-tab" data-bs-toggle="tab" href="#tab-group-savings" role="tab">
+                    <i class="bx bx-group"></i>
+                    Group Savings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin member" id="group-investments-tab" data-bs-toggle="tab" href="#tab-group-investments" role="tab">
+                    <i class="bx bx-trending-up"></i>
+                    Group Investments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin" id="individual-investment-income-tab" data-bs-toggle="tab" href="#tab-individual-investment-income" role="tab">
+                    <i class="bx bx-chart"></i>
+                    Individual Investment Income
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link admin member" id="group-investment-income-tab" data-bs-toggle="tab" href="#tab-group-investment-income" role="tab">
+                    <i class="bx bx-line-chart"></i>
+                    Group Investment Income
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link member" id="my-investment-income-tab" data-bs-toggle="tab" href="#tab-my-investment-income" role="tab">
+                    <i class="bx bx-money"></i>
+                    My Investment Income
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="reports-content">
+        <div class="tab-content">
+            <!-- My Savings Tab -->
+            <div class="tab-pane active" id="tab-my-savings" role="tabpanel">
+                <div class="reports-grid">
+                    <div class="report-card brand-card member">
+                        <div class="report-card-header brand-card-header">
+                            <div class="report-header-info">
+                                <h3 class="report-title text-brand-primary">My Savings</h3>
+                                <p class="report-description">Your personal savings contributions</p>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-download-individual bg-brand-primary" id="download-my-savings-report">
+                                    <i class="bx bx-download"></i>
+                                </button>
+                                <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('my-savings-report')">
+                                    <i class="bx bx-filter"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-filters" id="my-savings-report-filters">
+                            <div class="filter-row">
+                                <div class="filter-field">
+                                    <label for="my_savings_start" class="field-label">Start Date</label>
+                                    <input type="date" class="field-input" id="my_savings_start">
+                                </div>
+                                <div class="filter-field">
+                                    <label for="my_savings_end" class="field-label">End Date</label>
+                                    <input type="date" class="field-input" id="my_savings_end">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Owner</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id='my-savings-table-body'>
+                            {%for saving in my_savings%}
+                            <tr>
+                                <td>{{saving.owner.name}}</td>
+                                <td>{{saving.date | date:"d/m/Y"}}</td>
+                                <td>{{saving.saving_type.name}}</td>
+                                <td>ksh {{saving.amount | intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="4" class="text-center">No savings!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div id='my-savings-cont' class="mobile-cards">
+                    {%for saving in my_savings%}
+                        <div class="finance-card">
+                            <div class="saving-details">
+                                <div class="saving-details-row">
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Owner</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.owner.name}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Date</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.date | date:"d/m/Y" }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Type</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.saving_type.name}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Amount</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                ksh {{saving.amount | intcomma}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {%empty%}
+                    <div class="finance-card text-center mx-auto">
+                        <div class="saving-details">
+                            <h7 class="align-self-center">No savings!</h7>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Savings Tab -->
+        <div class="tab-pane" id="tab-individual-savings" role="tabpanel">
+            <div class="reports-grid">
+                <div class="report-card brand-card admin">
+                    <div class="report-card-header brand-card-header">
+                        <div class="report-header-info">
+                            <h3 class="report-title text-brand-primary">Individual Savings</h3>
+                            <p class="report-description">Member savings contributions tracking</p>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-download-individual bg-brand-primary" id="download-individual-savings-report">
+                                <i class="bx bx-download"></i>
+                            </button>
+                            <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('individual-savings-report')">
+                                <i class="bx bx-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="report-filters" id="individual-savings-report-filters">
+                        <div class="filter-row">
+                            <div class="filter-field">
+                                <label for="individual_savings_start" class="field-label">Start Date</label>
+                                <input type="date" class="field-input" id="individual_savings_start">
+                            </div>
+                            <div class="filter-field">
+                                <label for="individual_savings_end" class="field-label">End Date</label>
+                                <input type="date" class="field-input" id="individual_savings_end">
+                            </div>
+                            <div class="filter-field">
+                                <label for="individual_savings_member" class="field-label">Member</label>
+                                <select class="field-input" id="individual_savings_member">
+                                    <option value="">All Members</option>
+                                    {%for member in members%}
+                                    <option value="{{member.id}}" class="text-capitalize">{{member.name}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Owner</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id='individual-savings-table-body'>
+                            {%for saving in individual_savings%}
+                            <tr>
+                                <td>{{saving.owner.name}}</td>
+                                <td>{{saving.date | date:"d/m/Y"}}</td>
+                                <td>{{saving.saving_type.name}}</td>
+                                <td>ksh {{saving.amount | intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="4" class="text-center">No savings!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div id='individual-savings-cont' class="mobile-cards">
+                    {%for saving in individual_savings%}
+                        <div class="finance-card">
+                            <div class="saving-details">
+                                <div class="saving-details-row">
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Owner</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.owner.name}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Date</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.date | date:"d/m/Y"}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Type</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.saving_type.name}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Amount</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                ksh {{saving.amount | intcomma}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {%empty%}
+                        <div class="finance-card text-center mx-auto">
+                            <div class="saving-details">
+                                <h7 class="align-self-center">No savings!</h7>
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Group Savings Tab -->
+        <div class="tab-pane" id="tab-group-savings" role="tabpanel">
+            <div class="reports-grid">
+                <div class="report-card brand-card admin member">
+                    <div class="report-card-header brand-card-header">
+                        <div class="report-header-info">
+                            <h3 class="report-title text-brand-primary">Group Savings</h3>
+                            <p class="report-description">All group savings contributions</p>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-download-individual bg-brand-primary" id="download-group-savings-report">
+                                <i class="bx bx-download"></i>
+                            </button>
+                            <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('group-savings-report')">
+                                <i class="bx bx-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="report-filters" id="group-savings-report-filters">
+                        <div class="filter-row">
+                            <div class="filter-field">
+                                <label for="group-savings-start" class="field-label">Start Date</label>
+                                <input type="date" class="field-input" id="group-savings-start">
+                            </div>
+                            <div class="filter-field">
+                                <label for="group-savings-end" class="field-label">End Date</label>
+                                <input type="date" class="field-input" id="group-savings-end">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Owner</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id='group-savings-table-body'>
+                            {%for saving in group_savings%}
+                            <tr>
+                                <td>group</td>
+                                <td>{{saving.date | date:"d/m/Y"}}</td>
+                                <td>{{saving.saving_type.name}}</td>
+                                <td>ksh {{saving.amount | intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="4" class="text-center">No savings!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div id='group-savings-cont' class="mobile-cards">
+                    {%for saving in group_savings%}
+                        <div class="finance-card">
+                            <div class="saving-details">
+                                <div class="saving-details-row">
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Owner</h6>
+                                        <div class="amount-section">
+                                            <p class="amount"> group</p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Date</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.date | date:"d/m/Y"}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">type</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{saving.saving_type.name}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Amount</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                ksh {{saving.amount | intcomma}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {%empty%}
+                    <div class="finance-card text-center mx-auto">
+                        <div class="saving-details">
+                            <h7 class="align-self-center">No savings!</h7>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                    <div class="summary-section">
+                        <div class="summary-section-inner">
+                            <h6>Total saving</h6>
+                            <h5>ksh {{group_savings_tot | intcomma }}</h5>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Group Investments Tab -->
+        <div class="tab-pane" id="tab-group-investments" role="tabpanel">
+            <div class="reports-grid">
+                <div class="report-card brand-card admin member">
+                    <div class="report-card-header brand-card-header">
+                        <div class="report-header-info">
+                            <h3 class="report-title text-brand-primary">Group Investments</h3>
+                            <p class="report-description">All group investment activities</p>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-download-individual bg-brand-primary" id="download-group-investments-report">
+                                <i class="bx bx-download"></i>
+                            </button>
+                            <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('group-investments-report')">
+                                <i class="bx bx-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="report-filters" id="group-investments-report-filters">
+                        <div class="filter-row">
+                            <div class="filter-field">
+                                <label for="group-investments-start" class="field-label">Start Date</label>
+                                <input type="date" class="field-input" id="group-investments-start">
+                            </div>
+                            <div class="filter-field">
+                                <label for="group-investments-end" class="field-label">End Date</label>
+                                <input type="date" class="field-input" id="group-investments-end">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id='group-investments-table-body'>
+                            {%for investment in group_investments%}
+                            <tr>
+                                <td>{{investment.name}}</td>
+                                <td>{{investment.date | date:"d/m/Y"}}</td>
+                                <td>ksh {{investment.amount |intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="3" class="text-center">No Investments!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div id='group-investments-cont' class="mobile-cards">
+                    {%for investment in group_investments%}
+                        <div class="finance-card">
+                            <div class="saving-details">
+                                <div class="saving-details-row">
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">name</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">{{investment.name}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">Date</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{investment.date | date:"d/m/Y"}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="saving-cube">
+                                        <h6 class="fw-semibold">amount</h6>
+                                        <div class="amount-section">
+                                            <p class="amount">
+                                                {{investment.amount |intcomma}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {%empty%}
+                    <div class="finance-card text-center mx-auto">
+                        <div class="saving-details">
+                            <h7 class="align-self-center">No Investments!</h7>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                    <div class="summary-section">
+                        <div class="summary-section-inner">
+                            <h6>Total investments</h6>
+                            <h5>ksh {{group_investments_tot |intcomma}}</h5>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Investment Income Tab -->
+        <div class="tab-pane" id="tab-individual-investment-income" role="tabpanel">
+            <div class="reports-grid">
+                <div class="report-card brand-card admin">
+                    <div class="report-card-header brand-card-header">
+                        <div class="report-header-info">
+                            <h3 class="report-title text-brand-primary">Individual Investment Income</h3>
+                            <p class="report-description">Member investment income tracking</p>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-download-individual bg-brand-primary" id="download-individual-investment-income-report">
+                                <i class="bx bx-download"></i>
+                            </button>
+                            <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('individual-investment-income-report')">
+                                <i class="bx bx-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="report-filters" id="individual-investment-income-report-filters">
+                        <div class="filter-row">
+                            <div class="filter-field">
+                                <label for="individual_investment_income_start" class="field-label">Start Date</label>
+                                <input type="date" class="field-input" id="individual_investment_income_start">
+                            </div>
+                            <div class="filter-field">
+                                <label for="individual_investment_income_end" class="field-label">End Date</label>
+                                <input type="date" class="field-input" id="individual_investment_income_end">
+                            </div>
+                            <div class="filter-field">
+                                <label for="individual_investment_income_member" class="field-label">Member</label>
+                                <select class="field-input" id="individual_investment_income_member">
+                                    <option value="">All Members</option>
+                                    {%for member in members%}
+                                    <option value="{{member.id}}" class="text-capitalize">{{member.name}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Owner</th>
+                                <th>Name</th>
+                                <th>Investment</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id='individual-investment-income-table-body'>
+                            {%for income in individual_investment_income%}
+                            <tr>
+                                <td>{{income.owner.name}}</td>
+                                <td>{{income.name}}</td>
+                                <td>{{income.investment.name}}</td>
+                                <td>{{income.date | date:"d/m/Y"}}</td>
+                                <td>ksh {{income.amount | intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="5" class="text-center">No Investment Income!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div id='individual-investment-income-cont' class="mobile-cards">
+                    {%for income in individual_investment_income%}
+                    <div class="finance-card">
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Owner</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.owner.name}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Name</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.name}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Investment</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.investment.name}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.date | date:"d/m/Y"}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.amount | intcomma}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {%empty%}
+                    <div class="finance-card text-center mx-auto">
+                        <div class="saving-details">
+                            <h7 class="align-self-center">No Investment Income!</h7>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Group Investment Income Tab -->
+        <div class="tab-pane" id="tab-group-investment-income" role="tabpanel">
+            <div class="reports-grid">
+                <div class="report-card brand-card admin member">
+                    <div class="report-card-header brand-card-header">
+                        <div class="report-header-info">
+                            <h3 class="report-title text-brand-primary">Group Investment Income</h3>
+                            <p class="report-description">Group investment income tracking</p>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-download-individual bg-brand-primary" id="download-group-investment-income-report">
+                                <i class="bx bx-download"></i>
+                            </button>
+                            <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('group-investment-income-report')">
+                                <i class="bx bx-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="report-filters" id="group-investment-income-report-filters">
+                        <div class="filter-row">
+                            <div class="filter-field">
+                                <label for="group_investment_income_start" class="field-label">Start Date</label>
+                                <input type="date" class="field-input" id="group_investment_income_start">
+                            </div>
+                            <div class="filter-field">
+                                <label for="group_investment_income_end" class="field-label">End Date</label>
+                                <input type="date" class="field-input" id="group_investment_income_end">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Investment</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id='group-investment-income-table-body'>
+                            {%for income in group_investment_incomes%}
+                            <tr>
+                                <td>{{income.name}}</td>
+                                <td>{{income.investment.name}}</td>
+                                <td>{{income.date | date:"d/m/Y"}}</td>
+                                <td>ksh {{income.amount | intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="4" class="text-center">No Investment Income!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div id='group-investment-income-cont' class="mobile-cards">
+                    {%for income in group_investment_incomes%}
+                    <div class="finance-card">
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">name</h6>
+                                    <div class="amount-section">
+                                        <p class="amount"> {{income.name}}</p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Invenstment</h6>
+                                    <div class="amount-section">
+                                        <p class="amount"> {{income.investment.name}}</p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.date | date:"d/m/Y"}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.amount | intcomma}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {%empty%}
+                    <div class="finance-card text-center mx-auto">
+                        <div class="saving-details">
+                            <h7 class="align-self-center">No Investment Income!</h7>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                    <div class="summary-section">
+                        <div class="summary-section-inner">
+                            <h6>Total income</h6>
+                            <h5>ksh {{group_investment_incomes_tot | intcomma}}</h5>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Investment Income Tab -->
+        <div class="tab-pane" id="tab-my-investment-income" role="tabpanel">
+            <div class="reports-grid">
+                <div class="report-card brand-card member">
+                    <div class="report-card-header brand-card-header">
+                        <div class="report-header-info">
+                            <h3 class="report-title text-brand-primary">My Investment Income</h3>
+                            <p class="report-description">Your personal investment income tracking</p>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-download-individual bg-brand-primary" id="download-my-investment-income-report">
+                                <i class="bx bx-download"></i>
+                            </button>
+                            <button class="btn-filter-individual text-brand-primary" onclick="toggleReportFilter('my-investment-income-report')">
+                                <i class="bx bx-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="report-filters" id="my-investment-income-report-filters">
+                        <div class="filter-row">
+                            <div class="filter-field">
+                                <label for="my-investment-income-start" class="field-label">Start Date</label>
+                                <input type="date" class="field-input" id="my-investment-income-start">
+                            </div>
+                            <div class="filter-field">
+                                <label for="my-investment-income-end" class="field-label">End Date</label>
+                                <input type="date" class="field-input" id="my-investment-income-end">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-data brand-card-body">
+                <div class="brand-table-responsive desktop-view">
+                    <table class="brand-table">
+                        <thead>
+                            <tr>
+                                <th>Owner</th>
+                                <th>Investment</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for income in my_investment_income%}
+                            <tr>
+                                <td>{{income.owner.name}}</td>
+                                <td>{{income.investment.name}}</td>
+                                <td>{{income.date | date:"d/m/Y"}}</td>
+                                <td>ksh {{income.amount | intcomma}}</td>
+                            </tr>
+                            {%empty%}
+                            <tr>
+                                <td colspan="4" class="text-center">No Investment Income!</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mobile-cards">
+                    {%for income in my_investment_income%}
+                    <div class="finance-card">
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Owner</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.owner.name}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Investment</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.investment.name}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.date | date:"d/m/Y"}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6 class="fw-semibold">amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            {{income.amount | intcomma}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {%empty%}
+                    <div class="finance-card text-center mx-auto">
+                        <div class="saving-details">
+                            <h7 class="align-self-center">No Investment Income!</h7>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Saving Modal -->
+<div class="modal fade" id="createSavingModal" tabindex="-1" aria-labelledby="createSavingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content finance-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSavingModalLabel">
+                    <i class='bx bx-sort bx-rotate-90'></i>
+                    Create Savings
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="create-saving-alert-hub"></div>
+                <form action="" id="create-saving-form" style="width: 100%;">
+                    <div class="input-sect mt-4">
+                        <div class="input-group mb-3" style=" width: 100%; padding: 0.375rem 0.75rem; background-color: var(--bs-body-bg);
+                                            background-clip: padding-box;
+                                            border: var(--bs-border-width) solid var(--bs-border-color);
+                                            border-radius: var(--bs-border-radius);
+                                            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                            <select id="owner" class="border-0 bg-white" name="owner" required>
+                                <option value="" disabled selected>Owner</option>
+                                <option value="group">Group</option>
+                                {%for member in members%}
+                                <option value="{{member.id}}" class="text-capitalize">{{member.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+
+                        <div class="input-group mb-3" style=" width: 100%; padding: 0.375rem 0.75rem; background-color: var(--bs-body-bg);
+                        background-clip: padding-box;
+                        border: var(--bs-border-width) solid var(--bs-border-color);
+                        border-radius: var(--bs-border-radius);
+                        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                            <select id="type" name="saving-type" class="border-0 bg-white text-capitalize" required>
+                                <option value="" disabled selected>Type</option>
+                                {%for type in saving_types%}
+                                <option value="{{type.id}}">{{type.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-sect">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount</label>
+                            <input type="number" name="amount" class="form-control" id="amount" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary border-0" type="submit" style="width: 100%;">Create Saving</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Investment Modal -->
+<div class="modal fade" id="createInvestmentModal" tabindex="-1" aria-labelledby="createInvestmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content finance-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createInvestmentModalLabel">
+                    <i class='bx bx-sort bx-rotate-90'></i>
+                    Create Investment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="create-investment-alerts-hub"></div>
+                <form action="" style="width: 100%;" id="create-investment-form">
+                    <div class="input-sect">
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Investment Name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" name="date" class="form-control" id="date" required>
+                        </div>
+                    </div>
+
+                    <div class="input-sect">
+                        <div class="mb-3">
+                            <label for="Amount" class="form-label">Amount</label>
+                            <input type="number" name="amount" class="form-control" id="amount" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary border-0" style="width: 100%;">Create Investment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Income Modal -->
+<div class="modal fade" id="createIncomeModal" tabindex="-1" aria-labelledby="createIncomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content finance-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createIncomeModalLabel">
+                    <i class='bx bx-sort bx-rotate-90'></i>
+                    Create Income
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="create-income-alerts-hub"></div>
+                <form action="" id="create-income-form" style="width: 100%;">
+                    <div class="input-sect">
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Income Name</label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Income Name" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" name="date" class="form-control" id="date" required>
+                        </div>
+                    </div>
+
+                    <div class="input-sect">
+                        <div class="input-group mb-3" style=" width: 100%; padding: 0.375rem 0.75rem; background-color: var(--bs-body-bg);
+                        background-clip: padding-box;
+                        border: var(--bs-border-width) solid var(--bs-border-color);
+                        border-radius: var(--bs-border-radius);
+                        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                            <select id="investment-scheme" class="border-0 bg-white" name="investment-scheme" required>
+                                <option value="" disabled selected>Select Investment</option>
+                                {%for investment in investments%}
+                                {%if investment.name != 'others'%}
+                                <option value="{{investment.id}}" class="text-capitalize">{{investment.name}}</option>
+                                {%endif%}
+                                {%endfor%}
+                                <option value="others">others</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-sect">
+                        <div class="input-group mb-3" style=" width: 100%; padding: 0.375rem 0.75rem; background-color: var(--bs-body-bg);
+                            background-clip: padding-box;
+                            border: var(--bs-border-width) solid var(--bs-border-color);
+                            border-radius: var(--bs-border-radius);
+                            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                            <select id="owner" class="border-0 bg-white" name="owner">
+                                <option value="" disabled selected>Owner</option>
+                                <option selected value="group">Group</option>
+                                {%for member in members%}
+                                <option value="{{member.id}}" class="text-capitalize">{{member.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-sect">
+                        <div class="mb-3">
+                            <label for="Amount" class="form-label">Amount</label>
+                            <input type="number" name="amount" class="form-control" id="amount" required>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary border-0" type="submit" style="width: 100%;">Create Income</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Select the form
+        const form = document.getElementById("create-saving-form");
+
+        // Add a submit event listener to the form
+        form.addEventListener("submit", function (event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Gather form data
+            const formData = new FormData(form);
+
+            // Convert form data to JSON
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            // Fetch the CSRF token from the cookie
+            const csrftoken = getCookie("csrftoken");
+
+            // Send AJAX request to the backend
+            fetch(`/chamas-bookeeping/create-saving/${localStorage.getItem('groupId')}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrftoken
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Process the response and display Bootstrap alerts
+                    const alertHub = document.getElementById("create-saving-alert-hub");
+
+                    if (data.status === "success") {
+                        // Display success alert
+                        alertHub.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+
+                    } else {
+                        // Display error alert
+                        alertHub.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+        // Function to get the value of a cookie by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("create-investment-form");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            // Convert form data to JSON
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            // Fetch the CSRF token from the cookie
+            const csrftoken = getCookie("csrftoken");
+
+            // Send AJAX request to the backend
+            fetch(`/chamas-bookeeping/create-investment/${localStorage.getItem('groupId')}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrftoken
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Process the response and display Bootstrap alerts
+                    const alertHub = document.querySelector(".create-investment-alerts-hub");
+
+                    if (data.status === "success") {
+                        // Display success alert
+                        alertHub.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    } else {
+                        // Display error alert
+                        alertHub.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+        // Function to get the value of a cookie by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Select the form
+        const form = document.getElementById("create-income-form");
+
+        // Add a submit event listener to the form
+        form.addEventListener("submit", function (event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Gather form data
+            const formData = new FormData(form);
+
+            // Convert form data to JSON
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            // Fetch the CSRF token from the cookie
+            const csrftoken = getCookie("csrftoken");
+
+            // Send AJAX request to the backend
+            fetch(`/chamas-bookeeping/create-income/${localStorage.getItem('groupId')}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrftoken
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Process the response and display Bootstrap alerts
+                    const alertHub = document.querySelector(".create-income-alerts-hub");
+
+                    if (data.status === "success") {
+                        // Display success alert
+                        alertHub.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    } else {
+                        // Display error alert
+                        alertHub.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+        // Function to get the value of a cookie by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    });
+</script>
+
+<script>
+    var savings = [
+        {% for saving in my_savings %}
+            {
+                'owner': '{{ saving.owner.name|escapejs }}',
+                'date': new Date('{{ saving.date|date:"c" }}'),
+                'type': '{{ saving.saving_type.name|escapejs }}',
+                'amount': '{{ saving.amount }}',
+            },
+        {% endfor %}
+    ];
+    
+    document.getElementById('my_savings_start').addEventListener('change', filterSavings);
+    document.getElementById('my_savings_end').addEventListener('change', filterSavings);
+    
+    function filterSavings() {
+        var startInput = document.getElementById('my_savings_start').value;
+        var endInput = document.getElementById('my_savings_end').value;
+    
+        // Check if both start and end dates are selected
+        if (startInput && endInput) {
+            var start = new Date(startInput);
+            var end = new Date(endInput);
+    
+            // Check if the parsed dates are valid
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                var filteredSavings = savings.filter(function(saving) {
+                    return saving.date >= start && saving.date <= end;
+                });
+    
+                                // Update mobile cards
+                var savingsContainer = document.getElementById('my-savings-cont');
+                savingsContainer.innerHTML = '';
+                
+                // Update table body
+                var tableBody = document.getElementById('my-savings-table-body');
+                tableBody.innerHTML = '';
+
+                filteredSavings.forEach(function(saving) {
+                    // Create mobile card
+                    var savingElement = document.createElement('div');
+                    savingElement.className = 'finance-card';
+                    
+                    // Create table row
+                    var tableRow = document.createElement('tr');
+                    tableRow.innerHTML = `
+                        <td>${saving.owner}</td>
+                        <td>${saving.date.getDate()}/${saving.date.getMonth()+1}/${saving.date.getFullYear()}</td>
+                        <td>${saving.type}</td>
+                        <td>ksh ${saving.amount}</td>
+                    `;
+                    tableBody.appendChild(tableRow);
+                    savingElement.innerHTML = `
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6>Owner</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ${saving.owner}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ${saving.date.getDate()}/${saving.date.getMonth()+1}/${saving.date.getFullYear()}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Type</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ${saving.type}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ksh ${saving.amount}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    savingsContainer.appendChild(savingElement);
+                });
+            } else {
+                console.log("Invalid date format");
+            }
+        }
+    }
+</script>
+
+<script>
+    var savings = [
+        {% for saving in individual_savings %}
+            {
+                'owner': '{{ saving.owner.name|escapejs }}',
+                'owner_id': '{{ saving.owner.id }}',
+                'date': new Date('{{ saving.date|date:"c" }}'),
+                'type': '{{ saving.saving_type.name|escapejs }}',
+                'amount': '{{ saving.amount }}',
+            },
+        {% endfor %}
+    ];
+    
+    document.getElementById('individual_savings_start').addEventListener('change', filterSavings);
+    document.getElementById('individual_savings_end').addEventListener('change', filterSavings);
+    document.getElementById('individual_savings_member').addEventListener('change', filterSavings);
+    
+    function filterSavings() {
+        var startInput = document.getElementById('individual_savings_start').value;
+        var endInput = document.getElementById('individual_savings_end').value;
+        var memberInput = document.getElementById('individual_savings_member').value;
+    
+        var filteredSavings = savings;
+        
+        // Filter by date range if both dates are provided
+        if (startInput && endInput) {
+            var start = new Date(startInput);
+            var end = new Date(endInput);
+    
+            // Check if the parsed dates are valid
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                filteredSavings = filteredSavings.filter(function(saving) {
+                    return saving.date >= start && saving.date <= end;
+                });
+            }
+        }
+        
+        // Filter by member if selected
+        if (memberInput) {
+            filteredSavings = filteredSavings.filter(function(saving) {
+                return saving.owner_id == memberInput;
+            });
+        }
+        
+        // Only update display if we have filters applied
+        if ((startInput && endInput) || memberInput) {
+    
+                                // Update mobile cards
+                var savingsContainer = document.getElementById('individual-savings-cont');
+                savingsContainer.innerHTML = '';
+                
+                // Update table body
+                var tableBody = document.getElementById('individual-savings-table-body');
+                tableBody.innerHTML = '';
+
+                filteredSavings.forEach(function(saving) {
+                    // Create mobile card
+                    var savingElement = document.createElement('div');
+                    savingElement.className = 'finance-card';
+                    
+                    // Create table row
+                    var tableRow = document.createElement('tr');
+                    tableRow.innerHTML = `
+                        <td>${saving.owner}</td>
+                        <td>${saving.date.getDate()}/${saving.date.getMonth()+1}/${saving.date.getFullYear()}</td>
+                        <td>${saving.type}</td>
+                        <td>ksh ${saving.amount}</td>
+                    `;
+                    tableBody.appendChild(tableRow);
+                    savingElement.innerHTML = `
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6>Owner</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ${saving.owner}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ${saving.date.getDate()}/${saving.date.getMonth()+1}/${saving.date.getFullYear()}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Type</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ${saving.type}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">
+                                            ksh ${saving.amount}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    savingsContainer.appendChild(savingElement);
+                });
+        }
+    }
+</script>
+
+<script>
+    // Retrieve the group investments data from the template and convert it into an array of objects
+    var groupInvestments = [
+        {% for investment in group_investments %}
+        {
+            'name': '{{ investment.name|escapejs }}',
+            'date': new Date('{{ investment.date | date:"c" }}'), // Format date in ISO 8601 format
+            'amount': '{{ investment.amount }}',
+        },
+        {% endfor %}
+    ];
+
+    // Add event listeners to the start and end date input fields
+    document.getElementById('group-investments-start').addEventListener('change', filterInvestments);
+    document.getElementById('group-investments-end').addEventListener('change', filterInvestments);
+
+    // Function to filter group investments based on the selected date range
+    function filterInvestments() {
+        var startInput = document.getElementById('group-investments-start').value;
+        var endInput = document.getElementById('group-investments-end').value;
+
+        // Check if both start and end dates are selected
+        if (startInput && endInput) {
+            var start = new Date(startInput);
+            var end = new Date(endInput);
+
+            // Check if the parsed dates are valid
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                var filteredInvestments = groupInvestments.filter(function(investment) {
+                    return investment.date >= start && investment.date <= end;
+                });
+
+                // Update mobile cards
+                var investmentsContainer = document.getElementById('group-investments-cont');
+                investmentsContainer.innerHTML = '';
+                
+                // Update table body
+                var tableBody = document.getElementById('group-investments-table-body');
+                tableBody.innerHTML = '';
+
+                // Add filtered investments to the container
+                filteredInvestments.forEach(function(investment) {
+                    // Create mobile card
+                    var investmentElement = document.createElement('div');
+                    investmentElement.className = 'finance-card';
+                    
+                    // Create table row
+                    var tableRow = document.createElement('tr');
+                    tableRow.innerHTML = `
+                        <td>${investment.name}</td>
+                        <td>${investment.date.getDate()}/${investment.date.getMonth()+1}/${investment.date.getFullYear()}</td>
+                        <td>ksh ${investment.amount}</td>
+                    `;
+                    tableBody.appendChild(tableRow);
+                    investmentElement.innerHTML = `
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6>Name</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">${investment.name}</p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">${investment.date.getDate()}/${investment.date.getMonth()+1}/${investment.date.getFullYear()}</p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">ksh ${investment.amount}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    investmentsContainer.appendChild(investmentElement);
+                });
+            } else {
+                console.log("Invalid date format");
+            }
+        }
+    }
+</script>
+
+<script>
+    // Retrieve the group savings data from the template and convert it into an array of objects
+    var groupSavings = [
+        {% for saving in group_savings %}
+        {
+            'date': new Date('{{ saving.date | date:"c" }}'), // Format date in ISO 8601 format
+            'type': '{{ saving.saving_type.name|escapejs }}',
+            'amount': '{{ saving.amount }}',
+        },
+        {% endfor %}
+    ];
+
+    // Add event listeners to the start and end date input fields
+    document.getElementById('group-savings-start').addEventListener('change', filterSavings);
+    document.getElementById('group-savings-end').addEventListener('change', filterSavings);
+
+    // Function to filter group savings based on the selected date range
+    function filterSavings() {
+        var startInput = document.getElementById('group-savings-start').value;
+        var endInput = document.getElementById('group-savings-end').value;
+
+        // Check if both start and end dates are selected
+        if (startInput && endInput) {
+            var start = new Date(startInput);
+            var end = new Date(endInput);
+
+            // Check if the parsed dates are valid
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                var filteredSavings = groupSavings.filter(function(saving) {
+                    return saving.date >= start && saving.date <= end;
+                });
+
+                // Update mobile cards
+                var savingsContainer = document.getElementById('group-savings-cont');
+                savingsContainer.innerHTML = '';
+                
+                // Update table body
+                var tableBody = document.getElementById('group-savings-table-body');
+                tableBody.innerHTML = '';
+
+                // Add filtered savings to the container
+                filteredSavings.forEach(function(saving) {
+                    // Create mobile card
+                    var savingElement = document.createElement('div');
+                    savingElement.className = 'finance-card';
+                    
+                    // Create table row
+                    var tableRow = document.createElement('tr');
+                    tableRow.innerHTML = `
+                        <td>group</td>
+                        <td>${saving.date.getDate()}/${saving.date.getMonth()+1}/${saving.date.getFullYear()}</td>
+                        <td>${saving.type}</td>
+                        <td>ksh ${saving.amount}</td>
+                    `;
+                    tableBody.appendChild(tableRow);
+                    savingElement.innerHTML = `
+                        <div class="saving-details">
+                            <div class="saving-details-row">
+                                <div class="saving-cube">
+                                    <h6>Date</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">${saving.date.getDate()}/${saving.date.getMonth()+1}/${saving.date.getFullYear()}</p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Type</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">${saving.type}</p>
+                                    </div>
+                                </div>
+                                <div class="saving-cube">
+                                    <h6>Amount</h6>
+                                    <div class="amount-section">
+                                        <p class="amount">ksh ${saving.amount}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    savingsContainer.appendChild(savingElement);
+                });
+            } else {
+                console.log("Invalid date format");
+            }
+        }
+    }
+</script>
+
+<script>
+    // Individual Investment Income filtering
+    var individualInvestmentIncomes = [
+        {% for income in individual_investment_income %}
+            {
+                'owner': '{{ income.owner.name|escapejs }}',
+                'owner_id': '{{ income.owner.id }}',
+                'name': '{{ income.name|escapejs }}',
+                'investment': '{{ income.investment.name|escapejs }}',
+                'date': new Date('{{ income.date|date:"c" }}'),
+                'amount': '{{ income.amount }}',
+            },
+        {% endfor %}
+    ];
+    
+    document.getElementById('individual_investment_income_start').addEventListener('change', filterIndividualInvestmentIncomes);
+    document.getElementById('individual_investment_income_end').addEventListener('change', filterIndividualInvestmentIncomes);
+    document.getElementById('individual_investment_income_member').addEventListener('change', filterIndividualInvestmentIncomes);
+    
+    function filterIndividualInvestmentIncomes() {
+        var startInput = document.getElementById('individual_investment_income_start').value;
+        var endInput = document.getElementById('individual_investment_income_end').value;
+        var memberInput = document.getElementById('individual_investment_income_member').value;
+    
+        var filteredIncomes = individualInvestmentIncomes;
+        
+        // Filter by date range if both dates are provided
+        if (startInput && endInput) {
+            var start = new Date(startInput);
+            var end = new Date(endInput);
+    
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                filteredIncomes = filteredIncomes.filter(function(income) {
+                    return income.date >= start && income.date <= end;
+                });
+            }
+        }
+        
+        // Filter by member if selected
+        if (memberInput) {
+            filteredIncomes = filteredIncomes.filter(function(income) {
+                return income.owner_id == memberInput;
+            });
+        }
+        
+        // Only update display if we have filters applied
+        if ((startInput && endInput) || memberInput) {
+            // Update mobile cards
+            var incomesContainer = document.getElementById('individual-investment-income-cont');
+            incomesContainer.innerHTML = '';
+            
+            // Update table body
+            var tableBody = document.getElementById('individual-investment-income-table-body');
+            tableBody.innerHTML = '';
+
+            filteredIncomes.forEach(function(income) {
+                // Create mobile card
+                var incomeElement = document.createElement('div');
+                incomeElement.className = 'finance-card';
+                
+                // Create table row
+                var tableRow = document.createElement('tr');
+                tableRow.innerHTML = `
+                    <td>${income.owner}</td>
+                    <td>${income.name}</td>
+                    <td>${income.investment}</td>
+                    <td>${income.date.getDate()}/${income.date.getMonth()+1}/${income.date.getFullYear()}</td>
+                    <td>ksh ${income.amount}</td>
+                `;
+                tableBody.appendChild(tableRow);
+                
+                incomeElement.innerHTML = `
+                    <div class="saving-details">
+                        <div class="saving-details-row">
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Owner</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.owner}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Name</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.name}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Investment</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.investment}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Date</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.date.getDate()}/${income.date.getMonth()+1}/${income.date.getFullYear()}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Amount</h6>
+                                <div class="amount-section">
+                                    <p class="amount">ksh ${income.amount}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                incomesContainer.appendChild(incomeElement);
+            });
+        }
+    }
+</script>
+
+<script>
+    // Group Investment Income filtering
+    var groupInvestmentIncomes = [
+        {% for income in group_investment_incomes %}
+            {
+                'name': '{{ income.name|escapejs }}',
+                'investment': '{{ income.investment.name|escapejs }}',
+                'date': new Date('{{ income.date|date:"c" }}'),
+                'amount': '{{ income.amount }}',
+            },
+        {% endfor %}
+    ];
+    
+    document.getElementById('group_investment_income_start').addEventListener('change', filterGroupInvestmentIncomes);
+    document.getElementById('group_investment_income_end').addEventListener('change', filterGroupInvestmentIncomes);
+    
+    function filterGroupInvestmentIncomes() {
+        var startInput = document.getElementById('group_investment_income_start').value;
+        var endInput = document.getElementById('group_investment_income_end').value;
+    
+        var filteredIncomes = groupInvestmentIncomes;
+        
+        // Filter by date range if both dates are provided
+        if (startInput && endInput) {
+            var start = new Date(startInput);
+            var end = new Date(endInput);
+    
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                filteredIncomes = filteredIncomes.filter(function(income) {
+                    return income.date >= start && income.date <= end;
+                });
+            }
+        }
+        
+        // Only update display if we have filters applied
+        if (startInput && endInput) {
+            // Update mobile cards
+            var incomesContainer = document.getElementById('group-investment-income-cont');
+            incomesContainer.innerHTML = '';
+            
+            // Update table body
+            var tableBody = document.getElementById('group-investment-income-table-body');
+            tableBody.innerHTML = '';
+
+            filteredIncomes.forEach(function(income) {
+                // Create mobile card
+                var incomeElement = document.createElement('div');
+                incomeElement.className = 'finance-card';
+                
+                // Create table row
+                var tableRow = document.createElement('tr');
+                tableRow.innerHTML = `
+                    <td>${income.name}</td>
+                    <td>${income.investment}</td>
+                    <td>${income.date.getDate()}/${income.date.getMonth()+1}/${income.date.getFullYear()}</td>
+                    <td>ksh ${income.amount}</td>
+                `;
+                tableBody.appendChild(tableRow);
+                
+                incomeElement.innerHTML = `
+                    <div class="saving-details">
+                        <div class="saving-details-row">
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Name</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.name}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Investment</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.investment}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Date</h6>
+                                <div class="amount-section">
+                                    <p class="amount">${income.date.getDate()}/${income.date.getMonth()+1}/${income.date.getFullYear()}</p>
+                                </div>
+                            </div>
+                            <div class="saving-cube">
+                                <h6 class="fw-semibold">Amount</h6>
+                                <div class="amount-section">
+                                    <p class="amount">ksh ${income.amount}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                incomesContainer.appendChild(incomeElement);
+            });
+        }
+    }
+</script>
+
+<!-- Filter Toggle Function -->
+<script>
+    function toggleReportFilter(reportId) {
+        const filterElement = document.getElementById(reportId + '-filters');
+        if (filterElement) {
+            if (filterElement.style.display === 'none' || filterElement.style.display === '') {
+                filterElement.style.display = 'block';
+            } else {
+                filterElement.style.display = 'none';
+            }
+        }
+    }
+</script>
+
+
+<!-- FAB Functionality Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log('FAB Script Loading...');
+        const fabCreate = document.getElementById('fabCreate');
+        const fabBackdrop = document.getElementById('fabBackdrop');
+        const miniFabs = document.querySelectorAll('.mini-fab');
+        const fabContainer = document.querySelector('.fab-container');
+        let isExpanded = false;
+        
+        console.log('FAB Elements:', {
+            fabCreate: fabCreate,
+            fabBackdrop: fabBackdrop,
+            miniFabs: miniFabs.length,
+            fabContainer: fabContainer
+        });
+
+        function expandFAB() {
+            isExpanded = true;
+            fabCreate.classList.add('active');
+            fabBackdrop.classList.add('active');
+            miniFabs.forEach(function(fab) {
+                fab.classList.add('show');
+            });
+            document.body.style.overflow = 'hidden'; // Prevent scroll when menu is open
+        }
+
+        function collapseFAB() {
+            isExpanded = false;
+            fabCreate.classList.remove('active');
+            fabBackdrop.classList.remove('active');
+            miniFabs.forEach(function(fab) {
+                fab.classList.remove('show');
+            });
+            document.body.style.overflow = ''; // Restore scroll
+        }
+
+        function toggleFAB() {
+            if (isExpanded) {
+                collapseFAB();
+            } else {
+                expandFAB();
+            }
+        }
+
+        // FAB click handler
+        if (fabCreate) {
+            fabCreate.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleFAB();
+            });
+        }
+
+        // Backdrop click handler
+        if (fabBackdrop) {
+            fabBackdrop.addEventListener('click', function() {
+                collapseFAB();
+            });
+        }
+
+        // Mini-FAB click handlers (close menu when action is taken)
+        miniFabs.forEach(function(fab) {
+            fab.addEventListener('click', function(e) {
+                // Don't prevent default as we want the modal to open
+                setTimeout(function() {
+                    collapseFAB();
+                }, 100); // Small delay to allow modal to trigger
+            });
+        });
+
+        // Close FAB when modal is opened
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(function(modal) {
+            modal.addEventListener('show.bs.modal', function() {
+                collapseFAB();
+            });
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isExpanded) {
+                collapseFAB();
+            }
+        });
+
+        // Handle window resize - collapse FAB if screen becomes desktop size
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 767 && isExpanded) {
+                collapseFAB();
+            }
+        });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize Bootstrap tabs - This is the critical missing piece!
+    const tabTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tab"]'));
+    tabTriggerList.map(function (tabTriggerEl) {
+        return new bootstrap.Tab(tabTriggerEl);
+    });
+
+    // Individual report filter toggle (copied from working reports page)
+    window.toggleReportFilter = function(reportId) {
+        const filterElement = document.getElementById(reportId + '-filters');
+        if (filterElement) {
+            const isHidden = window.getComputedStyle(filterElement).display === 'none';
+            filterElement.style.display = isHidden ? 'block' : 'none';
+        }
+    };
+});
+</script>
+
+{%endblock%}

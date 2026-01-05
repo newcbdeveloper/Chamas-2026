@@ -1,0 +1,395 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Express Saving - ChamaSpace</title>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/express.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper modern-dashboard">
+    <main role="main" class="main-content p-0">
+
+        <!-- Enhanced Header -->
+        <div class="enhanced-header">
+            <div class="container">
+                <div class="mb-3">
+                    <a href="{% url 'goals:wekeza_dashboard' %}" class="btn btn-link text-white">
+                        <i class="fe fe-arrow-left"></i> Back to Goals
+                    </a>
+                </div>
+                <div class="user-greeting">
+                    <h1>Express Saving</h1>
+                    <p>High-interest instant access savings (12% p.a.)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container pt-4">
+
+            <!-- Main Balance Card (Large & Beautiful) -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-12 col-lg-10">
+                    <div class="wallet-card express-wallet-card text-white position-relative overflow-hidden">
+                        <div class="row text-center text-md-start">
+                            <div class="col-12 col-md-6">
+                                <div class="wallet-label">Total Saved</div>
+                                <div class="wallet-amount">Kshs. {{ my_wallet.saving_balance|floatformat:2 }}</div>
+                            </div>
+                            <div class="col-12 col-md-6 mt-3 mt-md-0">
+                                <div class="wallet-label">Interest Earned</div>
+                                <div class="wallet-amount text-success">+ Kshs. {{ my_wallet.saving_profit|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <small class="opacity-90">12% interest per year • Instant access anytime</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="row g-3 mb-4">
+                <div class="col-4">
+                    <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" data-bs-target="#exampleModal8">
+                        <div class="action-card bg-white">
+                            <div class="action-icon bg-success text-white">
+                                <img src="{% static 'images/wallet-money_.png' %}" width="28" alt="">
+                            </div>
+                            <div class="action-label">Add Funds</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" data-bs-target="#withdrawal_request">
+                        <div class="action-card bg-white">
+                            <div class="action-icon bg-warning text-white">
+                                <img src="{% static 'images/money-send_.png' %}" width="28" alt="">
+                            </div>
+                            <div class="action-label">Withdraw</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="{% url 'goals:express_statement' request.user.username %}" download class="text-center text-decoration-none">
+                        <div class="action-card bg-white">
+                            <div class="action-icon bg-info text-white d-flex align-items-center justify-content-center">
+                                <i class="fe fe-download fs-4"></i>
+                            </div>
+                            <div class="action-label">Statement</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Progress Donut (For Interest Earned) -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-auto">
+                    <div class="donut-container" style="width: 140px; height: 140px;">
+                        <div class="donut-chart" style="--progress: {{ my_wallet.interest_percentage|default:0 }}%">
+                            <div class="donut-center">
+                                <div class="donut-percentage">{{ my_wallet.interest_percentage|floatformat:0|default:0 }}%</div>
+                                <div class="donut-label">Earned</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <small class="text-muted">Interest earned so far @ {{ intrest_value }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Header -->
+            <div class="section-header-modern mb-3">
+                <h3>Recent Transactions</h3>
+                <span class="active-badge success">{{ all_express_savings|length }} Records</span>
+            </div>
+
+            <!-- Transactions List -->
+            <div class="transactions-list">
+                {% for item in all_express_savings %}
+                <div class="transaction-item d-flex align-items-center justify-content-between p-3 border-bottom">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="transaction-icon bg-success bg-opacity-10 text-success">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="fw-bold">Deposit</div>
+                            <small class="text-muted">{{ item.created_at|date:"d M Y" }}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-success">+ Kshs. {{ item.amount|floatformat:2 }}</div>
+                        <small class="text-muted">Earned: Kshs. {{ item.calculate_future_value_express_saving|floatformat:2 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state text-center py-5">
+                    <div class="empty-state-icon">Wallet</div>
+                    <h4>No transactions yet</h4>
+                    <p>Start saving today and watch your money grow!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Link to All Goals -->
+            <div class="text-center mt-4">
+                <a href="{% url 'user_dashboard:home' %}" class="btn saving_btn">All Goals</a>
+            </div>
+
+        </div>
+
+        <!-- Modals -->
+        <div class="modal fade" id="exampleModal8" tabindex="-1" aria-labelledby="exampleModal8Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="popup_box" id="firstInnerHowmuch">
+                            <h4 class="popup_heading">How much do you want to <br>save?</h4>
+                            <form id="add_amount_form" method="post" class="mt-25">
+                                {% csrf_token %}
+                                <label for="add_money">Add Money</label>
+                                <input type="number" name="add_money" id="add_money" placeholder="Enter Amount" class="mt-1" required min="1" step="0.01">
+                                <p class="mt-4">This money will be added to your express savings</p>
+                                <button type="submit" class="btn popup_btn">Save</button>
+                            </form>
+                        </div>
+                        <div class="popupTwo" id="secondInnerHowmuch" style="display: none;">
+                            <div class="popup_box">
+                                <h4 class="popup_heading">Success!</h4>
+                                <div class="text-center mt-3 mb-3">
+                                    <img src="{% static 'images/success.png' %}" alt="">
+                                </div>
+                                <h4 class="popup_heading">You have successfully deposited funds into your Express Savings.</h4>
+                                <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="popupTwo" id="deposit_deniedInnerHowmuch" style="display: none;">
+                            <div class="popup_box">
+                                <h4 class="popup_heading">Sorry!</h4>
+                                <h4 class="popup_heading">You have not sufficient funds available in wallet. Please load balance first.</h4>
+                                <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="withdrawal_request" tabindex="-1" aria-labelledby="withdrawal_request" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="popup_box" id="firstInnerHowmuch_withdraw">
+                            <h4 class="popup_heading">How much do you want to <br>withdraw?</h4>
+                            <form class="mt-25" method="post" id="withdrawal_request_form">
+                                {% csrf_token %}
+                                <label for="withdraw_money">Withdraw Money</label>
+                                <input type="text" value="Kshs.{{ Fv_after_tax|floatformat:2 }}" name="withdraw_money" id="withdraw_money" class="mt-1" readonly>
+                                <p class="mt-4">This amount will be deducted from your Express Savings wallet.</p>
+                                <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+                            </form>
+                        </div>
+                        <div class="popupTwo" id="secondInnerHowmuch_withdraw" style="display: none;">
+                            <div class="popup_box">
+                                <h4 class="popup_heading">Success!</h4>
+                                <div class="text-center mt-3 mb-3">
+                                    <img src="{% static 'images/success.png' %}" alt="">
+                                </div>
+                                <h4 class="popup_heading">Your payment withdrawal request has been received.</h4>
+                                <p>We are processing the transaction, and you will receive a confirmation once it is successfully completed.</p>
+                                <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mbl_footer">
+            <div class="container">
+                <div class="footer_row d-flex flex-row justify-content-between align-items-center">
+                    <a href="{% url 'user_dashboard:home' %}" class="footer_button btn">
+                        <img class="homer_white" src="{% static 'images/home_white.png' %}" alt="">
+                        <p>Home</p>
+                    </a>
+                    <a href="#" class="footer_button btn">
+                        <img src="{% static 'images/filter_active.png' %}" alt="">
+                        <p>Features</p>
+                    </a>
+                    <a href="{% url 'wallet:wallet_dashboard' %}" class="footer_button btn coming_soon">
+                        <img src="{% static 'images/wallet_alt_fill.png' %}" alt="">
+                        <p>Account</p>
+                    </a>
+                    <a href="{% url 'user_dashboard:settings' %}" class="footer_button btn">
+                        <img src="{% static 'images/setting.png' %}" alt="">
+                        <p>Settings</p>
+                    </a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+</div>
+
+<!-- Coming Soon Modal -->
+<div id="comingSoonModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" aria-label="Close">&times;</button>
+        <div class="modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <h2>Coming Soon!</h2>
+        <p>We're busy cooking up something great for this feature. Stay tuned!</p>
+    </div>
+</div>
+
+
+<!-- Coming Soon Modal Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('comingSoonModal');
+    const closeBtn = modal.querySelector('.close-btn');
+    
+    function showComingSoon(e) {
+        e.preventDefault();
+        modal.classList.add('show');
+    }
+    
+    function hideComingSoon() {
+        modal.classList.remove('show');
+    }
+    
+    document.querySelectorAll('.coming_soon').forEach(el => {
+        el.addEventListener('click', showComingSoon);
+    });
+    
+    closeBtn.addEventListener('click', hideComingSoon);
+    modal.addEventListener('click', e => {
+        if (e.target === modal) hideComingSoon();
+    });
+});
+</script>
+
+<!-- ✅ jQuery is already loaded in goal_base.html, so we just use it -->
+<script>
+jQuery(document).ready(function($) {
+    console.log("=== Express Saving Dashboard - jQuery Ready ===");
+    console.log("jQuery Version:", $.fn.jquery);
+    
+    // ===================================
+    // ADD FUNDS TO EXPRESS SAVING
+    // ===================================
+    $(document).on('submit', '#add_amount_form', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("✅ Add funds to Express Saving submitted");
+        
+        var amount = $('#add_money').val();
+        console.log("Amount:", amount);
+        
+        if (!amount || amount <= 0) {
+            alert("Please enter a valid amount");
+            return false;
+        }
+        
+        var submitBtn = $(this).find('button[type="submit"]');
+        submitBtn.prop('disabled', true).text('Processing...');
+        
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:express_saving' %}",
+            data: {
+                amount: amount,
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("✅ Add funds response:", response);
+                
+                if (response.success === '1') {
+                    $('#firstInnerHowmuch').hide();
+                    $('#secondInnerHowmuch').show();
+                    
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 4000);
+                } else {
+                    // Insufficient funds - redirect to load money
+                    $('#firstInnerHowmuch').hide();
+                    $('#deposit_deniedInnerHowmuch').show();
+                    
+                    setTimeout(function() {
+                        window.location.href = 'https://chamaspace.com/load_money/load_money';
+                    }, 4000);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("❌ Add funds error:", error);
+                console.error("Response:", xhr.responseText);
+                alert("Connection error. Please try again.");
+                submitBtn.prop('disabled', false).text('Save');
+            }
+        });
+        
+        return false;
+    });
+    
+    // ===================================
+    // WITHDRAWAL FROM EXPRESS SAVING
+    // ===================================
+    $(document).on('submit', '#withdrawal_request_form', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("✅ Express Saving withdrawal submitted");
+        
+        var submitBtn = $(this).find('button[type="submit"]');
+        submitBtn.prop('disabled', true).text('Processing...');
+        
+        $.ajax({
+            type: "POST",
+            url: "{% url 'goals:withdraw_money_express_saving' %}",
+            data: {
+                withdraw_money: $('#withdraw_money').val(),
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("✅ Withdrawal response:", response);
+                
+                if (response.success === '1') {
+                    $('#firstInnerHowmuch_withdraw').hide();
+                    $('#secondInnerHowmuch_withdraw').show();
+                    
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 4000);
+                } else {
+                    // No bank account configured - redirect to add account
+                    alert(response.message || "Please configure your bank account first.");
+                    window.location.href = 'https://chamaspace.com/goals/add_account';
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("❌ Withdrawal error:", error);
+                console.error("Response:", xhr.responseText);
+                alert("Connection error. Please try again.");
+                submitBtn.prop('disabled', false).text('Withdraw Now!');
+            }
+        });
+        
+        return false;
+    });
+    
+    console.log("=== All Express Saving event handlers registered ===");
+});
+</script>

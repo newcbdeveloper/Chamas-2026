@@ -1,0 +1,528 @@
+{%extends 'chamas/base.html'%}
+{%load static%}
+
+{%block head%}
+<title>Notifications</title>
+<link rel="stylesheet" href="{%static 'chamas/notifications.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/contribution.css'%}">
+<link rel="stylesheet" href="{%static 'chamas/dashboard.css'%}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{%endblock%}
+
+{%block body%}
+<div class="modern-notifications">
+    <!-- Mobile View -->
+    <div class="mobile-notifications d-block d-lg-none">
+        <!-- Tabs -->
+        <div class="mobile-tabs">
+            {% if is_admin %}
+            <button class="tab-btn admin active" data-tab="create-type">Create Type</button>
+            <button class="tab-btn admin" data-tab="send-notification">Send Notification</button>
+            <button class="tab-btn" data-tab="group-notifications">Group Notifications</button>
+            <button class="tab-btn" data-tab="my-notifications">My Notifications</button>
+            {% else %}
+            <button class="tab-btn active" data-tab="group-notifications">Group Notifications</button>
+            <button class="tab-btn" data-tab="my-notifications">My Notifications</button>
+            {% endif %}
+        </div>
+        
+        <!-- Create Type Tab Content -->
+        {% if is_admin %}
+        <div class="tab-content active" id="create-type">
+            <div class="mobile-create-form admin">
+                <div class="create-notification-card" style="margin-top: 18px;">
+                    <div class="create-notification-header">
+                        <i class='bx bx-bell'></i>
+                        <span>Create Notification Type</span>
+                    </div>
+                    <form id="mobile-create-type-form" class="notification-card-form" onsubmit="submitTypeMobile(); return false;">
+                        <div class="form-group">
+                            <label for="mobile-type-name">Name</label>
+                            <input type="text" id="mobile-type-name" name="name" class="form-input" placeholder="Enter type name">
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-type-description">Description</label>
+                            <textarea id="mobile-type-description" name="description" class="form-input" rows="2" placeholder="Enter description"></textarea>
+                        </div>
+                        <button type="submit" class="create-notification-btn beautiful-btn" id="mobile-create-type-button">
+                            Create Type
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Send Notification Tab Content -->
+        {% if is_admin %}
+        <div class="tab-content" id="send-notification">
+            <div class="mobile-send-form admin">
+                <div class="send-notification-card" style="margin-top: 18px;">
+                    <div class="send-notification-header">
+                        <i class='bx bx-send'></i>
+                        <span>Send Notification</span>
+                    </div>
+                    <form id="mobile-send-notification-form" class="notification-card-form" onsubmit="sendNotificationMobile(); return false;">
+                        <div class="form-group">
+                            <label for="mobile-member">Member</label>
+                            <select id="mobile-member" name="member" class="form-input">
+                                <option selected value="group">Group</option>
+                                {%for member in members%}
+                                <option value="{{member.id}}">{{member.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-type">Type</label>
+                            <select id="mobile-type" name="type" class="form-input">
+                                {%for type in types%}
+                                <option value="{{type.id}}">{{type.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-message">Message</label>
+                            <textarea id="mobile-message" name="message" class="form-input" rows="3" placeholder="Enter message"></textarea>
+                        </div>
+                        <button type="submit" class="send-notification-btn beautiful-btn" id="mobile-send-notification-button">
+                            Send Notification
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Group Notifications Tab Content -->
+        <div class="tab-content{% if not is_admin %} active{% endif %}" id="group-notifications">
+            <div class="mobile-notification-history-list">
+                {% for notif in chama_notifs %}
+                <div class="notification-history-beautiful-card">
+                    <div class="notification-history-beautiful-row">
+                        <div class="notification-history-beautiful-label">Type</div>
+                        <div class="notification-history-beautiful-value">{{notif.type.name}}</div>
+                        <div class="notification-history-beautiful-label">Member</div>
+                        <div class="notification-history-beautiful-value">Group</div>
+                    </div>
+                    <div class="notification-history-beautiful-row">
+                        <div class="notification-history-beautiful-label">Date</div>
+                        <div class="notification-history-beautiful-value">{{notif.date|date:'d/m/Y'}}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-notifications">
+                    <i class='bx bx-inbox'></i>
+                    <p>No group notifications found</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- My Notifications Tab Content -->
+        <div class="tab-content" id="my-notifications">
+            <div class="mobile-notification-history-list">
+                {% for notif in my_notifs %}
+                <div class="notification-history-beautiful-card">
+                    <div class="notification-history-beautiful-row">
+                        <div class="notification-history-beautiful-label">Type</div>
+                        <div class="notification-history-beautiful-value">{{notif.type.name}}</div>
+                        <div class="notification-history-beautiful-label">Date</div>
+                        <div class="notification-history-beautiful-value">{{notif.date|date:'d/m/Y'}}</div>
+                    </div>
+                    <div class="notification-history-beautiful-row">
+                        <div class="notification-history-beautiful-label">Message</div>
+                        <div class="notification-history-beautiful-value">{{notif.message}}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-notifications">
+                    <i class='bx bx-inbox'></i>
+                    <p>No personal notifications found</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="desktop-notifications d-none d-lg-block">
+        <div class="container-fluid justify-content-center">
+            <div class="container row justify-content-center mt-2">
+                <div class="body-div admin">
+                    <h5 class="w-auto mx-auto">Create Notification type</h5>
+                    <div class="div-header">
+                        <h6>Enter name</h6>
+                    </div>
+                    <div class="create-type-alert-box">
+            
+                    </div>
+                    <form action="" id="create-notification-type" onsubmit="" style="width: 100%;">
+                        {%csrf_token%}
+                        <div class="input-sect">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="name" name="name" class="form-control" id="name">
+                            </div>
+                        </div>
+                        <div class="mb-3 desc-area">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <button class="btn btn-primary border-0" type="button" onclick="submitType()" style="width: 100%;">Create Type</button>
+                    </form>
+                </div>
+            
+                <div class="body-div admin">
+                    <h5 class="w-auto mx-auto">Send notification</h5>
+                    <div class="div-header">
+                        <h6>Send Notification</h6>
+                    </div>
+                    <div class="send-notification-alert-box">
+            
+                    </div>
+                    <form action="" id="send-notification" onsubmit="" style="width: 100%;">
+                        {%csrf_token%}
+            
+                        <div class="input-group mb-3" style="width: 100%;">
+                            <label for="member">Member</label>
+                            <select id="member" name="member">
+                                <option selected value="group">Group</option>
+                                {%for member in members%}
+                                <option value="{{member.id}}">{{member.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                        <div class="input-group mb-3" style="width: 100%;">
+                            <label for="type">Type</label>
+                            <select id="type" name="type">
+                                {%for type in types%}
+                                <option value="{{type.id}}">{{type.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                        <div class="mb-3 desc-area">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5"></textarea>
+                        </div>
+                        <button class="btn btn-primary border-0" type="button" onclick="sendNotification()" style="width: 100%;">Send</button>
+                    </form>
+                </div>
+            </div>
+            <br>
+            <div class="container row justify-content-center">
+                <div class="body-div">
+                    <h5 class="w-auto mx-auto">Group Notifications</h5>
+                    <div class="div-header">
+                        <h6>Group Notifications</h6>
+                    </div>
+                    {%for notif in chama_notifs%}
+                        <div class="expense-single d-flex flex-wrap">
+                            <div class="expense-cube">
+                                <p class="expense-title">
+                                    Type
+                                </p>
+                                <button class="expense-value">{{notif.type.name}}</button>
+                            </div>
+                
+                            <div class="expense-cube">
+                                <p class="expense-title">
+                                    Member
+                                </p>
+                                <button class="expense-value">group</button>
+                            </div>
+                            
+                            <div class="expense-cube">
+                                <p class="expense-title">
+                                    Date
+                                </p>
+                                <button class="expense-value">{{notif.date | date:"d/m/Y"}}</button>
+                            </div>
+                            <br>
+                        </div>
+                    {% empty %}
+                        <p class="mx-auto fw-semibold">No notifications</p>
+                    {%endfor%}
+            
+                </div>
+            </div>
+            <br>
+            <div class="container row justify-content-center">
+                <div class="body-div">
+                    <h5 class="w-auto mx-auto">My Notifications</h5>
+                    <div class="div-header">
+                        <h6>My Notifications</h6>
+                    </div>
+                    {%for notif in my_notifs%}
+                    <div class="expense-single d-flex flex-wrap">
+                        <div class="expense-cube">
+                            <p class="expense-title">
+                                Type
+                            </p>
+                            <button class="expense-value">{{notif.type.name}}</button>
+                        </div>
+                        <div class="expense-cube">
+                            <p class="expense-title">
+                                Date
+                            </p>
+                            <button class="expense-value">{{notif.date | date:"d/m/Y"}}</button>
+                        </div>
+                        <br>
+                        <p class="expense-title">
+                            Message
+                        </p>
+                        <button class="expense-value">{{notif.message}}</button>
+                    </div>
+                    {% empty %}
+                        <p class="mx-auto fw-semibold">No notifications</p>
+                    {%endfor%}
+            
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Apply member/admin visibility from base toggle
+    if (window.syncAdminVisibility) { window.syncAdminVisibility(); }
+
+    // Ensure one tab is active for current role on load
+    function activateFirstVisibleTab() {
+        const $container = $('.mobile-notifications');
+        const $visibleTabs = $container.find('.mobile-tabs .tab-btn:visible');
+        if ($visibleTabs.length) {
+            const $currentActive = $visibleTabs.filter('.active');
+            if ($currentActive.length === 0) {
+                const firstId = $visibleTabs.first().data('tab');
+                $container.find('.tab-btn').removeClass('active');
+                $container.find('.tab-content').removeClass('active');
+                $visibleTabs.first().addClass('active');
+                $('#' + firstId).addClass('active');
+            } else {
+                const tabId = $currentActive.data('tab');
+                $container.find('.tab-content').removeClass('active');
+                $('#' + tabId).addClass('active');
+            }
+        }
+    }
+    activateFirstVisibleTab();
+    // Re-run after a tick in case role sync toggled visibility
+    setTimeout(activateFirstVisibleTab, 0);
+
+    // If base defines syncAdminVisibility, wrap it to also reactivate visible tab
+    if (typeof window.syncAdminVisibility === 'function') {
+        const originalSync = window.syncAdminVisibility;
+        window.syncAdminVisibility = function() {
+            try { originalSync(); } catch(e) { /* no-op */ }
+            // Re-activate a visible tab after visibility changes
+            setTimeout(activateFirstVisibleTab, 0);
+        };
+    }
+
+    // Observe visibility/class changes within the tabs to keep a visible content active
+    const tabsRoot = document.querySelector('.mobile-notifications .mobile-tabs');
+    if (tabsRoot && 'MutationObserver' in window) {
+        const observer = new MutationObserver(function() {
+            setTimeout(activateFirstVisibleTab, 0);
+        });
+        observer.observe(tabsRoot, { attributes: true, subtree: true, attributeFilter: ['style', 'class'] });
+    }
+
+    // Mobile tab functionality (scoped to this page's mobile container)
+    $('.mobile-notifications .tab-btn').click(function() {
+        const $container = $('.mobile-notifications');
+        const tabId = $(this).data('tab');
+        $container.find('.tab-btn').removeClass('active');
+        $(this).addClass('active');
+        $container.find('.tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
+    // Function to get the value of a cookie by name
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            var cookies = document.cookie.split(";");
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Make getCookie available globally for mobile functions
+    window.getCookie = getCookie;
+});
+
+// Mobile create type submission
+window.submitTypeMobile = function() {
+    var name = $('#mobile-type-name').val();
+    var description = $('#mobile-type-description').val();
+    var chama_id = localStorage.getItem('groupId');
+    var csrfToken = getCookie('csrftoken');
+    var formData = { name: name, description: description };
+    
+    if (!chama_id) {
+        alert('Invalid chama_id');
+        return;
+    }
+    if (!csrfToken) {
+        alert('CSRF token not found');
+        return;
+    }
+    
+    $.ajaxSetup({ headers: { 'X-CSRFToken': csrfToken } });
+    $.ajax({
+        url: `/chamas-bookeeping/new-notification-type/${chama_id}/`,
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        success: function(response) {
+            alert('Notification type created successfully!');
+            $('#mobile-create-type-form')[0].reset();
+            setTimeout(() => { location.reload(); }, 1000);
+        },
+        error: function(xhr) {
+            alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred. Please try again.');
+        }
+    });
+};
+
+// Mobile send notification submission
+window.sendNotificationMobile = function() {
+    var member = $('#mobile-member').val();
+    var type = $('#mobile-type').val();
+    var message = $('#mobile-message').val();
+    var chama_id = localStorage.getItem('groupId');
+    var csrfToken = getCookie('csrftoken');
+    var formData = { member: member, type: type, message: message };
+    
+    if (!chama_id) {
+        alert('Invalid chama_id');
+        return;
+    }
+    if (!csrfToken) {
+        alert('CSRF token not found');
+        return;
+    }
+    
+    $.ajaxSetup({ headers: { 'X-CSRFToken': csrfToken } });
+    $.ajax({
+        url: `/chamas-bookeeping/new-notification/${chama_id}/`,
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        success: function(response) {
+            alert('Notification sent successfully!');
+            $('#mobile-send-notification-form')[0].reset();
+            setTimeout(() => { location.reload(); }, 1000);
+        },
+        error: function(xhr) {
+            alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred. Please try again.');
+        }
+    });
+};
+
+// Desktop functions (existing)
+function submitType() {
+    // Get form data
+    var formData = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value
+    };
+
+    // Get chama_id from localStorage
+    var chamaId = localStorage.getItem('groupId');
+
+    // Get CSRF token from the Django template
+    var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+    // Perform AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', `/chamas-bookeeping/new-notification-type/${chamaId}/`, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-CSRFToken', csrfToken);  // Add CSRF token to headers
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+
+            // Display success or error messages in the alert box
+            var alertBox = document.querySelector('.create-type-alert-box');
+            alertBox.innerHTML = `<div class="alert alert-${response.status === 'success' ? 'success' : 'danger'}" role="alert">${response.message}</div>`;
+
+            // Clear form fields
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+        } else {
+            // Handle error
+            console.error('Error:', xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function () {
+        // Handle network error
+        console.error('Network error');
+    };
+
+    // Send form data as JSON
+    xhr.send(JSON.stringify(formData));
+}
+
+function sendNotification() {
+    // Get form data
+    var formData = {
+        member: document.getElementById('member').value,
+        message: document.getElementById('message').value,
+        type: document.getElementById('type').value
+    };
+
+    // Get chama_id from localStorage
+    var chamaId = localStorage.getItem('groupId');
+
+    // Get CSRF token from the Django template
+    var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+    // Perform AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', `/chamas-bookeeping/new-notification/${chamaId}/`, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+
+            // Display success or error messages in the alert box
+            var alertBox = document.querySelector('.send-notification-alert-box');
+            alertBox.innerHTML = `<div class="alert alert-${response.status === 'success' ? 'success' : 'danger'}" role="alert">${response.message}</div>`;
+
+            // Clear form fields
+            document.getElementById('member').value = '';
+            document.getElementById('message').value = '';
+            document.getElementById('type').value = '';
+        } else {
+            // Handle error
+            console.error('Error:', xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function () {
+        // Handle network error
+        console.error('Network error');
+    };
+
+    // Send form data as JSON
+    xhr.send(JSON.stringify(formData));
+}
+</script>
+{%endblock%}

@@ -1,0 +1,92 @@
+
+
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Stats 2
+{% endblock %}
+{% block content %}
+<div class="wrapper">
+
+
+    <main role="main" class="main-content">
+        <div class="container-fluid">
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <!-- /.box-header -->
+                            <div class="box-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Name of Waiting Members</th>
+                                        <th>Name of Pending Members</th>
+                                        <th>Active Chamas</th>
+                                        <th>Check Details</th>
+
+
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    {% for item in final_result %}
+
+
+
+
+
+                                        <tr>
+
+
+                                            <td>
+                                                {{ item.waiting.user_id.username }}
+
+                                            </td>
+
+                                            <td>{{ item.pending.user_id.username }}</td>
+
+
+                                            <td>
+
+
+                                                {{ item.active }}
+
+
+                                            </td>
+                                            <td>
+
+
+
+
+
+
+
+                                            </td>
+
+
+
+                                        </tr>
+
+                                    {% endfor %}
+
+
+                                    </tbody>
+
+
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div><!-- /.box -->
+                    </div>
+                </div>
+
+
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

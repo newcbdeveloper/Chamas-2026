@@ -1,0 +1,63 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Budgets{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-chart-pie me-2"></i>Budget Management</h2>
+            <p class="text-muted">Track and manage your spending limits</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'expense_tracker:budget_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Budget
+            </a>
+        </div>
+    </div>
+
+    {% if budget_data %}
+        <div class="row g-4">
+            {% for item in budget_data %}
+                {% include 'expense_tracker/partials/budget_card.html' with budget=item.budget spent=item.spent remaining=item.remaining percentage=item.percentage status=item.status %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-piggy-bank fa-4x text-muted mb-4"></i>
+                        <h4>No Budgets Yet</h4>
+                        <p class="text-muted mb-4">
+                            Create your first budget to start tracking your spending limits
+                        </p>
+                        <a href="{% url 'expense_tracker:budget_create' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>Create Your First Budget
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Budget Tips -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5><i class="fas fa-lightbulb me-2"></i>Budget Tips</h5>
+                    <ul class="mb-0">
+                        <li>Set realistic budgets based on your past spending patterns</li>
+                        <li>Review and adjust your budgets monthly</li>
+                        <li>Use the rollover feature to carry unused budget to the next period</li>
+                        <li>Set alert thresholds to get notified before overspending</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

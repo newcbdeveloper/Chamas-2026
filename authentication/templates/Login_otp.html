@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock %}
+{% block content %}
+    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-messaging.js"></script>
+    <script>
+        var notificationtitle;
+        window['notificationtitle'] = notificationtitle;
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyBHYZJCR9UqOqmDM0YOtEVi9WhoVfNg2eU",
+            authDomain: "chamabora-b72ce.firebaseapp.com",
+            projectId: "chamabora-b72ce",
+            storageBucket: "chamabora-b72ce.appspot.com",
+            messagingSenderId: "716918897134",
+            appId: "1:716918897134:web:be99ac855e0d585341b6ff",
+            measurementId: "${config.measurementId}"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+
+        function getToken() {
+            const messaging = firebase.messaging();
+            console.log(messaging.getToken())
+            messaging.getToken({vapidKey: 'BEOKcWRX3Th6qOijJPEbQczW_L2zYD9rnIAXAvdBVzJ8_Bo2-rHlFgfsnnbg_z5hVaONFY7h4NCT13Gt71-Di_A'}).then((currentToken) => {
+
+                if (currentToken) {
+
+                    console.log('Your notification token is :', currentToken)
+                    fetch('login_token',
+                        {
+                            method: "POST",
+
+                            body: JSON.stringify({searchText: currentToken, notificationtitles: notificationtitle}),
+
+
+                        }
+                    )
+
+
+                } else {
+                    console.log('No registration token available. Request permission to generate one.');
+
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+            });
+
+
+            messaging
+                .requestPermission()
+                .then(function () {
+                    console.log("Notification permission granted.");
+                    return messaging.getToken()
+                })
+                .catch(function (err) {
+                    console.log("Unable to get permission to notify.", err);
+                });
+
+
+            messaging.onMessage((payload) => {
+                console.log('Message received. ', payload);
+                if (!('Notification' in window)) {
+                    console.log('This browser does not support desktop notification')
+                } else {
+                    Notification.requestPermission()
+                }
+                try {
+                    const options = {
+                        body: payload.notification.body,
+                        // icon: themeConfig.app.appLogoImage,
+                        dir: "ltr",
+                    };
+                    new Notification("New Message from Chamabora", options);
+                } catch (error) {
+                }
+
+            });
+        }
+    </script>
+    <body>
+    <div class="header-head">
+        <nav class="navbar navbar-expand-lg nav">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/">
+                <img src="{% static 'images/ChamaSpace_Logo.png' %}" alt="Logo" width="120" height="100%" class="d-inline-block align-text-top logo">
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list prime-color" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                </svg>                      
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav w-100 d-flex justify-content-evenly">
+                  <li class="nav-item">
+                    <a class="nav-link fs-6 prime-color" aria-current="page" href="/">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link fs-6 prime-color" href="#features" >Features</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link fs-6 prime-color" href="#faq">FAQs</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link fs-6 prime-color" href="#contact">Contact Us</a>
+                  </li>              
+                </ul>
+              </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="login">
+        <div class="containers">
+            <div class="content">
+
+                <form method="post" action="{% url 'login_otp' %}" class="login-form">
+                    {% csrf_token %}
+                    <p class="title">
+                        <img src="{% static 'images/ChamaSpace_Logo.png' %}"
+                    </p>
+
+                    <br>
+                    <p class="log">Log in into ChamaBOA</p>
+                    <p class="log">Verification Code has been sent to your Phone Number</p>
+                    <hr/>
+                    <h5 style="text-decoration:#00a65a">{% include '_messages.html' %}</h5>
+
+
+                    <div class="form-input">
+                        <span class="label">Enter Security Code</span>
+                        <input class="input" type="text" name="2facode" placeholder="Enter Code"
+                               onmouseleave="getToken();">
+                    </div>
+
+                    <div class="container-button">
+                        <button type="submit" name="button" class="button"
+                                style="background-color: #0089A2;color :#fff">
+                            Login
+                        </button>
+
+                        {#                            onclick="getToken();this.form.submit()"#}
+                    </div>
+                    {#                        <button type="button" >click me</button>#}
+                </form>
+
+            </div>
+        </div>
+    </div>
+    </body>
+
+
+
+
+
+{% endblock %}

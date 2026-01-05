@@ -1,0 +1,363 @@
+{% extends 'goal_base.html' %}
+
+{% load static %}
+{% block title %}
+    Dashboard
+{% endblock %}
+{% block content %}
+
+
+    <div class="wrapper">
+
+
+
+
+    <main role="main" class="main-content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-12">
+
+                    <div class="row align-items-center mb-2">
+                        <div class="col">
+                            <h2>{% if request.user.is_authenticated %}
+                                Login as :{{ user.first_name }}{{ user.last_name }}
+
+                            {% endif %}</h2>
+                            <h5 style="text-decoration:#00a65a">{% include '_messages.html' %}</h5>
+                        </div>
+                        <div class="col-auto">
+                            <form class="form-inline">
+                                <div class="form-group d-none d-lg-inline">
+                                    <label for="reportrange" class="sr-only">Date Ranges</label>
+                                    <div id="reportrange" class="px-2 py-2 text-muted">
+                                        <span class="small"></span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mb-2 align-items-center">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="row mt-1 align-items-center">
+
+                                    <div class="col-6 col-lg-2 text-left py-4">
+                                        <p class="mb-1 small text-muted">Account Balance</p>
+                                        <span class="h3">KES {{ user_wallet.available_for_withdraw }}</span>
+                                        <p class="text-muted mt-2"> Working float</p>
+                                    </div>
+
+                                    <div class="col-6 col-lg-2 text-center py-4">
+                                        <p class="mb-1 small text-muted">Your Active Chamas</p>
+                                        <span class="h3">{{ user_active_chamas|length }}</span>
+                                    </div>
+
+
+                                    <div class="col-6 col-lg-2 text-center py-4 mb-2">
+                                        <p class="mb-1 small text-muted">Your Total Chamas Contribution</p>
+                                        <span class="h3">KES {{ Total_contribution }}</span><br/>
+                                    </div>
+
+                                    <div class="col-6 col-lg-2 text-center py-4">
+                                        <p class="mb-1 small text-muted">Withdrawals</p>
+                                        <span class="h3">KES {{ user_wallet.withdrawal }}</span>
+                                    </div>
+
+                                    <div class="col-6 col-lg-2 text-center py-4">
+                                        <p class="mb-1 small text-muted">Saving Wallet</p>
+                                        <span class="h3">KES {{ saving_wallet.available_balance}}</span>
+                                    </div>
+                                     <div class="col-6 col-lg-2 text-center py-4">
+                                        <p class="mb-1 small text-muted">Peer to Peer Wallet</p>
+                                        <span class="h3">KES {{ p_to_p_wallet.available_balance}}</span>
+                                    </div>
+
+
+                                </div>
+                            </div> <!-- .card-body -->
+                        </div> <!-- .card -->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 my-4">
+                            <h2 class="h4 mb-1">Your Journey</h2>
+                            <p class="mb-3">Summary of Activities</p>
+                        </div>
+                    </div>
+                    {% if user_active_chamas|length > 0 %}
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h3 class="h6 mb-0">Chamas Progress Summary</h3>
+                                            </div>
+                                            <div class="col-auto">
+                                                <a class="small text-muted" href="{% url 'mychamas' %}">View all</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body my-n2">
+
+                                        <!-- Chama 1 (Loop to fetch User's active chamas from database) -->
+                                        {% for item in user_active_chamas %}
+                                            <div class="row  align-items-center  my-2">
+                                                <div class="col-sm-3">
+                                                    <strong>{{ item.name }}</strong>
+                                                    <div class="my-0 text-muted small">Chama Name</div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <strong>{{ item.start_date }}</strong>
+                                                    <div class="my-0 text-muted small">Start Date</div>
+
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <strong>{{ item.end_date }}</strong>
+                                                    <div class="my-0 text-muted small">End Date</div>
+
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <strong>Week </strong>
+                                                    <div class="progress" style="height: 10px;">
+                                                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                             role="progressbar" aria-valuenow="30"
+                                                             aria-valuemin="0" aria-valuemax="100"
+                                                             style="width:{{ item.get_progress|floatformat:'0' }}%">
+                                                        </div>
+                                                    </div>
+                                                    <div class="my-0 text-muted small">{{ item.get_progress|floatformat:'0' }}%</div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+
+
+                                        <!-- End of Chama 1 -->
+
+
+                                    </div>
+                                    <!-- End of Chamas Loop -->
+                                </div>
+                            </div>
+
+                            <!-- Chamas Summary-->
+
+                            <div class="col-md-8 mb-4">
+                                <div class="card shadow">
+                                    <div class="card-header">
+                                        <strong class="card-title">Your Chamas</strong>
+                                        <a class="float-right small text-muted" href="{% url 'mychamas' %}">View all</a>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <table class="table table-borderless my-n3">
+
+                                            <tbody>
+                                            {% for item in user_active_chamas %}
+                                                <tr>
+                                                    <th scope="row">
+                                                        <small>
+                                                            <strong>{{ item.name }}</strong>
+                                                            <small><br/>
+                                                                <div class="my-0 text-muted small">Chama Name</div>
+                                                    </th>
+
+                                                    <th scope="row">
+                                                        <small>
+                                                            <strong>KES {{ item.amount }}</strong>
+                                                            <small><br/>
+                                                                <div class="my-0 text-muted small">Contribution</div>
+                                                    </th>
+
+                                                    <th scope="row">
+                                                        <small>
+                                                            <strong>{{ item.start_date }}</strong>
+                                                            <small><br/>
+                                                                <div class="my-0 text-muted small">Start Date</div>
+                                                    </th>
+                                                    <th scope="row">
+                                                        <small>
+                                                            <strong>{{ item.end_date }}</strong>
+                                                            <small><br/>
+                                                                <div class="my-0 text-muted small">End Date</div>
+                                                    </th>
+                                                    <th scope="row">
+                                                        <small>
+                                                            <strong>{{ item.contribution_date }}</strong>
+                                                            <small><br/>
+                                                                <div class="my-0 text-muted small">Next Contribution
+                                                                    Date
+                                                                </div>
+                                                    </th>
+
+                                                </tr>
+                                            {% endfor %}
+                                            <!-- End of Chama 1 -->
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <div class="alert alert-success" role="alert">
+                                    <h4 class="alert-heading">Well done!</h4>
+                                    <p>You have successfully registed for ChamaBORA. You can now join chamas of your
+                                        choice.</p>
+                                    <hr>
+                                    <p class="mb-0">The minimun number of Chamas you can join is two. However, you can
+                                        join
+                                        as many chamas as you would wish.</p>
+                                    <hr>
+                                    <p class="mb-0">Before joining any chama, make sure you have read and understood our
+                                        terms and conditions.</p>
+                                    <hr>
+                                    <p class="mb-0">We look forward to a successul journey as we help you grow your
+                                        capital
+                                        through reliable chamas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-12">
+                                <p class="lead text-muted">You are not in any Chama.</p>
+                            </div>
+                            {% if request.user.username == '33332222' %}
+                                <div class="row">
+                                    <a href="#">
+                                        <button type="button" class="btn mb-2 btn-primary btn-lg btn-block">Join a
+                                            Chama
+                                        </button>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    <a href="{% url 'joinchamas' %}">
+                                        <button type="button" class="btn mb-2 btn-primary btn-lg btn-block">Join a
+                                            Chama
+                                        </button>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- .container-fluid -->
+                    <div id="abc" class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog"
+                         aria-labelledby="defaultModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% for i in user_notifications %}
+                                        <div class="list-group list-group-flush my-n3">
+                                            <div class="list-group-item bg-transparent">
+                                                <div class="row align-items-center">
+
+                                                    <div class="col">
+
+                                                        <small><strong>{{ i.notification_title }} </strong></small>
+                                                        <div class="my-0 text-muted small">{{ i.notification_body }}</div>
+                                                        <small class="badge badge-pill badge-light text-muted">{{ i.created_at }}</small>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear
+                                        All
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                            <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body px-5">
+                                    <div class="row align-items-center">
+                                      <div class="col-6 text-center">
+                                        <div class="squircle bg-success justify-content-center">
+                                          <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                                        </div>
+                                        <p>Control area</p>
+                                      </div>
+                                      <div class="col-6 text-center">
+                                        <div class="squircle bg-primary justify-content-center">
+                                          <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                                        </div>
+                                        <p>Activity</p>
+                                      </div>
+                                    </div>
+                                    <div class="row align-items-center">
+                                      <div class="col-6 text-center">
+                                        <div class="squircle bg-primary justify-content-center">
+                                          <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                                        </div>
+                                        <p>Droplet</p>
+                                      </div>
+                                      <div class="col-6 text-center">
+                                        <div class="squircle bg-primary justify-content-center">
+                                          <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                                        </div>
+                                        <p>Upload</p>
+                                      </div>
+                                    </div>
+                                    <div class="row align-items-center">
+                                      <div class="col-6 text-center">
+                                        <div class="squircle bg-primary justify-content-center">
+                                          <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                                        </div>
+                                        <p>Users</p>
+                                      </div>
+                                      <div class="col-6 text-center">
+                                        <div class="squircle bg-primary justify-content-center">
+                                          <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                                        </div>
+                                        <p>Settings</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                    -->
+    </main>
+    </div>
+
+
+
+
+
+
+
+{% endblock %}

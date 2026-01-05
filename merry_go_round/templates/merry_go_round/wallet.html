@@ -1,0 +1,404 @@
+{% extends 'merry_go_round/base.html' %}
+{% load static %}
+
+{% block title %}My MGR Wallet{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'merry_go_round/css/mgrwallet.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4">
+    <!-- Header -->
+    <div class="page-section-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+            <div>
+                <h2><i class="fas fa-wallet me-2"></i> My MGR Wallet</h2>
+                <p class="text-muted">Manage your Merry-Go-Round savings wallet</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#depositModal">
+                    <i class="fas fa-arrow-down me-1"></i> Deposit
+                </button>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                    <i class="fas fa-arrow-up me-1"></i> Withdraw
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Balance Cards -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="balance-card">
+                <h6>Total Balance</h6>
+                <h3 class="text-primary">KES {{ wallet.balance|floatformat:2 }}</h3>
+                <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Available + Locked</small>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="balance-card bg-available">
+                <h6>Available Balance</h6>
+                <h3 class="text-success">KES {{ wallet.available_balance|floatformat:2 }}</h3>
+                <small class="text-muted"><i class="fas fa-check-circle me-1"></i> Ready to use</small>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="balance-card bg-locked">
+                <h6>Locked Balance</h6>
+                <h3 class="text-warning">KES {{ wallet.locked_balance|floatformat:2 }}</h3>
+                <small class="text-muted"><i class="fas fa-lock me-1"></i> Reserved for next contributions</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <h6>Total Deposited</h6>
+                <h4>KES {{ wallet.total_deposited|floatformat:2 }}</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <h6>Total Withdrawn</h6>
+                <h4>KES {{ wallet.total_withdrawn|floatformat:2 }}</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <h6>Total Contributed</h6>
+                <h4>KES {{ total_contributions|floatformat:2 }}</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <h6>Interest Earned</h6>
+                <h4 class="text-success">KES {{ total_interest|floatformat:2 }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="quick-actions-card">
+                <h6>Quick Actions</h6>
+                <div class="row g-2">
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#depositModal">
+                            <i class="fas fa-plus-circle"></i> Deposit Funds
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                            <i class="fas fa-minus-circle"></i> Withdraw Funds
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'merry_go_round:wallet_statistics' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-chart-bar"></i> View Statistics
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'merry_go_round:join_round' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-search"></i> Join a Round
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="transactions-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i> Transaction History</h5>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-filter me-1"></i>
+                    {% if selected_type %}
+                        {{ selected_type|title }}
+                    {% else %}
+                        All Transactions
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'merry_go_round:wallet_dashboard' %}">All Transactions</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="?type=deposit">Deposits</a></li>
+                    <li><a class="dropdown-item" href="?type=withdraw">Withdrawals</a></li>
+                    <li><a class="dropdown-item" href="?type=contribution">Contributions</a></li>
+                    <li><a class="dropdown-item" href="?type=payout">Payouts</a></li>
+                    <li><a class="dropdown-item" href="?type=interest">Interest</a></li>
+                    <li><a class="dropdown-item" href="?type=lock">Locks</a></li>
+                    <li><a class="dropdown-item" href="?type=unlock">Unlocks</a></li>
+                </ul>
+            </div>
+        </div>
+
+        {% if page_obj %}
+            <!-- Desktop: Table -->
+            <div class="d-none d-md-block">
+                <div class="transactions-table-card">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Round</th>
+                                    <th class="text-end">Amount</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for txn in page_obj %}
+                                <tr class="align-middle">
+                                    <td>
+                                        <div class="fw-bold">{{ txn.created_at|date:"M d, Y" }}</div>
+                                        <div class="text-muted small">{{ txn.created_at|date:"h:i A" }}</div>
+                                    </td>
+                                    <td><span class="badge-type">{{ txn.get_transaction_type_display }}</span></td>
+                                    <td>{{ txn.description|truncatewords:10 }}</td>
+                                    <td>
+                                        {% if txn.related_round %}
+                                            <small class="text-muted">{{ txn.related_round.name|truncatewords:3 }}</small>
+                                        {% else %}
+                                            <small class="text-muted">—</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if txn.transaction_type in 'deposit,payout,interest,unlock' %}
+                                            <span class="amount positive">+KES {{ txn.amount|floatformat:2 }}</span>
+                                        {% else %}
+                                            <span class="amount negative">-KES {{ txn.amount|floatformat:2 }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if txn.status == 'completed' %}
+                                            <span class="badge-status bg-success-subtle">Completed</span>
+                                        {% elif txn.status == 'pending' %}
+                                            <span class="badge-status bg-warning-subtle">Pending</span>
+                                        {% elif txn.status == 'failed' %}
+                                            <span class="badge-status bg-danger-subtle">Failed</span>
+                                        {% else %}
+                                            <span class="badge-status bg-secondary">{{ txn.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'merry_go_round:transaction_detail' txn.id %}" class="btn btn-sm btn-light rounded-circle">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile: Cards -->
+            <div class="d-md-none">
+                {% for txn in page_obj %}
+                <div class="mobile-transaction-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="card-title">{{ txn.description|truncatewords:10 }}</div>
+                        <div>
+                            {% if txn.transaction_type in 'deposit,payout,interest,unlock' %}
+                                <span class="amount positive">+KES {{ txn.amount|floatformat:2 }}</span>
+                            {% else %}
+                                <span class="amount negative">-KES {{ txn.amount|floatformat:2 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge-type">{{ txn.get_transaction_type_display }}</span>
+                        {% if txn.related_round %}
+                            <small class="text-muted">{{ txn.related_round.name|truncatewords:3 }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center text-muted small">
+                        <div>{{ txn.created_at|date:"M d, Y • h:i A" }}</div>
+                        <div class="status">
+                            {% if txn.status == 'completed' %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i> Completed</span>
+                            {% elif txn.status == 'pending' %}
+                                <span class="text-warning"><i class="fas fa-clock"></i> Pending</span>
+                            {% elif txn.status == 'failed' %}
+                                <span class="text-danger"><i class="fas fa-times-circle"></i> Failed</span>
+                            {% else %}
+                                {{ txn.get_status_display }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-2">
+                        <a href="{% url 'merry_go_round:transaction_detail' txn.id %}" class="btn btn-light rounded-circle">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="pagination-container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_type %}&type={{ selected_type }}{% endif %}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_type %}&type={{ selected_type }}{% endif %}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <i class="fas fa-receipt fa-3x text-muted mb-3 opacity-50"></i>
+                <p class="text-muted">No transactions yet</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#depositModal">
+                    Make Your First Deposit
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- === MODALS === -->
+
+<!-- Deposit Modal -->
+<div class="modal fade" id="depositModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-arrow-down text-success me-2"></i> Deposit to MGR Wallet
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'merry_go_round:deposit_to_wallet' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Deposit from Main Wallet</strong>
+                        <p class="mb-0 small">Funds will be transferred from your ChamaSpace main wallet to your MGR wallet instantly.</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Amount (KES)</label>
+                        <input type="number" name="amount" class="form-control" 
+                               placeholder="Enter amount" min="100" step="50" required>
+                        <small class="form-text text-muted">Minimum: KES 100</small>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <small>Ensure you have sufficient balance in your main wallet before depositing.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-1"></i> Deposit Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="modal fade" id="withdrawModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-arrow-up text-primary me-2"></i> Withdraw to Main Wallet
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'merry_go_round:withdraw_from_wallet' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Withdraw to Main Wallet</strong>
+                        <p class="mb-0 small">Funds will be transferred from your MGR wallet to your ChamaSpace main wallet instantly.</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Available Balance</label>
+                        <div class="input-group">
+                            <span class="input-group-text">KES</span>
+                            <input type="text" class="form-control" value="{{ wallet.available_balance|floatformat:2 }}" readonly>
+                        </div>
+                        <small class="form-text text-muted">Only available balance can be withdrawn (not locked funds)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Withdrawal Amount (KES)</label>
+                        <input type="number" name="amount" class="form-control" 
+                               placeholder="Enter amount" min="100" 
+                               max="{{ wallet.available_balance }}" step="50" required>
+                    </div>
+
+                    {% if wallet.locked_balance > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-lock"></i>
+                        <small>You have KES {{ wallet.locked_balance|floatformat:2 }} locked in active rounds. This amount cannot be withdrawn.</small>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check me-1"></i> Withdraw Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Optional: Auto-refresh balance (keep if needed)
+    setInterval(function() {
+        $.get('{% url "merry_go_round:api_wallet_balance" %}', function(data) {
+            // You can update balance fields here if API returns them
+            console.log('Balance refreshed:', data);
+        });
+    }, 30000);
+});
+</script>
+{% endblock %}

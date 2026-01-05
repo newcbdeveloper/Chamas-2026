@@ -1,0 +1,46 @@
+/* settings_tabs.css */
+.settings-tabs {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.settings-tab {
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.settings-tab:hover {
+  color: #0d6efd;
+  background-color: #f8f9fa;
+}
+
+.settings-tab.active {
+  background-color: #e9f7ef;
+  color: #0d6efd;
+}
+
+.settings-section {
+  display: none;
+}
+
+.settings-section.active {
+  display: block;
+}
+
+/* Optional: Make KYC card background */
+.kyc-card {
+  background-color: #f8f4eb;
+}
+
+.danger-zone-card {
+  border: 2px solid #dc3545;
+}

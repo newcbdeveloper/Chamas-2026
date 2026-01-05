@@ -1,0 +1,502 @@
+/* ============================================
+   USER DASHBOARD - MODERN FINFLOW THEME
+   Clean, Professional, Bootstrap-Compatible
+   ============================================ */
+
+   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
+
+   :root {
+       /* Brand Colors - Matching FinFlow Teal Theme */
+       --primary: #0f766e;       /* Teal 700 */
+       --primary-hover: #0d9488; /* Teal 600 */
+       --primary-light: #ccfbf1; /* Teal 100 */
+       --primary-soft: #f0fdfa;  /* Teal 50 */
+       
+       /* Semantic Colors */
+       --success: #10b981;       /* Emerald 500 */
+       --success-bg: #ecfdf5;    /* Emerald 50 */
+       --warning: #f59e0b;       /* Amber 500 */
+       --warning-bg: #fffbeb;    /* Amber 50 */
+       --danger: #ef4444;        /* Red 500 */
+       --danger-bg: #fef2f2;     /* Red 50 */
+       --info: #3b82f6;          /* Blue 500 */
+       --info-bg: #eff6ff;       /* Blue 50 */
+       --purple: #8b5cf6;        /* Violet 500 */
+       --purple-bg: #f5f3ff;     /* Violet 50 */
+       
+       /* Neutrals */
+       --bg-body: #f8fafc;       /* Slate 50 */
+       --bg-card: #ffffff;
+       --text-main: #0f172a;     /* Slate 900 */
+       --text-muted: #64748b;    /* Slate 500 */
+       --border-color: #e2e8f0;  /* Slate 200 */
+       
+       /* Shadows */
+       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+       
+       /* Dimensions */
+       --header-height: 70px;
+       --radius-card: 16px;
+       --radius-btn: 50px;
+   }
+   
+   body {
+       font-family: 'Inter', sans-serif;
+       background-color: var(--bg-body);
+       color: var(--text-main);
+       -webkit-font-smoothing: antialiased;
+   }
+   
+   h1, h2, h3, h4, h5, h6, .brand-font {
+       font-family: 'Outfit', sans-serif;
+   }
+   
+   a {
+       text-decoration: none;
+       transition: all 0.2s ease;
+   }
+   
+   /* ============================================
+      HEADER SECTION
+      Clean, white, sticky
+      ============================================ */
+   
+   .page_header {
+       background: rgba(255, 255, 255, 0.9);
+       backdrop-filter: blur(10px);
+       border-bottom: 1px solid var(--border-color);
+       position: sticky;
+       top: 0;
+       z-index: 1000;
+       padding: 0;
+       height: var(--header-height);
+       display: flex;
+       align-items: center;
+       box-shadow: var(--shadow-sm);
+   }
+   
+   .page_nav {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       width: 100%;
+   }
+   
+   .brand {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+   }
+   
+   .brand img {
+       height: 32px;
+       width: auto;
+   }
+   
+   .brand-text {
+       font-family: 'Outfit', sans-serif;
+       font-weight: 700;
+       font-size: 1.25rem;
+       color: var(--text-main);
+       letter-spacing: -0.5px;
+   }
+   
+   /* Navigation Icons */
+   .nav-list {
+       display: flex;
+       align-items: center;
+       gap: 16px;
+       list-style: none;
+       margin: 0;
+       padding: 0;
+   }
+   
+   .nav-btn {
+       width: 40px;
+       height: 40px;
+       border-radius: 50%;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       color: var(--text-muted);
+       background: transparent;
+       border: none;
+       transition: all 0.2s;
+       cursor: pointer;
+       position: relative;
+   }
+   
+   .nav-btn:hover {
+       background: var(--bg-body);
+       color: var(--primary);
+   }
+   
+   .nav-btn i {
+       font-size: 1.1rem;
+   }
+   
+   /* Notification Badge */
+   .nav-btn .badge-dot {
+       position: absolute;
+       top: 8px;
+       right: 8px;
+       width: 8px;
+       height: 8px;
+       background: var(--danger);
+       border-radius: 50%;
+       border: 2px solid #fff;
+   }
+   
+   /* Profile Avatar in Nav */
+   .nav-avatar {
+       width: 36px;
+       height: 36px;
+       border-radius: 50%;
+       object-fit: cover;
+       border: 2px solid var(--border-color);
+   }
+   
+   /* ============================================
+      WELCOME & HERO SECTION
+      ============================================ */
+   
+   .welcome-section {
+       padding: 2rem 0 1.5rem;
+       display: flex;
+       justify-content: space-between;
+       align-items: flex-end;
+   }
+   
+   .welcome-text h1 {
+       font-size: 1.75rem;
+       font-weight: 700;
+       color: var(--text-main);
+       margin-bottom: 0.25rem;
+   }
+   
+   .welcome-text p {
+       color: var(--text-muted);
+       margin: 0;
+   }
+   
+   .last-login {
+       font-size: 0.85rem;
+       color: var(--text-muted);
+       background: var(--bg-card);
+       padding: 4px 12px;
+       border-radius: 20px;
+       border: 1px solid var(--border-color);
+   }
+   
+   /* ============================================
+      BALANCE CARD (HERO)
+      Replaces circle_slider
+      ============================================ */
+   
+   .balance-card {
+       background: var(--bg-card);
+       border-radius: var(--radius-card);
+       padding: 2rem;
+       position: relative;
+       overflow: hidden;
+       border: 1px solid var(--border-color); /* Clean border instead of shadow */
+       box-shadow: var(--shadow-sm);
+       margin-bottom: 2rem;
+   }
+   
+   /* Watermark Icon */
+   .balance-card::after {
+       content: '\f555'; /* FontAwesome wallet icon unicode */
+       font-family: "Font Awesome 6 Free"; 
+       font-weight: 900;
+       position: absolute;
+       top: -20px;
+       right: -20px;
+       font-size: 10rem;
+       color: var(--primary);
+       opacity: 0.05;
+       pointer-events: none;
+       transform: rotate(-15deg);
+   }
+   
+   .balance-label {
+       font-size: 0.875rem;
+       text-transform: uppercase;
+       letter-spacing: 1px;
+       font-weight: 600;
+       color: var(--text-muted);
+       margin-bottom: 1rem;
+   }
+   
+   .balance-amount {
+       display: flex;
+       align-items: baseline;
+       gap: 8px;
+       margin-bottom: 2rem;
+       position: relative;
+       z-index: 1;
+   }
+   
+   .currency {
+       font-size: 1.5rem;
+       font-weight: 500;
+       color: var(--text-muted);
+   }
+   
+   .amount {
+       font-size: 3.5rem;
+       font-weight: 700;
+       color: var(--text-main);
+       letter-spacing: -1px;
+       line-height: 1;
+   }
+   
+   .balance-actions {
+       display: flex;
+       gap: 12px;
+       position: relative;
+       z-index: 1;
+   }
+   
+   .btn-action {
+       padding: 0.75rem 1.5rem;
+       border-radius: var(--radius-btn);
+       font-weight: 600;
+       font-size: 0.95rem;
+       display: inline-flex;
+       align-items: center;
+       gap: 8px;
+       transition: all 0.2s;
+       border: none;
+   }
+   
+   .btn-primary-custom {
+       background: var(--primary);
+       color: white;
+       box-shadow: 0 4px 6px rgba(15, 118, 110, 0.2);
+   }
+   
+   .btn-primary-custom:hover {
+       background: var(--primary-hover);
+       transform: translateY(-1px);
+       box-shadow: 0 6px 8px rgba(15, 118, 110, 0.3);
+       color: white;
+   }
+   
+   .btn-outline-custom {
+       background: transparent;
+       border: 1px solid rgba(15, 118, 110, 0.3);
+       color: var(--primary);
+   }
+   
+   .btn-outline-custom:hover {
+       background: var(--primary-soft);
+       border-color: var(--primary);
+       color: var(--primary-hover);
+   }
+   
+   /* ============================================
+      APPS GRID & TOOLS
+      ============================================ */
+   
+   .section-title {
+       font-size: 1.25rem;
+       font-weight: 700;
+       margin-bottom: 1.5rem;
+       color: var(--text-main);
+   }
+   
+   .app-card {
+       background: var(--bg-card);
+       border: 1px solid var(--border-color);
+       border-radius: var(--radius-card);
+       padding: 1.5rem;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       text-align: center;
+       height: 100%;
+       transition: all 0.2s ease;
+       position: relative;
+       overflow: hidden;
+       box-shadow: var(--shadow-sm);
+   }
+   
+   .app-card:hover {
+       transform: translateY(-4px);
+       box-shadow: var(--shadow-md);
+       border-color: var(--primary-light);
+   }
+   
+   .app-icon-box {
+       width: 56px;
+       height: 56px;
+       border-radius: 16px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       margin-bottom: 1rem;
+       font-size: 1.5rem;
+       transition: transform 0.2s;
+   }
+   
+   .app-card:hover .app-icon-box {
+       transform: scale(1.1);
+   }
+   
+   /* App Icon Colors */
+   .icon-wallet { background: var(--success-bg); color: var(--success); }
+   .icon-goals { background: var(--info-bg); color: var(--info); }
+   .icon-expense { background: var(--purple-bg); color: var(--purple); }
+   .icon-merry { background: var(--warning-bg); color: var(--warning); }
+   .icon-chama { background: #e0e7ff; color: #4338ca; } /* Indigo */
+   .icon-kopesha { background: #ffe4e6; color: #e11d48; } /* Rose */
+   
+   .app-title {
+       font-family: 'Outfit', sans-serif;
+       font-weight: 600;
+       font-size: 1.1rem;
+       margin-bottom: 0.25rem;
+       color: var(--text-main);
+   }
+   
+   .app-desc {
+       font-size: 0.875rem;
+       color: var(--text-muted);
+       line-height: 1.4;
+   }
+   
+   .badge-coming-soon {
+       position: absolute;
+       top: 12px;
+       right: 12px;
+       background: var(--warning-bg);
+       color: #b45309;
+       font-size: 0.7rem;
+       font-weight: 700;
+       padding: 2px 8px;
+       border-radius: 10px;
+       text-transform: uppercase;
+   }
+   
+   /* ============================================
+      NOTIFICATION LIST
+      ============================================ */
+   
+   .notification-card {
+       background: var(--bg-card);
+       border-radius: var(--radius-card);
+       border: 1px solid var(--border-color);
+       overflow: hidden;
+   }
+   
+   .notification-header {
+       padding: 1.25rem 1.5rem;
+       border-bottom: 1px solid var(--border-color);
+   }
+   
+   .notification-header h3 {
+       font-size: 1.1rem;
+       font-weight: 700;
+       margin: 0;
+   }
+   
+   .notification-item {
+       padding: 1rem 1.5rem;
+       display: flex;
+       gap: 1rem;
+       border-bottom: 1px solid var(--border-color);
+       transition: background 0.2s;
+   }
+   
+   .notification-item:last-child {
+       border-bottom: none;
+   }
+   
+   .notification-item:hover {
+       background: var(--bg-body);
+   }
+   
+   .notif-icon {
+       margin-top: 2px;
+       color: var(--success);
+   }
+   
+   .notif-content p {
+       font-size: 0.9rem;
+       font-weight: 500;
+       margin-bottom: 0.25rem;
+       color: var(--text-main);
+   }
+   
+   .notif-time {
+       font-size: 0.75rem;
+       color: var(--text-muted);
+       display: flex;
+       align-items: center;
+       gap: 4px;
+   }
+   
+   /* ============================================
+      PRO TIP WIDGET
+      ============================================ */
+   
+   .pro-tip-card {
+       background: linear-gradient(135deg, var(--primary) 0%, #0f5156 100%);
+       border-radius: var(--radius-card);
+       padding: 1.5rem;
+       color: white;
+       margin-top: 2rem;
+   }
+   
+   .pro-tip-title {
+       font-weight: 700;
+       font-size: 1.1rem;
+       margin-bottom: 0.5rem;
+       display: flex;
+       align-items: center;
+       gap: 8px;
+   }
+   
+   .pro-tip-text {
+       font-size: 0.9rem;
+       color: rgba(255, 255, 255, 0.9);
+       margin-bottom: 1rem;
+       line-height: 1.5;
+   }
+   
+   .btn-tip {
+       background: rgba(255, 255, 255, 0.2);
+       color: white;
+       border: none;
+       width: 100%;
+       padding: 0.5rem;
+       border-radius: 8px;
+       font-size: 0.85rem;
+       font-weight: 600;
+       transition: background 0.2s;
+   }
+   
+   .btn-tip:hover {
+       background: rgba(255, 255, 255, 0.3);
+       color: white;
+   }
+   
+   /* ============================================
+      RESPONSIVE TWEAKS
+      ============================================ */
+   @media (max-width: 768px) {
+       .amount {
+           font-size: 2.5rem;
+       }
+       .welcome-section {
+           flex-direction: column;
+           align-items: flex-start;
+           gap: 1rem;
+       }
+       .last-login {
+           display: none;
+       }
+   }

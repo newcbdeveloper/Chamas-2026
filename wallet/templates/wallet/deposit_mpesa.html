@@ -1,0 +1,224 @@
+{% extends 'goal_base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+<style>
+    :root {
+    /* Primary Brand Colors */
+    --brand-primary: #2191a5;
+    --brand-primary-light: #2ba6bd;
+    --brand-primary-dark: #1a7589;
+    --brand-primary-hover: #1e8396;
+    
+    /* Secondary Colors */
+    --brand-white: #ffffff;
+    --brand-gray-50: #f9fafb;
+    --brand-gray-100: #f3f4f6;
+    --brand-gray-200: #e5e7eb;
+    --brand-gray-300: #d1d5db;
+    --brand-gray-400: #9ca3af;
+    --brand-gray-500: #6b7280;
+    --brand-gray-600: #4b5563;
+    --brand-gray-700: #374151;
+    --brand-gray-800: #1f2937;
+    --brand-gray-900: #111827;
+    }
+
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .main-content {
+        padding-top: 20px;
+        padding-bottom: 80px; /* Space for mobile footer */
+    }
+
+    /* Modern Header Card */
+    .deposit-header-card {
+        background: linear-gradient(135deg, #2191a5 0%, #2191a5 100%);
+        color: white;
+        border-radius: var(--border-radius);
+        padding: 2.5rem 1.5rem;
+        margin-bottom: -40px;
+        position: relative;
+        z-index: 1;
+        box-shadow: var(--card-shadow);
+    }
+
+    .deposit-container {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 60px 25px 30px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        z-index: 0;
+    }
+
+    /* Form Styling */
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:disabled {
+        background-color: #f1f3f5;
+        cursor: not-allowed;
+    }
+
+    .input-group-text {
+        border-radius: 8px 0 0 8px;
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+
+    .input-group > .form-control {
+        border-radius: 0 8px 8px 0;
+    }
+
+    /* Buttons */
+    .btn-action {
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: transform 0.2s;
+    }
+
+    .btn-action:active {
+        transform: scale(0.98);
+    }
+
+    .secure-badge {
+        display: inline-flex;
+        align-items: center;
+        background: #e7f4e9;
+        color: ##2191a5;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .deposit-container {
+            margin-top: 10px;
+            border-radius: 20px 20px 20px 20px;
+        }
+        .btn-stack-mobile {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+        }
+    }
+</style>
+
+<div class="wrapper">
+    <main role="main" class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 col-lg-5 mx-auto">
+                                <a href="{% url 'wallet:wallet_dashboard' %}" class="text-decoration-none text-dark d-inline-flex align-items-center">
+                                    <i class="fas fa-chevron-left mr-2"></i>
+                                    <span style="font-weight: 600;">Back to Wallet</span>
+                                </a>
+                            </div>
+                        </div>
+                    
+                    <div class="deposit-header-card text-center">
+                        <h4 class="mb-1" style="font-weight: 700;">Add Funds</h4>
+                        <p class="mb-0 small opacity-75">Deposit securely via M-Pesa STK Push</p>
+                    </div>
+
+                    <div class="deposit-container">
+                        <div class="text-center">
+                            <div class="secure-badge">
+                                <i class="fas fa-shield-alt mr-1"></i> Secure Encrypted Transaction
+                            </div>
+                        </div>
+
+                        <form action="{% url 'wallet:deposit_mpesa' %}" method="post">
+                            {% csrf_token %}
+
+                            <div class="form-group mb-4">
+                                <label for="phone">Registered M-Pesa Number</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-phone-alt text-muted"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="phone" 
+                                           value="{{ phone_number }}" id="phone" disabled>
+                                </div>
+                                <small class="text-muted">The STK prompt will be sent to this number.</small>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="amount">Deposit Amount (KES)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">KES</span>
+                                    </div>
+                                    <input type="number" name="amount" id="amount" 
+                                           class="form-control form-control-lg" placeholder="Enter amount" 
+                                           min="10" step="10" required>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <small class="text-muted">Minimum: <strong>KES 10</strong></small>
+                                </div>
+                            </div>
+
+                            <div class="instruction-box mb-4 p-3 border rounded bg-light" style="font-size: 0.85rem;">
+                                <p class="mb-0 text-secondary">
+                                    <i class="fas fa-info-circle mr-1"></i> 
+                                    After clicking <strong>Deposit Now</strong>, check your phone for an M-Pesa prompt to enter your PIN.
+                                </p>
+                            </div>
+
+                            <div class="btn-stack-mobile d-md-flex justify-content-between">
+                                <a href="{% url 'wallet:wallet_dashboard' %}" class="btn btn-light btn-action flex-grow-1 mr-md-2">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success btn-action flex-grow-1 ml-md-2">
+                                    Deposit Now
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mbl_footer fixed-bottom bg-white border-top py-2">
+        <div class="container">
+            <div class="d-flex justify-content-around align-items-center text-center">
+                <a href="{% url 'user_dashboard:home' %}" class="text-muted small text-decoration-none">
+                    <img src="{% static 'images/home_white.png' %}" style="filter: brightness(0); width: 20px;" alt=""><br>Home
+                </a>
+                <a href="{% url 'wallet:wallet_dashboard' %}" class="text-success small text-decoration-none">
+                    <img src="{% static 'images/wallet_alt_fill.png' %}" style="width: 20px;" alt=""><br>Wallet
+                </a>
+                <a href="{% url 'user_dashboard:settings' %}" class="text-muted small text-decoration-none">
+                    <img src="{% static 'images/setting.png' %}" style="filter: brightness(0); width: 20px;" alt=""><br>Settings
+                </a>
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}

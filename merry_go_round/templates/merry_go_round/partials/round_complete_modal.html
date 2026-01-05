@@ -1,0 +1,68 @@
+<!-- Round Completion Modal -->
+<div class="modal fade" id="roundCompleteModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trophy"></i> Round Completed Successfully!
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 80px;"></i>
+                    <h3 class="mt-4 mb-3">Congratulations!</h3>
+                    <p class="lead">
+                        <strong id="modal-round-name"></strong> has been completed.
+                    </p>
+                </div>
+
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-3">Your Summary</h6>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="mb-2">
+                                    <i class="fas fa-coins text-primary fa-2x"></i>
+                                </div>
+                                <small class="text-muted d-block">Total Contributed</small>
+                                <strong class="d-block" id="modal-total-contributed">KES 0.00</strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="mb-2">
+                                    <i class="fas fa-chart-line text-success fa-2x"></i>
+                                </div>
+                                <small class="text-muted d-block">Interest Earned</small>
+                                <strong class="text-success d-block" id="modal-interest-earned">KES 0.00</strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="mb-2">
+                                    <i class="fas fa-money-bill-wave text-warning fa-2x"></i>
+                                </div>
+                                <small class="text-muted d-block">Total Payout</small>
+                                <strong class="text-warning d-block" id="modal-payout-amount">KES 0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0">
+                    <i class="fas fa-info-circle"></i>
+                    Your payout has been credited to your MGR wallet. 
+                    All locked funds have been released.
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-primary" id="view-round-details-btn">
+                        <i class="fas fa-eye"></i> View Round Details
+                    </a>
+                    <a href="{% url 'merry_go_round:wallet_dashboard' %}" class="btn btn-success">
+                        <i class="fas fa-wallet"></i> View Wallet
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

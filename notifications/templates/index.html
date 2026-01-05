@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-messaging.js"></script>
+
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+          apiKey: "AIzaSyAAInslpg1y5EqLK000rYrQMFK_oT21ZYI",
+          authDomain: "bcdr-cc959.firebaseapp.com",
+          projectId: "bcdr-cc959",
+          storageBucket: "bcdr-cc959.appspot.com",
+          messagingSenderId: "93221637096",
+          appId: "1:93221637096:web:f03edf7bb4440b827ab25d",
+          measurementId: "G-VHBH6Q7K7W"
+        };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+</head>
+<body>
+<button type="submit" onclick="getToken()"></button>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:'Django site admin' }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:'Django administration' }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+<!-- Optional: global extra nav -->
+{% endblock %}
+
+<!-- Override the app list to inject custom links -->
+{% block sidebar %}
+<div id="content-related" class="sidebar">
+  <div class="module" id="recent-actions-module">
+    <h2>Support Dashboard</h2>
+    <ul class="actionlist">
+      <li>
+        <a href="{% url 'support:admin_tickets_list' %}" target="_blank">
+          💬 Support Tickets (Custom UI)
+        </a>
+      </li>
+    </ul>
+  </div>
+  {{ block.super }}
+</div>
+{% endblock %}

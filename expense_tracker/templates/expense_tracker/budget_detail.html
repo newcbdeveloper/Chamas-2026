@@ -1,0 +1,227 @@
+{% extends 'expense_tracker/base.html' %}
+{% load static %}
+{% load expense_filters %}
+
+{% block title %}Budget Details - {{ budget.category.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Back Button -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <a href="{% url 'expense_tracker:budget_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Budgets
+            </a>
+        </div>
+    </div>
+
+    <!-- Budget Overview -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <span style="font-size: 24px;">{{ budget.category.icon }}</span>
+                            {{ budget.category.name }} Budget
+                        </h4>
+                        <span class="badge bg-light text-dark">{{ budget.get_period_display }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Budget Amount -->
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block">Budget Amount</small>
+                                <h3 class="mb-0">{{ budget.amount|currency }}</h3>
+                            </div>
+                        </div>
+
+                        <!-- Spent Amount -->
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block">Spent</small>
+                                <h3 class="mb-0 text-danger">{{ spent|currency }}</h3>
+                            </div>
+                        </div>
+
+                        <!-- Remaining Amount -->
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block">Remaining</small>
+                                <h3 class="mb-0 {% if remaining >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ remaining|currency }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <!-- Percentage Used -->
+                        <div class="col-md-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block">Usage</small>
+                                <h3 class="mb-0 {% if percentage < 80 %}text-success{% elif percentage < 100 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ percentage|floatformat:1 }}%
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Budget Progress</span>
+                            <span class="fw-bold">{{ percentage|floatformat:1 }}%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar {% if percentage < 50 %}bg-success{% elif percentage < 80 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ percentage|floatformat:0 }}%" 
+                                 aria-valuenow="{{ percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ percentage|floatformat:0 }}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Period Information -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">Current Period:</small>
+                                <p class="mb-0 fw-bold">{{ start_date }} to {{ end_date }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Alert Threshold:</small>
+                                <p class="mb-0 fw-bold">{{ budget.alert_threshold }}%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Alert -->
+                    {% if percentage >= 100 %}
+                        <div class="alert alert-danger mt-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Budget Exceeded!</strong> You've spent {{ spent|currency }} which is over your budget of {{ budget.amount|currency }}.
+                        </div>
+                    {% elif percentage >= budget.alert_threshold %}
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Approaching Limit!</strong> You've used {{ percentage|floatformat:0 }}% of your budget. Only {{ remaining|currency }} remaining.
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success mt-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>On Track!</strong> You're doing well with {{ remaining|currency }} remaining in your budget.
+                        </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="mt-3 d-flex gap-2">
+                        <a href="{% url 'expense_tracker:budget_edit' budget.pk %}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Edit Budget
+                        </a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBudgetModal">
+                            <i class="fas fa-trash me-2"></i>Delete Budget
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions in This Period -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Transactions in This Period
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Amount</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in transactions %}
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-calendar me-1"></i>
+                                                {{ transaction.date }}
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 18px;">{{ transaction.category.icon }}</span>
+                                                {{ transaction.description|default:"No description" }}
+                                            </td>
+                                            <td class="text-end">
+                                                <strong class="text-danger">{{ transaction.amount|currency }}</strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{% url 'expense_tracker:transaction_edit' transaction.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th colspan="2">Total</th>
+                                        <th class="text-end">{{ spent|currency }}</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No transactions in this period</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Budget Modal -->
+<div class="modal fade" id="deleteBudgetModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Delete Budget</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this budget?</p>
+                <div class="alert alert-warning">
+                    <strong>{{ budget.category.icon }} {{ budget.category.name }}</strong><br>
+                    Amount: {{ budget.amount|currency }}<br>
+                    Period: {{ budget.get_period_display }}
+                </div>
+                <p class="text-muted small mb-0">This will not delete your transactions, only the budget tracking.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{% url 'expense_tracker:budget_delete' budget.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Budget</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
