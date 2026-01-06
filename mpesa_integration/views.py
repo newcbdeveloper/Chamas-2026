@@ -63,21 +63,22 @@ def lipa_na_mpesa_online(request):
             "PartyA": phone,
             "PartyB": LipanaMpesaPpassword.Business_short_code,
             "PhoneNumber": phone,
-            "CallBackURL": "https://chamaspace.com/load_money/callback",
+            "CallBackURL": LipanaMpesaPpassword.callback_url,
             "AccountReference": "chamabora",
             "TransactionDesc": "chamabora stk push"
         }
 
-        response = requests.post(api_url, json=request_data, headers=headers)
-        data = response.json()
-        print('value of data is:', data)
-        
         try:
+            response = requests.post(api_url, json=request_data, headers=headers)
+            data = response.json()
+            print('value of data is:', data)
             if data['ResponseCode'] == "0":
                 return redirect('stk_push_success')
             else:
+                print('Failed:', data)
                 return redirect('stk_push_fail')
-        except:
+        except Exception as e:
+            print('STKPush Error:', e)
             return redirect('stk_push_fail')
             
     return render(request, 'add no.html', context)

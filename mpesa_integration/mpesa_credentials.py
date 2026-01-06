@@ -19,7 +19,8 @@ def get_mpesa_access_token():
         mpesa_access_token = json.loads(r.text)
         print(mpesa_access_token)
         return mpesa_access_token['access_token'] if 'access_token' in mpesa_access_token else None
-    except:
+    except Exception as e:
+        print('Access token failed: ', e)
         # Return mock token for development environment
         return "mock_access_token_for_development"
 
@@ -35,3 +36,4 @@ class LipanaMpesaPpassword:
     data_to_encode = Business_short_code + passkey + lipa_time
     online_password = base64.b64encode(data_to_encode.encode())
     decode_password = online_password.decode('utf-8')
+    callback_url=settings.CALLBACK_URL

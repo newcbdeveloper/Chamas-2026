@@ -46,6 +46,7 @@ CONSUMER_KEY = env('CONSUMER_KEY', default='local-consumer-key')
 CONSUMER_SECRET = env('CONSUMER_SECRET', default='local-consumer-secret')
 BUSINESS_SHORT_CODE = env('BUSINESS_SHORT_CODE', default='174379')
 PASSKEY = env('PASSKEY', default='local-passkey')
+CALLBACK_URL=env('CALLBACK_URL', default='https://chamaspace.com/load_money/callback')
 
 # FCM - use dummy value for local
 FCM_SERVER_KEY = env('FCM_SERVER_KEY', default='local-fcm-key')
