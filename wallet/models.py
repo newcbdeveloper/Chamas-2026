@@ -389,6 +389,13 @@ class PendingTransfer(models.Model):
         blank=True,
         related_name='pending_transfer'
     )
+    # Unique UUID reference for the pending transfer
+    reference_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        help_text="UUID reference for the Daraja's OriginatorConversationID"
+    )
     
     # ENHANCED SECURITY FIELDS
     requires_password_verification = models.BooleanField(
@@ -424,6 +431,12 @@ class PendingTransfer(models.Model):
         default=dict, 
         blank=True,
         help_text="Includes phone_number, withdrawal_method, KYC status, etc."
+    )
+    # Raw JSON response from M-Pesa callback (B2C ResultURL)
+    raw_response = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Raw JSON response received from the M-Pesa callback"
     )
     
     class Meta:

@@ -36,4 +36,6 @@ class LipanaMpesaPpassword:
     data_to_encode = Business_short_code + passkey + lipa_time
     online_password = base64.b64encode(data_to_encode.encode())
     decode_password = online_password.decode('utf-8')
-    callback_url=settings.CALLBACK_URL
+    callback_url = settings.CALLBACK_URL
+    initiator_name = settings.INITIATOR_NAME
+    security_credential = settings.SECURITY_CREDENTIAL
