@@ -63,21 +63,22 @@ def lipa_na_mpesa_online(request):
             "PartyA": phone,
             "PartyB": LipanaMpesaPpassword.Business_short_code,
             "PhoneNumber": phone,
-            "CallBackURL": "https://chamaspace.com/load_money/callback",
+            "CallBackURL": LipanaMpesaPpassword.callback_url,
             "AccountReference": "chamabora",
             "TransactionDesc": "chamabora stk push"
         }
 
-        response = requests.post(api_url, json=request_data, headers=headers)
-        data = response.json()
-        print('value of data is:', data)
-        
         try:
+            response = requests.post(api_url, json=request_data, headers=headers)
+            data = response.json()
+            print('value of data is:', data)
             if data['ResponseCode'] == "0":
                 return redirect('stk_push_success')
             else:
+                print('Failed:', data)
                 return redirect('stk_push_fail')
-        except:
+        except Exception as e:
+            print('STKPush Error:', e)
             return redirect('stk_push_fail')
             
     return render(request, 'add no.html', context)
@@ -277,3 +278,89 @@ def test_mpesa_body(request):
     print('Line no 199', obj.available_for_withdraw, obj.description)
 
     return None
+
+@csrf_exempt
+def b2c_result(request):
+    """Endpoint to receive M-Pesa B2C result callbacks (ResultURL).
+    Renders a transaction success page.
+    """
+    body = ''
+    try:
+        body = request.body.decode('utf-8')
+    except Exception:
+        body = ''
+
+    parsed = None
+    try:
+        parsed = json.loads(body) if body else None
+    except Exception:
+        parsed = None
+
+    response_code = None
+    response_desc = None
+    conversation_id = None
+    originator_id = None
+
+    if isinstance(parsed, dict):
+        response_code = parsed.get('ResponseCode') or parsed.get('ResultCode')
+        response_desc = parsed.get('ResponseDescription') or parsed.get('ResultDesc')
+        conversation_id = parsed.get('ConversationID')
+        originator_id = parsed.get('OriginatorConversationID')
+
+        if response_code is None:
+            for key in ('Result', 'Body', 'ResultParameters'):
+                nested = parsed.get(key)
+                if isinstance(nested, dict):
+                    response_code = response_code or nested.get('ResponseCode') or nested.get('ResultCode')
+                    response_desc = response_desc or nested.get('ResponseDescription') or nested.get('ResultDesc')
+                    conversation_id = conversation_id or nested.get('ConversationID')
+                    originator_id = originator_id or nested.get('OriginatorConversationID')
+
+    success = False
+    try:
+        if response_code is not None:
+            success = str(response_code) == '0' or int(response_code) == 0
+    except Exception:
+        success = False
+
+    if success:
+        title = 'Withdrawal Successful'
+        message = 'Your withdrawal was completed successfully.'
+    else:
+        title = 'Withdrawal Status'
+        message = 'The withdrawal result was received but indicates a failure or unknown state.'
+
+    context = {
+        'success': success,
+        'title': title,
+        'message': message,
+        'conversation_id': conversation_id,
+        'originator_id': originator_id,
+    }
+
+    try:
+        if originator_id:
+            # wallet app import here to avoid circular imports
+            from wallet.models import PendingTransfer
+            import uuid as _uuid
+            try:
+                parsed_uuid = _uuid.UUID(str(originator_id))
+                pt = PendingTransfer.objects.filter(reference_id=parsed_uuid).first()
+            except Exception:
+                # If originator_id is not a UUID, try direct string match
+                pt = PendingTransfer.objects.filter(reference_id=str(originator_id)).first()
+
+            if pt:
+                try:
+                    if parsed is not None:
+                        pt.raw_response = parsed
+                    else:
+                        pt.raw_response = {'raw': body}
+                    pt.save(update_fields=['raw_response'])
+                    logger.info(f"Saved raw_response for PendingTransfer #{pt.id}")
+                except Exception as e:
+                    logger.error(f"Failed to save raw_response for PendingTransfer: {e}")
+    except Exception:
+        logger.debug('Could not persist raw_response to PendingTransfer (wallet app may be missing)')
+
+    return render(request, 'mpesa_integration/result.html', context)

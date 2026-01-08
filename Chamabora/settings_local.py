@@ -42,10 +42,13 @@ TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='+1234567890')
 # CLOUDINARY_STORAGE_API_SECRET = 'test'
 
 # M-Pesa - use test values or keep real ones for testing
-CONSUMER_KEY = env('CONSUMER_KEY', default='local-consumer-key')
-CONSUMER_SECRET = env('CONSUMER_SECRET', default='local-consumer-secret')
+CONSUMER_KEY = env('CONSUMER_KEY')
+CONSUMER_SECRET = env('CONSUMER_SECRET')
 BUSINESS_SHORT_CODE = env('BUSINESS_SHORT_CODE', default='174379')
 PASSKEY = env('PASSKEY', default='local-passkey')
+CALLBACK_URL=env('CALLBACK_URL', default='https://chamaspace.com/load_money/callback')
+INITIATOR_NAME=env('INITIATOR_NAME')
+SECURITY_CREDENTIAL=env('SECURITY_CREDENTIAL')
 
 # FCM - use dummy value for local
 FCM_SERVER_KEY = env('FCM_SERVER_KEY', default='local-fcm-key')

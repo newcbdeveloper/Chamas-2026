@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from authentication.views import showFirebaseJS
 from django.views.generic import RedirectView
+from mpesa_integration import views as mpesa_views
 
 
 urlpatterns = [
@@ -27,6 +28,7 @@ urlpatterns = [
     # ========== WALLET & PAYMENTS (ACTIVE) ==========
     path('wallet/', include('wallet.urls', namespace='wallet')),
     path('load_money/', include('mpesa_integration.urls')),
+    path('mpesa/result', mpesa_views.b2c_result, name='mpesa_b2c_result'),
     path('withdraw/', include('pyment_withdraw.urls')),
 
     # ========== NOTIFICATIONS ==========

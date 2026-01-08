@@ -666,7 +666,7 @@ class MpesaIntegrationService:
             
             # Send actual M-Pesa B2C request
             access_token = get_mpesa_access_token()
-            api_url = "https://api.safaricom.co.ke/mpesa/b2c/v1/paymentrequest"
+            api_url = "https://api.safaricom.co.ke/mpesa/b2c/v3/paymentrequest"
             headers = {"Authorization": f"Bearer {access_token}"}
             
             # Format phone number for M-Pesa (remove + and leading 0)
@@ -675,14 +675,15 @@ class MpesaIntegrationService:
                 clean_phone = '254' + clean_phone
             
             payload = {
-                "InitiatorName": LipanaMpesaPpassword.InitiatorName,
-                "SecurityCredential": LipanaMpesaPpassword.SecurityCredential,
+                "OriginatorConversationID": str(pending_transfer.reference_id),
+                "InitiatorName": LipanaMpesaPpassword.initiator_name,
+                "SecurityCredential": LipanaMpesaPpassword.security_credential,
                 "CommandID": "BusinessPayment",
                 "Amount": float(amount),
                 "PartyA": LipanaMpesaPpassword.Business_short_code,
                 "PartyB": clean_phone,
                 "Remarks": f"Withdrawal for {user.username}",
-                "QueueTimeOutURL": "https://chamaspace.com/mpesa/timeout",
+                "QueueTimeOutURL": "https://chamaspace.com/mpesa/result",
                 "ResultURL": "https://chamaspace.com/mpesa/result",
                 "Occasion": "WalletWithdrawal"
             }
@@ -704,6 +705,7 @@ class MpesaIntegrationService:
                 return False, f"M-Pesa processing failed: {error_msg}"
                 
         except Exception as e:
+            import traceback
             error_msg = str(e)
             logger.error(f"Error in process_approved_withdrawal: {error_msg}\n{traceback.format_exc()}")
             pending_transfer.fail(reason=error_msg)

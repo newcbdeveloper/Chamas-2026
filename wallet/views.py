@@ -142,7 +142,7 @@ def deposit_via_mpesa(request):
                 phone = int(''.join(filter(str.isdigit, without_plus)))
                 
                 # Import M-Pesa credentials
-                from payment_integration.mpesa_credentials import (
+                from mpesa_integration.mpesa_credentials import (
                     LipanaMpesaPpassword, 
                     get_mpesa_access_token
                 )
@@ -164,7 +164,7 @@ def deposit_via_mpesa(request):
                     "PartyA": phone,
                     "PartyB": LipanaMpesaPpassword.Business_short_code,
                     "PhoneNumber": phone,
-                    "CallBackURL": "https://chamaspace.com/load_money/callback",
+                    "CallBackURL": LipanaMpesaPpassword.callback_url,
                     "AccountReference": "ChamaSpace Wallet",
                     "TransactionDesc": "Deposit to Main Wallet"
                 }
