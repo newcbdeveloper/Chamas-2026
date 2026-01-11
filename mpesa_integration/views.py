@@ -27,8 +27,8 @@ def send_mpesa_success_sms(mobile, body):
 
 
 def getAccessToken(request):
-    consumer_key = 'yHXpR8eVq0HWdaft5QgNCDjjfYklT3HX'
-    consumer_secret = '3awmu3uigWx5ATnH'
+    consumer_key = settings.CONSUMER_KEY
+    consumer_secret = settings.CONSUMER_SECRET
     api_URL = 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
     r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
