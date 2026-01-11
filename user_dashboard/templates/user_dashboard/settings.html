@@ -220,6 +220,51 @@
         display: block;
         opacity: 1;
     }
+
+/* Password visibility toggle styles — consistent with emerald theme */
+    .password-wrapper {
+        position: relative;
+        flex: 1;
+        display: flex;
+    }
+
+    .password-wrapper .form-control {
+        padding-right: 40px; /* space for toggle button */
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--gray-400);
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        z-index: 2;
+    }
+
+    .toggle-password:hover,
+    .toggle-password:focus {
+        color: var(--emerald-600);
+    }
+
+    .toggle-password:focus {
+        outline: 2px solid var(--emerald-600);
+        outline-offset: 2px;
+    }
+
+    /* Ensure input-group doesn’t clip the button */
+    .custom-input-group .password-wrapper {
+        width: 100%;
+    }
 </style>
 {% endblock %}
 
@@ -349,43 +394,73 @@
             </div>
 
             <!-- PASSWORD -->
-            <div id="password" class="settings-tab-content">
-                <h4 class="section-header">Password</h4>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="row g-4">
-                        <div class="col-12">
-                            <label class="form-label-uppercase">Current Password</label>
-                            <div class="input-group custom-input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" name="current_password" class="form-control"
-                                    placeholder="Enter current password">
+                <div id="password" class="settings-tab-content">
+                    <h4 class="section-header">Password</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="form-label-uppercase">Current Password</label>
+                                <div class="input-group custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <div class="password-wrapper">
+                                        <input type="password" name="current_password" id="current_password" class="form-control"
+                                            placeholder="Enter current password">
+                                        <button type="button" class="toggle-password" data-target="current_password"
+                                            aria-label="Toggle current password visibility">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-uppercase">New Password</label>
+                                <div class="input-group custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                    <div class="password-wrapper">
+                                        <input type="password" name="new_password" id="new_password" class="form-control"
+                                            placeholder="Enter new password">
+                                        <button type="button" class="toggle-password" data-target="new_password"
+                                            aria-label="Toggle new password visibility">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-uppercase">Confirm New Password</label>
+                                <div class="input-group custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-check-double"></i></span>
+                                    <div class="password-wrapper">
+                                        <input type="password" name="confirm_password" id="confirm_password" class="form-control"
+                                            placeholder="Confirm new password">
+                                        <button type="button" class="toggle-password" data-target="confirm_password"
+                                            aria-label="Toggle confirm password visibility">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <label class="form-label-uppercase">New Password</label>
-                            <div class="input-group custom-input-group">
-                                <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                <input type="password" name="new_password" class="form-control"
-                                    placeholder="Enter new password">
-                            </div>
+                        <div class="mt-4 pt-3 border-top d-flex gap-3">
+                            <button type="submit" name="section" value="password" class="btn btn-emerald">Update
+                                Password</button>
+                            <button type="button" class="btn btn-link text-secondary text-decoration-none">Cancel</button>
                         </div>
-                        <div class="col-12">
-                            <label class="form-label-uppercase">Confirm New Password</label>
-                            <div class="input-group custom-input-group">
-                                <span class="input-group-text"><i class="fas fa-check-double"></i></span>
-                                <input type="password" name="confirm_password" class="form-control"
-                                    placeholder="Confirm new password">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 pt-3 border-top d-flex gap-3">
-                        <button type="submit" name="section" value="password" class="btn btn-emerald">Update
-                            Password</button>
-                        <button type="button" class="btn btn-link text-secondary text-decoration-none">Cancel</button>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
 
             <!-- VERIFICATION -->
             <div id="verification" class="settings-tab-content">
@@ -558,38 +633,33 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // === Tab Switching (unchanged) ===
         const desktopBtns = document.querySelectorAll('.segmented-btn');
         const mobileSelect = document.getElementById('mobile-tab-select');
         const contents = document.querySelectorAll('.settings-tab-content');
 
-        // Function to switch tabs
         function switchTab(targetId) {
-            // Update contents
             contents.forEach(el => {
                 el.style.opacity = '0';
                 setTimeout(() => {
                     el.classList.remove('active');
                     if (el.id === targetId) {
                         el.classList.add('active');
-                        // Trigger reflow
                         void el.offsetWidth;
                         el.style.opacity = '1';
                     }
-                }, 150); // Fast fade out
+                }, 150);
             });
 
-            // Update Desktop Buttons
             desktopBtns.forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === targetId);
             });
 
-            // Update Mobile Select
             if (mobileSelect) {
                 mobileSelect.value = targetId;
             }
         }
 
-        // Event Listeners for Desktop
         desktopBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.dataset.tab;
@@ -597,30 +667,26 @@
             });
         });
 
-        // Event Listener for Mobile
         if (mobileSelect) {
             mobileSelect.addEventListener('change', (e) => {
                 switchTab(e.target.value);
             });
         }
 
-        // Handle URL Hash/Params if needed (Optional)
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
-        if (tabParam) {
-            if (['personal', 'password', 'verification', 'deletion'].includes(tabParam)) {
-                switchTab(tabParam);
-            }
+        if (tabParam && ['personal', 'password', 'verification', 'deletion'].includes(tabParam)) {
+            switchTab(tabParam);
         }
 
-        // Delete Account Toggle
+        // === Delete Account Toggle (unchanged) ===
         const initialDeleteBtn = document.getElementById('initial-delete-btn');
         const confirmSection = document.getElementById('confirm-delete-section');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
         if (initialDeleteBtn && confirmSection) {
             initialDeleteBtn.addEventListener('click', () => {
-                initialDeleteBtn.closest('div').style.display = 'none'; // Hide the refined button
+                initialDeleteBtn.closest('.d-flex').style.display = 'none';
                 confirmSection.style.display = 'block';
             });
         }
@@ -628,9 +694,26 @@
         if (cancelDeleteBtn) {
             cancelDeleteBtn.addEventListener('click', () => {
                 confirmSection.style.display = 'none';
-                initialDeleteBtn.closest('div').style.display = 'block'; // Show the refined button again
+                initialDeleteBtn.closest('.d-flex').style.display = 'block';
             });
         }
+
+        // === ✅ Password Visibility Toggle (NEW) ===
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+
+                // Visual feedback: change icon color
+                const icon = this.querySelector('svg');
+                icon.style.stroke = isPassword ? 'var(--emerald-600)' : 'currentColor';
+            });
+        });
     });
 </script>
 {% endblock %}

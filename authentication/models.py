@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 from django.contrib.auth.models import User
@@ -56,28 +57,27 @@ class amount_per_contribution(models.Model):
 
 
 
+
+
 class Profile(models.Model):
-    owner=models.OneToOneField(User,on_delete=models.CASCADE)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=25, blank=True, unique=True, null=True)
-    NIC_No=models.CharField(max_length=25,unique=True,blank=True,null=True, db_column='NIC_No')
-    physical_address=models.CharField(max_length=40,blank=True,null=True)
+    NIC_No = models.CharField(max_length=25, unique=True, blank=True, null=True, db_column='NIC_No')
+    physical_address = models.CharField(max_length=40, blank=True, null=True)
     picture = models.ImageField(upload_to='ProfileImages', blank=True)
-    # No_of_chamas_memebrs=models.CharField(max_length=225,blank=True,null=True)
-    # frequency_of_contribution=models.CharField(max_length=225,blank=True,null=True)
-    # amount_per_contribution=models.CharField(max_length=225,blank=True,null=True)
-    # no_of_cycles=models.CharField(max_length=225,blank=True,null=True)
-    payment_method=models.CharField(max_length=225,blank=True,null=True)
-    how_did_you_find=models.CharField(max_length=225,blank=True,null=True)
-    gender=models.CharField(max_length=25,blank=True,null=True)
-    otp = models.CharField(max_length=6,blank=True,null=True)
+    payment_method = models.CharField(max_length=225, blank=True, null=True)
+    how_did_you_find = models.CharField(max_length=225, blank=True, null=True)
+    gender = models.CharField(max_length=25, blank=True, null=True)
+    otp = models.CharField(max_length=6, blank=True, null=True)
+    
+    # User sessions 
+    password_changed_at = models.DateTimeField(null=True, blank=True)
+    phone_changed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.NIC_No if self.NIC_No else str(self.owner)
 
-
-
-@property
-def image_url(self):
-    if self.picture and hasattr(self.picture, 'url'):
-        return self.picture.url
-
+    @property
+    def image_url(self):
+        if self.picture and hasattr(self.picture, 'url'):
+            return self.picture.url

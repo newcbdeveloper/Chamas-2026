@@ -1,7 +1,7 @@
 {% extends 'goal_base.html' %}
 {% load static %}
 
-{% block title %}Create Goal{% endblock %}
+
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/create_personal_goal.css' %}">
@@ -28,6 +28,24 @@
 
             <form id="personal_goals_created">
                 {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" id="category" required>
+                        <option value="">Choose a category</option>
+                        <option value="education">🎓 Education</option>
+                        <option value="business">💼 Business</option>
+                        <option value="housing">🏠 Housing</option>
+                        <option value="vehicle">🚗 Vehicle</option>
+                        <option value="travel">✈️ Travel</option>
+                        <option value="medical">🏥 Medical</option>
+                        <option value="wedding">💍 Wedding</option>
+                        <option value="farming">🌾 Farming</option>
+                        <option value="gadgets">📱 Gadgets</option>
+                        <option value="investment">📈 Investment</option>
+                        <option value="retirement">🏖️ Retirement</option>
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label>Select goal type</label>
@@ -296,6 +314,7 @@
                 data: {
                     saving_type_input: savingType,
                     goal_title: $('#goal_title').val(),
+                    category: $('#category').val(),  // Category selection
                     target_amount: noTarget ? '' : $target.val(),
                     amount_to_save: $calc.val(),
                     start_date: startDate,
@@ -303,7 +322,7 @@
                     just_want_to_save: noEndDate ? 'on' : 'off',
                     reminder_frequency: $('#reminder_frequency').val(),
                     select_payment_frequency: $('#select_payment_frequency').val(),
-                    is_saving_or_goal: noTarget ? 'on' : 'off',
+                    is_saving_or_goal: noTarget ? 'on' : 'off',                    
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                 },
                 success: function(response) {

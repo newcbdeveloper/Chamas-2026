@@ -1,97 +1,290 @@
-/* Express Saving - Premium Wallet Card (Improved centering, text alignment) */
+/* ========================================================= */
+/*         EXPRESS SAVING DASHBOARD — TEAL THEME            */
+/* ========================================================= */
+
+/* General Layout */
+.modern-dashboard {
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Enhanced Header */
+.enhanced-header {
+    /* Teal Gradient */
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+    color: white;
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+    position: relative;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.user-greeting h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+}
+
+.user-greeting p {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Express Saving - Premium Wallet Card */
 .express-wallet-card {
-    background: linear-gradient(135deg, #0f766e 0%, #166534 100%);
+    /* Darker Teal Gradient for Card */
+    background: linear-gradient(135deg, #134e4a 0%, #0891b2 100%); 
     border-radius: 20px;
     padding: 2rem;
     color: white;
-    box-shadow: 0 10px 30px rgba(15, 118, 110, 0.3);
+    box-shadow: 0 10px 30px rgba(13, 148, 136, 0.3);
     transition: all 0.3s ease;
-}
-.express-wallet-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(15, 118, 110, 0.4);
-}
-.wallet-label {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-bottom: 0.5rem;
-}
-.wallet-amount {
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: -1px;
+    margin-top: -3.5rem; /* Overlap effect */
 }
 
-/* Action Cards (Larger icons, even spacing, glow on hover) */
+.express-wallet-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(13, 148, 136, 0.4);
+}
+
+.wallet-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.wallet-amount {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+/* Make the interest earned green/success color */
+.express-wallet-card .text-success {
+    color: #a7f3d0 !important; /* Light green for contrast */
+}
+
+/* Action Cards - Unified Teal Theme */
 .action-card {
-    padding: 1.5rem 1rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    padding: 1.25rem 0.75rem;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: all 0.3s ease;
     text-align: center;
 }
+
 .action-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.15);
+    border-color: #0d9488;
 }
-.action-icon {
-    width: 64px; height: 64px;  /* Larger for better visibility */
+
+/* Unified Teal Icons */
+.teal-icon {
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 0.75rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.625rem;
+    background: #0d9488;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
-.action-card:hover .action-icon {
-    transform: scale(1.1);
+
+.action-card:hover .teal-icon {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
+    background: #06b6d4;
 }
+
 .action-label {
     font-weight: 600;
     color: #1e293b;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
 }
 
-/* Transactions List (Card-style, better hover, rounded) */
+/* Section Headers */
+.section-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-header-modern h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.active-badge {
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.active-badge.success {
+    background: rgba(13, 148, 136, 0.1);
+    color: #0d9488;
+}
+
+/* Transactions List */
+.transactions-list {
+    background: white;
+    border-radius: 14px;
+    padding: 0.5rem;
+}
+
 .transaction-item {
     background: white;
     border-radius: 12px;
-    margin-bottom: 0.75rem;  /* More space between items */
+    padding: 1rem;
+    margin-bottom: 0.75rem;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
 }
+
 .transaction-item:hover {
     background: #f8fafc;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+    border-color: #0d9488;
 }
+
+.transaction-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Transaction Icons */
 .transaction-icon {
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-/* Donut Improvements (From goals.css - Ensure it's included or copied) */
-.donut-container {
-    margin: 0 auto;  /* Better centering */
-}
-.donut-chart {
-    animation: donutFill 1.4s ease-out forwards;
-    box-shadow: 0 6px 20px rgba(15, 118, 110, 0.18);
-}
-.donut-percentage {
-    background: linear-gradient(135deg, #0f766e, #16a34a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.bg-teal-light {
+    background: rgba(13, 148, 136, 0.1) !important;
 }
 
-/* Responsive Fixes (Mobile-first improvements) */
+.text-teal {
+    color: #0d9488 !important;
+}
+
+/* Withdrawal Specific Styles (for transaction list) */
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.bg-danger-light {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Button Styles */
+.btn-teal {
+    background: #0d9488;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.btn-teal:hover {
+    background: #06b6d4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
+    color: white;
+}
+
+/* Modal Buttons - matching teal theme */
+.popup_btn {
+    background: #0d9488;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.popup_btn:hover {
+    background: #06b6d4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
+    color: white;
+}
+
+/* Modal Input Focus */
+.mt-25 input:focus {
+    outline: none;
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* Milestone Button Styling in Modal */
+.milestone-btn {
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.milestone-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+}
+
+/* Responsive Fixes */
 @media (max-width: 768px) {
-    .wallet-amount { font-size: 1.8rem; }
-    .action-icon { width: 56px; height: 56px; }
-    .donut-container { width: 140px; height: 140px; }
-    .transaction-item { flex-direction: column; text-align: center; gap: 1rem; }
-}
+    .wallet-amount {
+        font-size: 1.75rem;
+    }
 
-.action-icon i {
-    font-size: 1.5rem;
+    .express-wallet-card {
+        padding: 1.5rem;
+        margin-top: -2.5rem;
+    }
+
+    .teal-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .action-label {
+        font-size: 0.75rem;
+    }
+
+    .transaction-icon {
+        width: 36px;
+        height: 36px;
+    }
 }

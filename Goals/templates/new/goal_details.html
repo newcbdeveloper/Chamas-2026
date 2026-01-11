@@ -370,61 +370,76 @@
 
         <div class="container pt-4 pb-5">
 
-            <!-- UNIFIED HERO CARD -->
-            <div class="unified-hero-card">
-                <!-- Top Section: Navigation & Title -->
-                <div class="hero-header">
-                    <a href="{% url 'goals:wekeza_dashboard' %}" class="back-link">
-                        <i class="fe fe-chevron-left"></i> Back to Goals
-                    </a>
+            <!-- ========== UNIFIED HERO CARD WITH CATEGORY IMAGE ========== -->
+                <!-- If no category, use default teal gradient -->
+                    <div class="unified-hero-card" 
+                        {% if goal_info.category %}
+                        style="background-image: linear-gradient(135deg, rgba(14, 133, 147, 0.2) 0%, rgba(6, 107, 120, 0.3) 100%), url('{{ goal_image_url }}'); background-size: cover; background-position: center; background-blend-mode: overlay;"
+                        {% else %}
+                        style="background: linear-gradient(135deg, #0e8593 0%, #066b78 100%);"
+                        {% endif %}>
+                    
+                    <!-- Top Section: Navigation & Title -->
+                    <div class="hero-header">
+                        <a href="{% url 'goals:wekeza_dashboard' %}" class="back-link">
+                            <i class="fe fe-chevron-left"></i> Back to Goals
+                        </a>
 
-                    <div class="hero-title-row">
-                        <div class="hero-title-content">
-                            <h1 class="goal-title">{{ goal_info.name }}</h1>
-                            <div class="goal-days-left">
-                                <span class="dot-indicator"></span> {{ goal_info.calculate_month_difference }} Days Left
+                        <div class="hero-title-row">
+                            <div class="hero-title-content">
+                                <!-- Category Badge (Optional - shows category name) -->
+                                {% if goal_info.category %}
+                                <div class="category-badge">
+                                    <i class="fe fe-{{ goal_info.category.default_icon }}"></i>
+                                    {{ goal_info.category.display_name }}
+                                </div>
+                                {% endif %}
+                                
+                                <h1 class="goal-title">{{ goal_info.name }}</h1>
+                                <div class="goal-days-left">
+                                    <span class="dot-indicator"></span> {{ goal_info.calculate_month_difference }} Days Left
+                                </div>
+                            </div>
+
+                            <!-- Glassy Balance Card -->
+                            <div class="hero-balance-card">
+                                <div class="balance-item">
+                                    <div class="balance-label">TOTAL SAVED</div>
+                                    <div class="balance-value">Kshs. {{goal_info.goal_balance|add:goal_info.goal_profit|floatformat:2 }}</div>
+                                </div>
+                                <div class="balance-divider"></div>
+                                <div class="balance-item">
+                                    <div class="balance-label">INTEREST EARNED</div>
+                                    <div class="balance-value positive">+ {{ goal_info.goal_profit|floatformat:2 }}</div>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Glassy Balance Card -->
-                        <div class="hero-balance-card">
-                            <div class="balance-item">
-                                <div class="balance-label">TOTAL SAVED</div>
-                                <div class="balance-value">Kshs. {{goal_info.goal_balance|add:goal_info.goal_profit|floatformat:2 }}</div>
-                            </div>
-                            <div class="balance-divider"></div>
-                            <div class="balance-item">
-                                <div class="balance-label">INTEREST EARNED</div>
-                                <div class="balance-value positive">+ {{ goal_info.goal_profit|floatformat:2 }}</div>
-                            </div>
+                    <!-- Progress Bar Section -->
+                    <div class="hero-progress-container mt-4 mb-2">
+                        <div class="d-flex justify-content-between text-white-50 mb-1 small fw-bold">
+                            <span>PROGRESS</span>
+                            <span>{{ goal_info.percentage|floatformat:0 }}%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: {{ goal_info.percentage }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Footer: Info Pill -->
+                    <div class="hero-footer text-center text-md-start">
+                        <div class="info-pill">
+                            <i class="fe fe-info"></i>
+                            <span>{{ interest_rate }}% interest per year
+                                    {% if goal_info.goal_amount and goal_info.goal_amount > 0 %}<br>
+                                    Target: Kshs. {{ goal_info.goal_amount|floatformat:2 }}
+                                    {% else %}
+                                    No target amount (flexible savings)
+                                    {% endif %}</span>
                         </div>
                     </div>
                 </div>
-
-                <!-- Progress Bar Section -->
-                <div class="hero-progress-container mt-4 mb-2">
-                    <div class="d-flex justify-content-between text-white-50 mb-1 small fw-bold">
-                        <span>PROGRESS</span>
-                        <span>{{ goal_info.percentage|floatformat:0 }}%</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: {{ goal_info.percentage }}%"></div>
-                    </div>
-                </div>
-
-                <!-- Hero Footer: Info Pill -->
-                <div class="hero-footer text-center text-md-start">
-                    <div class="info-pill">
-                        <i class="fe fe-info"></i>
-                        <span>{{ interest_rate }}% interest per year
-                                {% if goal_info.goal_amount and goal_info.goal_amount > 0 %}<br>
-                                Target: Kshs. {{ goal_info.goal_amount|floatformat:2 }}
-                                {% else %}
-                                No target amount (flexible savings)
-                                {% endif %}</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- ACTION BUTTONS GRID -->
             <div class="action-buttons-grid">
@@ -437,7 +452,7 @@
                         <div class="icon-wrapper icon-teal">
                             <i class="fe fe-plus"></i>
                         </div>
-                        <span class="action-text">Add Funds</span>
+                        <span class="action-text">Save</span>
                     </a>
 
                     <!-- Withdraw -->
@@ -458,7 +473,7 @@
                             <div class="icon-wrapper icon-blue">
                                 <i class="fe fe-edit-2"></i>
                             </div>
-                            <span class="action-text">Edit Goal</span>
+                            <span class="action-text">Edit</span>
                         </a>
 
                         <!-- Statement -->

@@ -14,6 +14,17 @@
     
     <h1 class="page-title">Contact Us</h1>
     
+    <!-- Display success/error messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
     <div class="contact-grid">
         <div class="contact-info">
             <h3>Get in Touch</h3>
@@ -46,28 +57,40 @@
         
         <div class="contact-form">
             <h3>Send us a Message</h3>
-            <form id="contactForm">
+            <form id="contactForm" method="post" action="{% url 'contact:contact' %}">
+                {% csrf_token %}
+                
+                <!-- Honeypot field (hidden from users, catches bots) -->
+                <input type="text" name="honeypot" style="display:none;" tabindex="-1" autocomplete="off">
+                
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
+                    <input type="text" id="name" name="name" required maxlength="200">
+                    <div class="error-message" id="name-error"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="email-error"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="subject">Subject</label>
-                    <input type="text" id="subject" name="subject" required>
+                    <input type="text" id="subject" name="subject" required maxlength="300">
+                    <div class="error-message" id="subject-error"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
+                    <textarea id="message" name="message" rows="5" required maxlength="5000"></textarea>
+                    <div class="error-message" id="message-error"></div>
                 </div>
                 
-                <button type="submit" class="btn-primary">Send Message</button>
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <span id="btnText">Send Message</span>
+                    <span id="btnSpinner" style="display:none;">Sending...</span>
+                </button>
             </form>
         </div>
     </div>
@@ -76,11 +99,121 @@
 <!-- Load custom CSS -->
 <link rel="stylesheet" type="text/css" href="{% static 'css/contact.css' %}">
 
+<style>
+    .messages {
+        margin: 20px 0;
+    }
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: none;
+    }
+    .error-message.show {
+        display: block;
+    }
+</style>
+
 <script>
     document.getElementById('contactForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Thank you! Your message has been sent. We’ll get back to you soon.');
-        // In production, replace this with a real form submission to your backend.
+    e.preventDefault();
+
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.classList.remove('show');
+        el.textContent = '';
     });
+
+    // Show loading state
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+
+    submitBtn.disabled = true;
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline';
+
+    const formData = new FormData(this);
+
+    fetch('{% url "contact:contact" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+    })
+    .then(async response => {
+        let data;
+        try {
+            data = await response.json();
+        } catch (err) {
+            throw new Error('Invalid response from server.');
+        }
+
+        if (data.success) {
+            // Show success message in the page (avoid alert blocking)
+            let messagesDiv = document.querySelector('.messages');
+            if (!messagesDiv) {
+                messagesDiv = document.createElement('div');
+                messagesDiv.classList.add('messages');
+                document.querySelector('.contact-form').prepend(messagesDiv);
+            }
+            messagesDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+
+            this.reset();
+        } else {
+            if (data.errors) {
+                for (let field in data.errors) {
+                    const errorDiv = document.getElementById(field + '-error');
+                    if (errorDiv) {
+                        errorDiv.textContent = data.errors[field].join(', ');
+                        errorDiv.classList.add('show');
+                    }
+                }
+            } else {
+                let messagesDiv = document.querySelector('.messages');
+                if (!messagesDiv) {
+                    messagesDiv = document.createElement('div');
+                    messagesDiv.classList.add('messages');
+                    document.querySelector('.contact-form').prepend(messagesDiv);
+                }
+                messagesDiv.innerHTML = `<div class="alert alert-error">${data.message || 'An error occurred.'}</div>`;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        let messagesDiv = document.querySelector('.messages');
+        if (!messagesDiv) {
+            messagesDiv = document.createElement('div');
+            messagesDiv.classList.add('messages');
+            document.querySelector('.contact-form').prepend(messagesDiv);
+        }
+        messagesDiv.innerHTML = `<div class="alert alert-error">An error occurred. Please try again later.</div>`;
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+    });
+});
 </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 /* ========================================================= */
-/*           PERSONAL GOAL DETAILS — MODERN TEAL THEME        */
+/*           THEME VARIABLES                                 */
 /* ========================================================= */
 
 :root {
@@ -23,11 +23,14 @@ body {
 }
 
 /* ========================================================= */
-/*           UNIFIED HERO CARD                               */
+/*           HERO CARD — HEADER & STATS                      */
 /* ========================================================= */
 
 .unified-hero-card {
     background: var(--primary-teal-gradient);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: var(--radius-xl);
     padding: 2.5rem;
     color: var(--white);
@@ -37,13 +40,52 @@ body {
     margin-bottom: 2rem;
 }
 
-/* Top Section: Header & Stats */
-.hero-header {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+/* Overlay for text readability on background images */
+.unified-hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+    z-index: 0;
 }
 
+.unified-hero-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.unified-hero-card .goal-title,
+.unified-hero-card .goal-days-left,
+.unified-hero-card .balance-label,
+.unified-hero-card .balance-value {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Category badge (optional, above title) */
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.category-badge i {
+    font-size: 1rem;
+}
+
+/* Back link */
 .back-link {
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
@@ -60,16 +102,21 @@ body {
     color: var(--white);
 }
 
+/* Title & Days Left */
+.hero-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
 .hero-title-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    /* Align bottom of title with bottom of balance card */
     flex-wrap: wrap;
     gap: 2rem;
 }
 
-/* Left Content: Title & Days */
 .hero-title-content {
     flex: 1;
     min-width: 250px;
@@ -94,16 +141,14 @@ body {
 .dot-indicator {
     width: 8px;
     height: 8px;
-    background-color: #4ade80;
-    /* Bright Green */
+    background-color: #4ade80; /* Bright Green */
     border-radius: 50%;
     display: inline-block;
 }
 
-/* Right Content: Glassy Balance Card */
+/* Balance Card (Glass Effect) */
 .hero-balance-card {
     background: rgba(0, 0, 0, 0.2);
-    /* Darker semi-transparent background */
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
@@ -134,11 +179,6 @@ body {
     letter-spacing: -0.5px;
 }
 
-.balance-value.positive {
-    font-weight: 600;
-    font-size: 1.75rem;
-}
-
 .balance-divider {
     width: 1px;
     height: 40px;
@@ -148,6 +188,7 @@ body {
 /* Progress Bar */
 .hero-progress-container {
     max-width: 100%;
+    margin-top: 1.5rem;
 }
 
 .progress-track {
@@ -162,13 +203,12 @@ body {
 .progress-fill {
     height: 100%;
     background: #4ade80;
-    /* Bright Green */
     border-radius: 10px;
     transition: width 1s ease-in-out;
     box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
 }
 
-/* Footer Section: Info Pill */
+/* Info Pill (Footer) */
 .hero-footer {
     margin-top: 2rem;
 }
@@ -207,7 +247,6 @@ body {
     gap: 1rem;
     text-decoration: none;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    /* Very subtle shadow */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: 1px solid transparent;
 }
@@ -216,10 +255,9 @@ body {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1);
     border-color: rgba(14, 133, 147, 0.1);
-    /* Subtle teal border on hover */
 }
 
-/* Icon Wrappers */
+/* Icon Styles */
 .icon-wrapper {
     width: 54px;
     height: 54px;
@@ -237,28 +275,24 @@ body {
 
 .icon-teal {
     background-color: rgb(20, 184, 166);
-    /* Tailwind teal-500 equivalent */
     color: white;
     box-shadow: 0 4px 10px rgba(20, 184, 166, 0.3);
 }
 
 .icon-green {
     background-color: rgb(34, 197, 94);
-    /* Tailwind green-500 */
     color: white;
     box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
 }
 
 .icon-blue {
     background-color: rgb(14, 165, 233);
-    /* Tailwind sky-500 */
     color: white;
     box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
 }
 
 .icon-purple {
     background-color: rgb(139, 92, 246);
-    /* Tailwind violet-500 */
     color: white;
     box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
 }
@@ -270,7 +304,7 @@ body {
 }
 
 /* ========================================================= */
-/*           TRANSACTIONS & SECTIONS                         */
+/*           TRANSACTION SECTIONS                           */
 /* ========================================================= */
 
 .section-header-modern {
@@ -290,16 +324,14 @@ body {
 
 .active-badge {
     background-color: #e0f2fe;
-    /* Light blue */
     color: #0284c7;
-    /* Dark blue text */
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
 }
 
-/* Transactions List */
+/* Transaction List */
 .transactions-list {
     display: flex;
     flex-direction: column;
@@ -343,6 +375,7 @@ body {
     background: var(--bg-light);
     border-radius: var(--radius-lg);
     border: 2px dashed #cbd5e1;
+    text-align: center;
 }
 
 .empty-state-icon {
@@ -362,10 +395,12 @@ body {
 }
 
 @media (max-width: 768px) {
+    /* Hero Card Adjustments */
     .unified-hero-card {
         padding: 1.5rem;
         border-radius: var(--radius-lg);
-        /* Slightly smaller radius on mobile */
+        background-position: center center;
+        background-size: cover;
     }
 
     .hero-title-row {
@@ -389,13 +424,27 @@ body {
         font-size: 1.4rem;
     }
 
-    .balance-value.positive {
-        font-size: 1.4rem;
+    /* Category Badge */
+    .category-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
     }
 
+    /* Force horizontal scroll for action buttons */
     .action-buttons-grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* 2x2 Grid on Tablet/Large Mobile */
+        grid-template-columns: repeat(4, minmax(70px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .action-btn-card {
+        min-width: 80px;
+        padding: 1rem;
+    }
+    .action-text {
+        font-size: 0.85rem;
+        font-weight: 500;
     }
 }
 
@@ -408,19 +457,8 @@ body {
         font-size: 0.65rem;
     }
 
-    .balance-value,
-    .balance-value.positive {
+    .balance-value {
         font-size: 1.2rem;
-    }
-
-    .action-buttons-grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* Keep 2x2 for reasonable tap targets */
-        gap: 0.75rem;
-    }
-
-    .action-btn-card {
-        padding: 1rem;
     }
 
     .icon-wrapper {
@@ -429,7 +467,5 @@ body {
         font-size: 1.25rem;
     }
 
-    .action-text {
-        font-size: 0.85rem;
-    }
+    
 }

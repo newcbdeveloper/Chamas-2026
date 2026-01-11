@@ -158,7 +158,7 @@ html, body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0.25rem 0;
-  scrollbar-width: none;
+
   -ms-overflow-style: none;
   /* Ensure no negative margin or padding causes overflow */
   margin: 0 -1rem;
@@ -471,7 +471,56 @@ html, body {
 /* =============================================
    INFORMATIONAL GRID
    ============================================= */
-/* ... keep as before ... */
+/* Zone 3: Informational Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.info-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.info-icon {
+    color: var(--info);
+    background: var(--info-bg);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.info-content h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-main);
+}
+
+.info-content p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+}
+
+.info-meta {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+}
 
 /* =============================================
    MOBILE RESPONSIVE
@@ -515,10 +564,7 @@ html, body {
     scrollbar-width: none;
   }
 
-  .zone-label-row::-webkit-scrollbar {
-    display: none;
-  }
-
+  
   .mobile-utility-bar {
     display: flex;
   }
@@ -698,3 +744,199 @@ html, body {
   color: var(--text-muted);
   margin-top: 0.5rem;
 }
+
+/* Mobile & Responsive */
+.mobile-utility-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    z-index: 1000;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media (max-width: 991px) {
+    .notifications-frame {
+        padding: 1rem;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .command-title-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .header-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .search-shortcut-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .jump-to-bar {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+
+    .search-input-wrapper {
+        max-width: none;
+    }
+
+    
+
+    /* Urgent Card Mobile Redesign */
+    .urgent-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding-bottom: 4rem;
+        /* Space for the footer actions */
+        position: relative;
+    }
+
+    .urgent-icon {
+        margin-bottom: 0.5rem;
+        align-self: flex-start;
+    }
+
+    .urgent-content {
+        width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .urgent-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .urgent-actions .btn-pay,
+    .urgent-actions .btn-remind {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Redesigning the Urgent Secondary section to be a bottom bar */
+    .urgent-secondary {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid var(--border-color);
+        margin-top: 0;
+        border-radius: 0 0 12px 12px;
+    }
+
+    /* Override the inline styles for color and margin */
+    .urgent-secondary>div:last-child {
+        color: var(--text-muted) !important;
+        margin-top: 0 !important;
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .urgent-secondary>div:last-child i {
+        font-size: 1.1rem;
+        padding: 4px;
+        color: var(--text-muted) !important;
+    }
+
+    .urgent-amount {
+        text-align: left;
+        min-width: 0;
+        font-size: 1rem;
+    }
+
+    /* Recent Activity Mobile - New Robust Layout */
+    .log-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+        position: relative;
+    }
+
+    .log-header-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .log-header-row .log-icon {
+        margin-bottom: 0;
+        /* Override desktop if any */
+        float: none;
+        margin-right: 0;
+    }
+
+    .log-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .log-body-content {
+        padding-left: 0.25rem;
+    }
+
+    .log-footer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .log-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        position: static;
+        margin: 0;
+    }
+
+    /* Ensure actions are always visible */
+    .item-actions {
+        opacity: 1 !important;
+        display: flex;
+        gap: 1rem;
+        position: static;
+        /* Let it flow in the footer */
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .item-actions .action-icon {
+        font-size: 1.1rem;
+        padding: 0.35rem;
+        color: var(--text-muted);
+        background: #f1f5f9;
+        border-radius: 6px;
+    }

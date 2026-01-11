@@ -80,6 +80,32 @@ ALLOWED_HOSTS = ['chamaspace.com', 'www.chamaspace.com', '172.105.47.21','localh
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
 CSRF_TRUSTED_ORIGINS = ['https://chamaspace.com']
+
+
+# ==================== SESSION SECURITY CONFIGURATION ====================
+# Session engine - already using database
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Session cookie settings
+SESSION_COOKIE_NAME = 'chamaspace_sessionid'
+SESSION_COOKIE_AGE = 86400  # 24 hours (absolute expiry)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Default behavior
+SESSION_SAVE_EVERY_REQUEST = True  # Update session on every request
+
+# Security flags
+SESSION_COOKIE_SECURE = True  # HTTPS only (you already have SSL)
+SESSION_COOKIE_HTTPONLY = True  # Prevent JS access
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+
+# CSRF cookie security
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Idle timeout in seconds (15 minutes)
+SESSION_IDLE_TIMEOUT = 900  # 15 minutes * 60 seconds
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -115,6 +141,7 @@ INSTALLED_APPS = [
     'expense_tracker',
     'merry_go_round',
     'support',
+    'contact',
 
     # Third-party apps
     'tinymce',
@@ -139,12 +166,26 @@ FCM_DJANGO_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # Sessions must come early
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # Messages MUST come immediately after sessions
+    'django.contrib.messages.middleware.MessageMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
+    # Authentication before custom auth logic
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+
+    # Your custom session security middleware
+    'authentication.middleware.session_security.SessionSecurityMiddleware',
+    'authentication.middleware.session_security.SessionInvalidationMiddleware',
+
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Business logic middleware LAST
     'subscriptions.middleware.SubscriptionMiddleware',
     'expense_tracker.middleware.ExpenseTrackerMiddleware',
 ]
@@ -152,6 +193,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'Chamabora.urls'
 
 LOGIN_REDIRECT_URL = '/dashboard/'
+
 
 TEMPLATES = [
     {
@@ -622,6 +664,15 @@ if ENABLE_CELERY:
                 ),  # Daily at 9:00 AM
             },
             
+            # Celery Task for Session Cleanup
+            'cleanup-expired-sessions': {
+                'task': 'authentication.cleanup_expired_sessions',
+                'schedule': crontab(hour=3, minute=0),  # 3:00 AM daily
+                'options': {
+                    'expires': 3600,
+                }
+            },
+
         }
         
     except ImportError:
@@ -668,4 +719,48 @@ CONSTANCE_CONFIG_FIELDSETS = {
         'ROTATIONAL_MODEL_ENABLED', 
         'MGR_INVITATION_VALIDITY_DAYS',
     ),
+}
+
+#============================================================================ 
+# CONTACT APP CONFIGURATION
+# ============================================================================
+
+# Use SMTP backend so emails actually get sent via Zoho
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Zoho SMTP settings for testing
+EMAIL_HOST = 'smtppro.zoho.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'info@chamaspace.com'           # your Zoho email
+EMAIL_HOST_PASSWORD = 'SGVWpi82hTXb'    # your Zoho app-specific password
+
+# Default email addresses
+DEFAULT_FROM_EMAIL = 'info@chamaspace.com'
+CONTACT_EMAIL_RECIPIENTS = ['info@chamaspace.com']  # where notifications go
+
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'contact_messages.log',
+        },
+    },
+    'loggers': {
+        'contact': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }

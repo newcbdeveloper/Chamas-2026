@@ -1,0 +1,78 @@
+/* profile_settings.css */
+
+/* KYC Verification Card */
+.kyc-card {
+    background-color: #f8f4eb;
+    border: none;
+}
+
+.kyc-card .badge {
+    font-weight: 500;
+}
+
+/* Danger Zone Card */
+.danger-zone-card {
+    border: 2px solid #dc3545; /* Red border */
+    background-color: #fff; /* White background */
+}
+
+.danger-zone-card .card-body {
+    padding: 1.5rem;
+}
+
+.danger-zone-card .text-danger {
+    color: #dc3545 !important;
+}
+
+/* Input Fields - Optional: Fine-tuning */
+.form-control {
+    border-color: #dee2e6; /* Light gray border */
+    border-radius: 8px; /* Slightly more rounded corners */
+    box-shadow: none; /* Remove default shadow */
+}
+
+.form-control:focus {
+    border-color: #0d6efd; /* Blue focus border */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Focus ring */
+}
+
+/* Button Styling - Optional: Fine-tuning */
+.btn-primary {
+    background-color: #0d6efd; /* Solid blue */
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
+}
+
+.btn-outline-secondary {
+    color: #6c757d; /* Gray text */
+    border-color: #6c757d;
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    color: #fff; /* White text on hover */
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Profile Picture Edit Icon */
+.profile-pic-edit-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+}

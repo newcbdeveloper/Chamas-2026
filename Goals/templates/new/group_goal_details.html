@@ -310,91 +310,89 @@
     </div>
 
     <!-- Withdrawal Request Modal -->
-    <div class="modal fade" id="withdrawal_request" tabindex="-1" aria-labelledby="withdrawal_request"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="popup_box" id="withdrawal_request_firstinner">
-                        <h4 class="popup_heading">How much do you want to withdraw?</h4>
-                        <form class="mt-25" method="post" id="withdrawal_request_form">
-                            {% csrf_token %}
-                            <label for="withdraw_money">Withdraw Money</label>
-                            <input type="text" value="Kshs.{{ available_for_withdrawal|floatformat:2 }}"
-                                name="withdraw_money" id="withdraw_money" class="mt-1" readonly>
+<div class="modal fade" id="withdrawal_request" tabindex="-1" aria-labelledby="withdrawal_request" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="popup_box" id="withdrawal_request_firstinner">
+          <h4 class="popup_heading">How much do you want to withdraw?</h4>
+          <form class="mt-25" method="post" id="withdrawal_request_form">
+            {% csrf_token %}
+            <label for="withdraw_money">Withdraw Money</label>
+            <input type="text" value="Kshs.{{ available_for_withdrawal|floatformat:2 }}" name="withdraw_money" id="withdraw_money" class="mt-1" readonly>
 
-                            {% if available_for_withdrawal > 0 %}
-                            {% if goal_info.saving_type == 'regular' %}
-                            <!-- ✅ REGULAR GOALS: Can always withdraw -->
-                            <p class="mt-4">This amount will be deducted from {{ goal_info.goal_name }}.</p>
-                            <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after
-                                    withdrawal.</small></p>
-                            <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+            {% if available_for_withdrawal > 0 %}
+              {% if goal_info.saving_type == 'regular' %}
+                <!-- ✅ REGULAR GOALS: Can always withdraw -->
+                <p class="mt-4">This amount will be deducted from {{ goal_info.goal_name }}.</p>
+                <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after withdrawal.</small></p>
+                <button type="submit" class="btn popup_btn">Withdraw Now!</button>
 
-                            {% elif goal_info.saving_type == 'fixed' %}
-                            <!-- ✅ FIXED GOALS: Check if target reached OR end date passed -->
-                            {% if goal_info.achieved_amount >= goal_info.target_amount %}
-                            <p class="mt-4">🎉 <strong>Goal achieved!</strong> This amount will be deducted from {{goal_info.goal_name }}.</p>
-                            <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after
-                                    withdrawal.</small></p>
-                            <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+              {% elif goal_info.saving_type == 'fixed' %}
+                <!-- ✅ FIXED GOALS: Check if target reached OR end date passed -->
+                {% if goal_info.achieved_amount >= goal_info.target_amount %}
+                  <p class="mt-4">🎉 <strong>Goal achieved!</strong> This amount will be deducted from {{ goal_info.goal_name }}.</p>
+                  <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after withdrawal.</small></p>
+                  <button type="submit" class="btn popup_btn">Withdraw Now!</button>
 
-                            {% elif goal_info.end_date and goal_info.end_date <= today %} <p class="mt-4">📅 <strong>End
-                                    date reached!</strong> This amount will be deducted from {{ goal_info.goal_name }}.
-                                </p>
-                                <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after
-                                        withdrawal.</small></p>
-                                <button type="submit" class="btn popup_btn">Withdraw Now!</button>
+                {% elif goal_info.end_date and goal_info.end_date <= today %}
+                  <p class="mt-4">📅 <strong>End date reached!</strong> This amount will be deducted from {{ goal_info.goal_name }}.</p>
+                  <p class="mt-4 text-warning"><small>⚠️ Note: The group goal will be closed after withdrawal.</small></p>
+                  <button type="submit" class="btn popup_btn">Withdraw Now!</button>
 
-                                {% else %}
-                                <br><br>
-                                <div class="alert alert-danger" role="alert">
-                                    <strong>❌ Cannot Withdraw Yet</strong><br>
-                                    Fixed goal withdrawal requires EITHER:<br>
-                                    1️⃣ Target amount reached (Current: KES {{ goal_info.achieved_amount|floatformat:2}} / Target: KES {{ goal_info.target_amount|floatformat:2 }})<br>
-                                    2️⃣ End date reached ({% if goal_info.end_date %}{{ goal_info.end_date }}{% else
-                                    %}No end date set{% endif %})
-                                </div>
-                                {% endif %}
-                                {% endif %}
-                                {% else %}
-                                <br><br>
-                                <p class="btn btn-warning text-dark">No funds available for withdrawal</p>
-                                {% endif %}
-                        </form>
-                    </div>
-                    <div class="popupTwo" id="withdrawal_success_popup" style="display: none;">
-                        <div class="popup_box">
-                            <h4 class="popup_heading">Success!</h4>
-                            <div class="text-center mt-3 mb-3">
-                                <img src="{% static 'images/success.png' %}" alt="">
-                            </div>
-                            <h4 class="popup_heading">Your payment withdrawal request has been received.</h4>
-                            <p>We are processing the transaction, and you will receive a confirmation once it is
-                                successfully completed.</p>
-                            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% else %}
+                  <br><br>
+                  <div class="alert alert-danger" role="alert">
+                    <strong>❌ Cannot Withdraw Yet</strong><br>
+                    Fixed goal withdrawal requires <strong>EITHER</strong>:<br>
+                    1️⃣ Target amount reached (Current: KES {{ goal_info.achieved_amount|floatformat:2 }} / Target: KES {{ goal_info.target_amount|floatformat:2 }})<br>
+                    2️⃣ End date reached (
+                      {% if goal_info.end_date %}
+                        {{ goal_info.end_date|date:"M. d, Y" }}
+                      {% else %}
+                        No end date set
+                      {% endif %}
+                    )
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% else %}
+              <br><br>
+              <p class="btn btn-warning text-dark">No funds available for withdrawal</p>
+            {% endif %}
+          </form>
         </div>
-    </div>
 
-    <!-- Withdrawal Denied Modal -->
-    <div class="modal fade" id="withdrawal_request_denied" tabindex="-1" aria-labelledby="withdrawal_request_denied"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="popup_box" id="delete_form_popup">
-                        <h4 class="popup_heading mb-3">Sorry! Only admin of this group can initiate withdrawal request.
-                        </h4>
-                        <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
+        <!-- Success Popup -->
+        <div class="popupTwo" id="withdrawal_success_popup" style="display: none;">
+          <div class="popup_box">
+            <h4 class="popup_heading">Success!</h4>
+            <div class="text-center mt-3 mb-3">
+              <img src="{% static 'images/success.png' %}" alt="">
             </div>
+            <h4 class="popup_heading">Your payment withdrawal request has been received.</h4>
+            <p>We are processing the transaction, and you will receive a confirmation once it is successfully completed.</p>
+            <button class="btn popup_btn" data-bs-dismiss="modal">Close</button>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Withdrawal Denied Modal -->
+<div class="modal fade" id="withdrawal_request_denied" tabindex="-1" aria-labelledby="withdrawal_request_denied" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="popup_box" id="delete_form_popup">
+          <h4 class="popup_heading mb-3">Sorry! Only admin of this group can initiate withdrawal request.</h4>
+          <button class="btn popup_btn mt-4" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Disable Group Popup -->
     <div class="modal fade" id="disable_group_popup" tabindex="-1" aria-labelledby="disable_group_popup"
@@ -455,11 +453,16 @@
                         </div>
                         <div class="user-greeting d-flex align-items-center gap-3">
                             <h1 class="font-outfit text-dark">{{ goal_info.goal_name }}</h1>
-                            {% if goal_info.creator == request.user %}
-                            <a href="#" class="edit-icon-btn" data-bs-toggle="modal" data-bs-target="#edit_goal">
-                                <i class="fe fe-edit-2"></i>
-                            </a>
-                            {% endif %}
+                                {% if goal_info.creator == request.user %}
+                                <a href="#" class="edit-icon-btn" data-bs-toggle="modal" data-bs-target="#edit_goal">
+                                    <i class="fe fe-edit-2"></i>
+                                </a>
+                                {% if goal_info.is_active == 'No' or goal_info.achieved_amount|floatformat:"2" == "0.00" %}
+                                    <a href="#" class="edit-icon-btn text-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete_group_goal_confirm">
+                                    <i class="fe fe-trash-2"></i>
+                                    </a>
+                                {% endif %}
+                                {% endif %}
                         </div>
                         {% if goal_info.end_date %}
                         <div class="days-remaining">
@@ -476,7 +479,7 @@
             <!-- Wallet Card - Updated Design -->
             <div class="row justify-content-center mb-5">
                 <div class="col-12 col-lg-10">
-                    <div class="wallet-card personal-wallet-card text-dark position-relative overflow-hidden bg-white">
+                    <div class="wallet-card personal-wallet-card position-relative overflow-hidden">
                         <div class="row mb-4">
                             <!-- Total Saved -->
                             <div class="col-12 col-md-6 mb-4 mb-md-0">
@@ -523,61 +526,57 @@
                 </div>
             </div>
 
-            <!-- Action Buttons Grid -->
-            <!-- Center the grid and constrain width for better look -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-lg-10">
-                    <div class="row g-3">
-                        <div class="col-6 col-md-3">
-                            <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" {% if goal_info.is_active == 'Yes' %} data-bs-target="#add_funds" {% else %} data-bs-target="#disable_group_popup" {% endif %}>
-                            <div class="action-card bg-white">
-                                <div class="teal-icon">
-                                    <i class="fe fe-plus-circle fs-4"></i>
-                                </div>
-                                <div class="action-label">Add Funds</div>
-                            </div>
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal"
-                            {% if goal_info.creator == request.user %}
-                                data-bs-target="#withdrawal_request"
-                            {% elif goal_info.is_active == 'No' %}
-                                data-bs-target="#disable_group_popup"
-                            {% else %}
-                                data-bs-target="#withdrawal_request_denied"
-                            {% endif %}>
-                            <div class="action-card bg-white">
-                                <div class="teal-icon">
-                                    <i class="fe fe-arrow-up-circle fs-4"></i>
-                                </div>
-                                <div class="action-label">Withdraw</div>
-                            </div>
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="#" class="text-center text-decoration-none" data-bs-toggle="modal" {% if goal_info.is_active == 'Yes' %} data-bs-target="#exampleModalMemb" {% else %} data-bs-target="#disable_group_popup" {% endif %}>
-                            <div class="action-card bg-white">
-                                <div class="teal-icon">
-                                    <i class="fe fe-users fs-4"></i>
-                                </div>
-                                <div class="action-label">Add Member</div>
-                            </div>
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="{% url 'goals:goal_statement' goal_info.id %}" download class="text-center text-decoration-none">
-                            <div class="action-card bg-white">
-                                <div class="teal-icon">
-                                    <i class="fe fe-download fs-4"></i>
-                                </div>
-                                <div class="action-label">Statement</div>
-                            </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- ACTION BUTTONS GRID (Consistent with Personal Goal) -->
+<div class="action-buttons-grid">
+    <!-- Add Funds -->
+    <a href="#" class="action-btn-card" data-bs-toggle="modal"
+       {% if goal_info.is_active == 'Yes' %}
+           data-bs-target="#add_funds"
+       {% else %}
+           data-bs-target="#disable_group_popup"
+       {% endif %}>
+        <div class="icon-wrapper icon-teal">
+            <i class="fe fe-plus-circle"></i>
+        </div>
+        <span class="action-text">Add Funds</span>
+    </a>
+
+    <!-- Withdraw -->
+    <a href="#" class="action-btn-card" data-bs-toggle="modal"
+       {% if goal_info.creator == request.user %}
+           data-bs-target="#withdrawal_request"
+       {% elif goal_info.is_active == 'No' %}
+           data-bs-target="#disable_group_popup"
+       {% else %}
+           data-bs-target="#withdrawal_request_denied"
+       {% endif %}>
+        <div class="icon-wrapper icon-green">
+            <i class="fe fe-arrow-up-circle"></i>
+        </div>
+        <span class="action-text">Withdraw</span>
+    </a>
+
+    <!-- Add Member -->
+    <a href="#" class="action-btn-card" data-bs-toggle="modal"
+       {% if goal_info.is_active == 'Yes' %}
+           data-bs-target="#exampleModalMemb"
+       {% else %}
+           data-bs-target="#disable_group_popup"
+       {% endif %}>
+        <div class="icon-wrapper icon-blue">
+            <i class="fe fe-users"></i>
+        </div>
+        <span class="action-text">Add Member</span>
+    </a>
+
+    <!-- Statement -->
+    <a href="{% url 'goals:goal_statement' goal_info.id %}" download class="action-btn-card">
+        <div class="icon-wrapper icon-purple">
+            <i class="fe fe-download"></i>
+        </div>
+        <span class="action-text">Statement</span>
+    </a>
+</div>
 
             <!-- Two Column Layout: Members & Activities -->
             <div class="row justify-content-center">

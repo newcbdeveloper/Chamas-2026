@@ -1,34 +1,37 @@
 /* ========================================================= */
-/*        GROUP GOAL DETAILS — MODERN TEAL THEME            */
+/*        GROUP GOAL DETAILS — MODERN TEAL THEME              */
 /* ========================================================= */
 
 :root {
     --teal-primary: #14b8a6;
-    /* Brighter teal */
     --teal-dark: #0f766e;
     --teal-light: #f0fdf4;
     --text-dark: #0f172a;
     --text-muted: #64748b;
     --bg-light: #f8fafc;
+    --border-color: #e2e8f0;
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.08);
-    --border-color: #e2e8f0;
 }
+
+/* ========================================================= */
+/* GLOBAL STYLES                                             */
+/* ========================================================= */
 
 body {
-    background-color: var(--bg-light);
-    font-family: 'Outfit', sans-serif;
-    /* Changed to Outfit */
+    font-family: 'Inter', 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
     color: var(--text-dark);
-}
-
-.font-outfit {
-    font-family: 'Outfit', sans-serif;
 }
 
 .main-content {
     background-color: var(--bg-light);
     min-height: 100vh;
+}
+
+.font-outfit {
+    font-family: 'Outfit', sans-serif;
 }
 
 /* ========================================================= */
@@ -37,13 +40,13 @@ body {
 
 .enhanced-header {
     background: transparent;
-    padding-top: 2rem;
+    padding-top: 1.75rem;
     padding-bottom: 0.5rem;
 }
 
 .back-link {
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     text-decoration: none;
     display: inline-flex;
@@ -61,25 +64,23 @@ body {
 }
 
 .user-greeting h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
     letter-spacing: -0.02em;
+    margin: 0;
 }
 
 .edit-icon-btn {
     color: var(--text-muted);
-    font-size: 1rem;
-    padding: 0;
-    border-radius: 50%;
-    transition: all 0.2s;
+    font-size: 0.95rem;
     background: #f1f5f9;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
     text-decoration: none;
 }
 
@@ -89,169 +90,175 @@ body {
 }
 
 .days-remaining {
-    color: var(--teal-primary);
+    font-size: 0.75rem;
     font-weight: 600;
-    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
     margin-top: 0.25rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .dot-indicator {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     background-color: var(--teal-primary);
     border-radius: 50%;
 }
 
 /* ========================================================= */
-/* WALLET CARD                                               */
+/* WALLET CARD — TEAL BACKGROUND WITH WHITE TEXT             */
 /* ========================================================= */
 
 .personal-wallet-card {
-    border-radius: 20px;
-    border: 1px solid white;
-    /* Subtle border */
-    background: white;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
-    /* Softer, spread out shadow */
-    padding: 3rem;
+    padding: 2.25rem;
+    background-color: var(--teal-primary) !important;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    color: white !important;
 }
 
-.wallet-label {
+.personal-wallet-card .wallet-label {
     font-size: 0.7rem;
     font-weight: 600;
-    color: #94a3b8;
-    /* Lighter gray for labels */
     letter-spacing: 0.08em;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-bottom: 4px;
 }
 
-.wallet-amount {
-    font-size: 2.75rem;
+.personal-wallet-card .wallet-amount {
+    font-size: 1.35rem;
     font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 0.25rem;
-    letter-spacing: -0.03em;
-    color: var(--text-dark);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: white !important;
 }
 
-.text-teal {
-    color: var(--teal-primary) !important;
+.personal-wallet-card small.text-muted,
+.personal-wallet-card small.text-italic {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75) !important;
 }
 
-.bg-success-soft {
-    background-color: transparent !important;
-    /* Removed bg for cleaner look based on image */
-    color: var(--teal-primary) !important;
+/* APR badge */
+.personal-wallet-card .bg-success-soft {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    display: inline-block;
-    padding: 0;
-}
-
-.bg-teal {
-    background: linear-gradient(90deg, #2dd4bf 0%, #0d9488 100%) !important;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 /* Progress Bar */
 .progress {
-    height: 16px;
-    /* Thicker bar */
+    height: 12px;
     background-color: #f1f5f9;
-    border-radius: 100px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .progress-bar {
-    border-radius: 100px;
+    border-radius: 10px;
     background: linear-gradient(90deg, #2dd4bf 0%, #0f766e 100%);
-    /* Teal gradient */
+}
+
+/* Progress labels inside wallet card */
+.personal-wallet-card .fw-bold.fs-5,
+.personal-wallet-card .text-muted.text-uppercase.fw-bold {
+    color: white !important;
 }
 
 /* ========================================================= */
-/* ACTION BUTTONS GRID                                       */
+/* ACTION BUTTONS GRID — FLOATING STYLE                      */
 /* ========================================================= */
 
-.action-card {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem 1rem;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--card-shadow);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    height: 100%;
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
 }
 
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--card-shadow-hover);
-    border-color: var(--teal-light);
+.action-btn-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    opacity: 0.9;
 }
 
-.box-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+.action-btn-card:hover {
+    transform: translateY(-4px);
+    opacity: 1;
+}
+
+.icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    margin: 0 auto;
-    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+    /* Slight shadow for clarity on light backgrounds */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.bg-teal {
-    background-color: var(--teal-primary) !important;
+.action-btn-card:hover .icon-wrapper {
+    transform: scale(1.05);
 }
 
-.bg-teal-dark {
-    background-color: var(--teal-dark) !important;
-}
-
-.bg-dark-slate {
-    background-color: #334155 !important;
-}
-
-.action-label {
-    font-weight: 600;
-    color: var(--text-dark);
+.action-text {
     font-size: 0.85rem;
-    margin-top: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-dark);
 }
+
+/* Icon background colors */
+.icon-teal { background: #14b8a6; color: white; }
+.icon-green { background: #22c55e; color: white; }
+.icon-blue { background: #0ea5e9; color: white; }
+.icon-purple { background: #8b5cf6; color: white; }
 
 /* ========================================================= */
-/* CONTENT CARDS (MEMBERS & ACTIVITIES)                      */
+/* CONTENT CARDS (Members & Activities)                      */
 /* ========================================================= */
 
 .content-card {
+    background: white;
     border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
     overflow: hidden;
-    height: 100%;
 }
 
 .content-card h5 {
-    font-size: 1rem;
-    color: var(--text-dark);
+    font-size: 0.95rem;
+    font-weight: 700;
 }
 
 .badge.bg-teal-light {
     background-color: var(--teal-light);
     color: var(--teal-dark);
     font-weight: 700;
-    padding: 0.35em 0.65em;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .badge.bg-teal-tiny {
@@ -262,85 +269,35 @@ body {
     border-radius: 4px;
 }
 
-/* Scroll Container */
+/* Scrollable containers */
 .scroll-container {
-    max-height: 400px;
+    max-height: 380px;
     overflow-y: auto;
 }
 
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* List Items */
+/* List items */
 .list-group-item {
-    transition: background-color 0.2s;
+    font-size: 0.85rem;
     border-bottom: 1px solid #f1f5f9 !important;
+    transition: background-color 0.2s;
 }
 
 .list-group-item:hover {
     background-color: #f8fafc;
 }
 
-.list-group-item:last-child {
-    border-bottom: none !important;
-}
-
-/* Avatar */
-.avatar {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
-}
-
-.avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Activities */
-.activity-icon-wrapper {
-    width: 32px;
-    height: 32px;
-    background-color: var(--teal-light);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
 .form-text-xs {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
 }
 
 /* ========================================================= */
-/* RESPONSIVE STYLES                                         */
+/* RESPONSIVE ADJUSTMENTS                                    */
 /* ========================================================= */
 
 @media (max-width: 768px) {
-    .enhanced-header {
-        padding-top: 1.5rem;
-    }
-
     .user-greeting h1 {
-        font-size: 1.75rem;
+        font-size: 1.2rem;
     }
 
     .personal-wallet-card {
@@ -348,25 +305,73 @@ body {
     }
 
     .wallet-amount {
-        font-size: 2rem;
+        font-size: 1.15rem;
     }
 
-    .action-card {
-        padding: 1rem 0.5rem;
+    .action-buttons-grid {
+        grid-template-columns: repeat(4, minmax(80px, 1fr));
+        gap: 0.75rem;
+        overflow-x: auto;
     }
 
-    .box-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
+    .action-btn-card {
+        min-width: 90px;
+        padding: 1rem 0;
     }
 
-    .action-label {
-        font-size: 0.7rem;
+    .action-text {
+        font-size: 0.75rem;
+        font-weight: 500;
     }
 
-    /* Ensure content cards have height on mobile */
     .scroll-container {
         max-height: 300px;
     }
+}
+
+/* ========================================================= */
+/* MODAL POPUP STYLES                                        */
+/* ========================================================= */
+
+.popup_box {
+    padding: 25px;
+    text-align: center;
+}
+
+.popup_heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+.popup_btn {
+    background-color: var(--teal-primary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    width: 100%;
+}
+
+.popup_btn:hover {
+    background-color: var(--teal-dark);
+}
+
+.white_btn {
+    background-color: white !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+}
+
+.invite_color {
+    background-color: #8b5cf6 !important;
+}
+
+.invite_color:hover {
+    background-color: #7c3aed !important;
+}
+
+.bg-pre {
+    background-color: var(--bg-light) !important;
 }

@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect
 from notifications.models import UserFcmTokens
 from decimal import Decimal, ROUND_HALF_UP
 import traceback
+from django.core.exceptions import ValidationError
 from notifications.utils import *
 from authentication.models import Profile
 from notifications.models import UserNotificationHistory
@@ -20,7 +21,7 @@ from django.db.models import Sum, Q, Count
 from .models import (
     ExpressSaving, Goal, Deposit, GroupGoal, GroupGoalMember,
     GroupGoalActivites, GroupGoalMember_contribution,
-    Goal_Wallet, Interest_Rate, tax_Rate
+    Goal_Wallet, Interest_Rate, tax_Rate, GoalCategory  
 )
 from django.template.loader import get_template
 from io import BytesIO
@@ -29,6 +30,7 @@ import logging
 from django.utils import timezone
 from django.db import transaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.templatetags.static import static
 
 # NEW: Use ONLY MainWallet and GoalsIntegrationService
 from wallet.services import GoalsIntegrationService
@@ -418,12 +420,29 @@ def exit_group_goal(request):
         return redirect('user_dashboard:home')
 
 
+@login_required(login_url='Login')
 def delete_group_goal(request):
     if request.method == 'POST':
-        goal_group_id = request.POST.get('goal_id')
-        x = GroupGoal.objects.get(pk=goal_group_id)
-        x.delete()
-        return JsonResponse({'success': '1'})
+        goal_id = request.POST.get('goal_id')
+        try:
+            goal = GroupGoal.objects.get(pk=goal_id, creator=request.user)
+
+            # ✅ Enforce: only allow deletion if completed OR zero balance
+            if not (goal.is_active == 'No' or goal.achieved_amount == Decimal('0.00')):
+                logger.warning(f"User {request.user} tried to delete active non-zero group goal {goal_id}")
+                return JsonResponse({
+                    'success': '0',
+                    'message': 'Only completed goals or goals with zero balance can be deleted.'
+                })
+
+            goal.delete()
+            return JsonResponse({'success': '1'})
+        except GroupGoal.DoesNotExist:
+            return JsonResponse({'success': '0', 'message': 'Goal not found or you are not the creator.'})
+        except Exception as e:
+            logger.error(f"Delete group goal error: {e}")
+            return JsonResponse({'success': '0', 'message': str(e)})
+    return JsonResponse({'success': '0', 'message': 'Invalid request method'})
 
 
 @login_required(login_url='Login')
@@ -535,10 +554,14 @@ def create_personal_goals(request):
     interest_rates = Interest_Rate.objects.get(pk=1)
     regular_rate = interest_rates.percent_regular_deposit()  # Returns percentage (e.g., 6.0)
     fixed_rate = interest_rates.percent_fixed_deposit()      # Returns percentage (e.g., 10.0)
+
+    # Get Goal Categories
+    all_categories = GoalCategory.objects.all().order_by('display_name')
     
     if request.method == 'POST':
         saving_type_added = request.POST.get('saving_type_input', 'regular')
         goal_title = request.POST.get('goal_title')
+        category_key = request.POST.get('category')
         is_saving_or_goal = request.POST.get('is_saving_or_goal')
         just_want_to_save = request.POST.get('just_want_to_save')
         reminder_frequency = request.POST.get('reminder_frequency')
@@ -582,6 +605,14 @@ def create_personal_goals(request):
             start_date=start_date if start_date else None,
             end_date=end_date if end_date else None,
         )
+
+        # Attach category if selected
+        if category_key:
+            try:
+                category = GoalCategory.objects.get(key=category_key)
+                goal.category = category
+            except GoalCategory.DoesNotExist:
+                logger.warning(f"Category {category_key} not found")
         
         # Set amounts
         is_saving_or_goal = request.POST.get('is_saving_or_goal')
@@ -643,8 +674,9 @@ def create_personal_goals(request):
     context = {
         'user_profile': user_profile, 
         'user_notifications': user_notifications,
-        'regular_rate': regular_rate,  # ✅ Pass to template
-        'fixed_rate': fixed_rate       # ✅ Pass to template
+        'regular_rate': regular_rate,  
+        'fixed_rate': fixed_rate,
+        'all_categories': all_categories
     }
     return render(request, 'creat_personal_goals.html', context)
 
@@ -654,6 +686,15 @@ def goal_details(request, id):
     user_profile = Profile.objects.get(owner=request.user)
     user_notifications = UserNotificationHistory.objects.filter(user=request.user).order_by('-created_at')[:6]
     goal_info = Goal.objects.get(pk=id)
+
+    # Resolve category image URL for template
+    goal_image_url = None
+    if goal_info.category:
+        image_path = goal_info.category.get_image_url()
+        if image_path:
+            goal_image_url = static(image_path)
+    else:
+        goal_image_url = None
     all_deposits = Deposit.objects.filter(goal=goal_info).order_by('-deposit_date')
     
     if goal_info.is_active == 'Yes':
@@ -718,6 +759,7 @@ def goal_details(request, id):
         'interest_rate': interest_value,
         'show_50_milestone': show_50_milestone,  # NEW LINE
         'show_75_milestone': show_75_milestone,  # NEW LINE
+        'goal_image_url': goal_image_url,
     }
 
     return render(request, 'new/goal_details.html', context)

@@ -46,6 +46,9 @@ urlpatterns = [
     # ========== SUPPORT APP ==========
     path('support/', include('support.urls', namespace='support')),
 
+    # CONTACT US FORM
+    path('contact/', include('contact.urls')),
+
     # ========== LEGACY REDIRECTS (KEEP THESE!) ==========
     # These ensure old links still work and redirect to the NEW dashboard
     #path('my_goals/', RedirectView.as_view(pattern_name='user_dashboard:home'), name='my_goals'),

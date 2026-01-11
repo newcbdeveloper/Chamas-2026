@@ -1,0 +1,266 @@
+/* Modern Design Variables */
+:root {
+    --primary-color: #2663eb;
+    --primary-hover: #1a54d6;
+    --primary-light: #eff4ff;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --bg-page: #f8fafc;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    --card-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --success-color: #27ae60;
+}
+
+body {
+    background-color: var(--bg-page);
+    color: var(--text-dark);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.text-primary { color: var(--primary-color) !important; }
+
+/* Wallet Banner */
+.wallet-banner {
+    background: linear-gradient(135deg, #aabecf 0%, #90a4b5 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.wallet-banner-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wallet-icon-circle {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+}
+
+.btn-wallet-light {
+    background: rgba(255,255,255,0.9);
+    color: #475569;
+    border: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 50px; /* Pill shape */
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+.btn-wallet-light:hover {
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+/* Cards & Layout */
+.card-base {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    /* font-weight: 600; implied */
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background-color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(38, 99, 235, 0.1);
+}
+
+.input-group-text {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+/* Custom Selection Cards (Radio Replacement) */
+.selection-card-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+@media (min-width: 768px) {
+    .selection-card-group {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.selection-card {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    background: #fff;
+}
+
+.selection-card:hover {
+    border-color: #94a3b8;
+}
+
+.selection-card.selected {
+    border-color: var(--primary-color);
+    background-color: #f8fbff; /* Very subtle blue tint */
+}
+
+/* Make sure the text inside doesn't interfere with click */
+.selection-card * {
+    pointer-events: none; 
+}
+
+.selection-icon {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    transition: color 0.2s;
+}
+
+.selection-card.selected .selection-icon {
+    color: var(--primary-color);
+}
+
+.selection-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.selection-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Financial Summary Side Card */
+.summary-card {
+    position: sticky;
+    top: 2rem;
+    border-top: 4px solid var(--primary-color);
+}
+
+.summary-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.summary-item:last-child { border-bottom: none; }
+
+.summary-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.summary-value.highlight {
+    color: var(--primary-color);
+}
+.summary-value.total {
+    font-size: 2rem;
+}
+
+.summary-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Range Slider */
+.form-range {
+    height: 6px;
+    border-radius: 3px;
+}
+.form-range::-webkit-slider-thumb {
+    background: var(--primary-color);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin-top: -7px;
+}
+.form-range::-webkit-slider-runnable-track {
+    background: #e2e8f0;
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* Buttons */
+.btn-lg-primary {
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    transition: all 0.2s;
+}
+.btn-lg-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+}
+.btn-lg-primary:disabled {
+    background-color: #94a3b8;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+    animation: slideDown 0.3s ease-out forwards;
+}

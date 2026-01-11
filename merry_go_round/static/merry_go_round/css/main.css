@@ -4,11 +4,11 @@
    ======================================== */
 :root {
   /* Slate Neutral Scale */
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-300: #cbd5e1;
-  --color-slate-400: #94a3b8;
+  /* Brand Colors */
+    --primary-color: #2191a5;
+    --primary-light: #2ba6bd;
+    --primary-dark: #1a7585;
+    --primary-soft: #f0fdfa;
   --color-slate-500: #64748b;
   --color-slate-600: #475569;
   --color-slate-700: #334155;

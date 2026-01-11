@@ -1,0 +1,305 @@
+/* Import Inter font if not already in base */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ===== Color Variables ===== */
+:root {
+  /* Backgrounds */
+  --bg-slate-50: #f8fafc;
+  --bg-white: #ffffff;
+
+  /* Text */
+  --text-slate-900: #0f172a;
+  --text-slate-800: #1e293b;
+  --text-slate-700: #334155;
+  --text-slate-500: #64748b;
+  --text-slate-400: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Accents */
+  --cyan-500: #06b6d4;
+  --cyan-600: #0891b2;
+  --cyan-100: #cffafe;
+
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-100: #d1fae5;
+  --emerald-800: #065f46;
+
+  --amber-400: #f59e0b;
+  --amber-500: #d97706;
+  --amber-100: #fef3c7;
+  --amber-800: #92400e;
+
+  --yellow-100: #fef9c3;
+  --yellow-600: #ca8a04;
+
+  --green-100: #dcfce7;
+  --green-600: #16a34a;
+
+  --purple-100: #f3e8ff;
+  --purple-600: #9333ea;
+
+  --blue-100: #dbeafe;
+  --blue-800: #1e40af;
+
+  --red-600: #ef4444;
+  --red-100: #fee2e2;
+
+  --slate-100: #f1f5f9;
+  --slate-500: #64748b;
+  --slate-900: #0f172a;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Text Utilities ===== */
+.text-slate-900 { color: var(--text-slate-900); }
+.text-slate-800 { color: var(--text-slate-800); }
+.text-slate-700 { color: var(--text-slate-700); }
+.text-slate-500 { color: var(--text-slate-500); }
+.text-slate-400 { color: var(--text-slate-400); }
+
+/* Font Sizes (matches spec) */
+.fs-7 { font-size: 0.875rem; }          /* text-sm */
+.fs-8 { font-size: 0.75rem; }           /* text-xs */
+.fs-9 { font-size: 0.625rem; }          /* text-[10px] */
+
+/* ===== Backgrounds ===== */
+.bg-slate-50 { background-color: var(--bg-slate-50); }
+.bg-white { background-color: var(--bg-white); }
+
+.bg-cyan-500 { background-color: var(--cyan-500); }
+.bg-cyan-100 { background-color: var(--cyan-100); }
+.bg-emerald-500 { background-color: var(--emerald-500); }
+.bg-emerald-100 { background-color: var(--emerald-100); }
+.bg-amber-400 { background-color: var(--amber-400); }
+.bg-amber-100 { background-color: var(--amber-100); }
+.bg-yellow-100 { background-color: var(--yellow-100); }
+.bg-green-100 { background-color: var(--green-100); }
+.bg-purple-100 { background-color: var(--purple-100); }
+.bg-blue-100 { background-color: var(--blue-100); }
+.bg-slate-100 { background-color: var(--slate-100); }
+.bg-slate-500 { background-color: var(--slate-500); }
+.bg-red-100 { background-color: var(--red-100); }
+
+/* Text Colors */
+.text-cyan-600 { color: var(--cyan-600); }
+.text-emerald-600 { color: var(--emerald-600); }
+.text-amber-600 { color: var(--amber-500); }
+.text-yellow-600 { color: var(--yellow-600); }
+.text-green-600 { color: var(--green-600); }
+.text-purple-600 { color: var(--purple-600); }
+.text-blue-800 { color: var(--blue-800); }
+.text-amber-800 { color: var(--amber-800); }
+.text-emerald-800 { color: var(--emerald-800); }
+.text-slate-800 { color: var(--text-slate-800); }
+
+/* ===== Custom Rounded Corners ===== */
+.rounded-4 {
+  border-radius: 1rem; /* ~16px */
+}
+
+/* ===== Buttons ===== */
+.btn-cyan {
+  background-color: var(--cyan-500);
+  border-color: var(--cyan-500);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.btn-cyan:hover {
+  background-color: var(--cyan-600);
+  border-color: var(--cyan-600);
+}
+
+/* ===== Cards & Components ===== */
+.card {
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  background-color: var(--bg-white);
+}
+
+.stat-card:hover,
+.info-card:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease-in-out;
+}
+
+.avatar {
+  font-weight: bold;
+}
+
+.badge {
+  font-weight: 700;
+  padding: 0.35em 0.65em;
+  border-radius: 0.75rem;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.25em 0.5em;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.status-badge.active {
+  background-color: var(--emerald-100);
+  color: var(--emerald-800);
+}
+.status-badge.pending {
+  background-color: var(--amber-100);
+  color: var(--amber-800);
+}
+.status-badge.completed {
+  background-color: var(--slate-100);
+  color: var(--text-slate-800);
+}
+
+/* Hover row */
+.hover-bg:hover {
+  background-color: #f8fafc;
+}
+
+/* Sticky input in updates */
+.sticky-bottom {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ===== Custom Scrollbar ===== */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+
+/* ===== Alert Variants ===== */
+.alert-cyan {
+  background-color: #ecfeff;
+  border-color: #06b6d4;
+  color: var(--cyan-600);
+}
+
+/* ===== Minimum width utility ===== */
+.min-w-120 {
+  min-width: 120px;
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 991.98px) {
+  .main-content {
+    padding: 1rem;
+  }
+}
+
+/* ===== Mobile Footer Spacing ===== */
+@media (max-width: 767.98px) {
+  .main-content {
+    padding-bottom: 80px; /* Space for footer */
+  }
+  .card-footer.sticky-bottom {
+    position: static;
+    margin-top: 1rem;
+  }
+}
+
+/* ===== Smaller Stat Cards ===== */
+.stat-card {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+}
+
+.stat-value {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+/* ===== Consistent Font Size in Updates ===== */
+.updates-list .text-slate-700 {
+  font-size: 0.625rem;
+}
+
+/* ===== Custom Scrollbar for Updates ===== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+
+/* ===== Mobile: Date at Bottom for Members & Transactions ===== */
+@media (max-width: 767.98px) {
+  .member-meta {
+    font-size: 0.625rem;
+    margin-top: 0.5rem;
+  }
+  .trans-title .due-date {
+    display: none;
+  }
+  .trans-details .trans-title {
+    flex-direction: column;
+  }
+  .trans-details .trans-title .cycle-label {
+    margin-top: 0.25rem;
+  }
+}
+
+/* ===== Mobile: Horizontal Scroll for Stat Cards ===== */
+@media (max-width: 767.98px) {
+  .stat-card {
+    padding: 0.6rem;
+    min-width: 180px;
+  }
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  .stat-value {
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+  }
+  .stat-label {
+    font-size: 0.625rem;
+    margin-top: 0.2rem;
+  }
+}
+
+/* Optional: Smooth scrolling on iOS */
+@media (max-width: 767.98px) {
+  .d-md-none.d-flex.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}

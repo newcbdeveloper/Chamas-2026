@@ -1,0 +1,127 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}Contact Messages – ChamaSpace Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">ChamaSpace Admin</a>
+</h1>
+{% endblock %}
+
+{% block content_title %}
+<h2>Contact Messages</h2>
+<p style="margin-top: -10px; color: #666;">Manage inquiries from your users</p>
+{% endblock %}
+
+{% block result_list %}
+<div class="chamaspace-contact-list">
+    {% if cl.result_count %}
+        <div class="table-responsive">
+            <table id="result_list" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col"><input type="checkbox" id="action-toggle"></th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Submitted</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obj in cl.result_list %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            <td>
+                                <input type="checkbox" name="_selected_action" value="{{ obj.pk }}">
+                            </td>
+                            <td><a href="{% url 'admin:contact_contactmessage_change' obj.pk %}">{{ obj.id }}</a></td>
+                            <td>{{ obj.name|default:"—" }}</td>
+                            <td>{{ obj.email|default:"—" }}</td>
+                            <td>{{ obj.subject|truncatechars:40 }}</td>
+                            <td>{{ obj.created_at|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                {% if obj.is_resolved %}
+                                    <span class="status-badge resolved">RESOLVED</span>
+                                {% else %}
+                                    <span class="status-badge pending">PENDING</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ obj.ip_address|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if cl.paginator.count %}
+            <p class="paginator">
+                {{ cl.paginator.count }} message{{ cl.paginator.count|pluralize }}
+                {% if cl.paginator.num_pages > 1 %}
+                    &nbsp;|&nbsp; Page {{ cl.page_num }} of {{ cl.paginator.num_pages }}
+                {% endif %}
+            </p>
+        {% endif %}
+    {% else %}
+        <p class="no-results">No contact messages yet.</p>
+    {% endif %}
+</div>
+
+<style>
+.chamaspace-contact-list {
+    margin-top: 15px;
+}
+.table-responsive {
+    overflow-x: auto;
+}
+#result_list {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+#result_list th,
+#result_list td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+#result_list th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.status-badge.resolved {
+    background-color: #d4edda;
+    color: #155724;
+}
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+.no-results {
+    text-align: center;
+    color: #6c757d;
+    padding: 30px;
+    font-style: italic;
+}
+.paginator {
+    margin-top: 15px;
+    color: #6c757d;
+    text-align: center;
+}
+</style>
+{% endblock %}
+
+{% block pagination %}
+<!-- Reuse Django's built-in pagination -->
+{{ block.super }}
+{% endblock %}

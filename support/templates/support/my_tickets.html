@@ -1,16 +1,29 @@
 {% extends 'support/base_support.html' %}
 {% load static %}
 
-{% block page_title %}My Support Tickets{% endblock %}
-{% block page_subtitle %}Track and manage your support requests{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'support/css/my_tickets.css' %}">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}{% endblock %}
 
 {% block header_actions %}
-<a href="{% url 'support:create_ticket' %}" class="btn btn-primary">
+<a href="{% url 'support:create_ticket' %}" class="btn btn-success">
     <i class="fas fa-plus me-2"></i>New Ticket
 </a>
 {% endblock %}
-
 {% block support_content %}
+<!-- Mobile-optimized header section -->
+<div class="page-header-section">
+  <h1 class="page-title">My Support Tickets</h1>
+  <p class="page-subtitle">Track and manage your support requests</p>
+  
+</div>
+
+
 <!-- Status Filter Tabs -->
 <div class="status-tabs mb-4">
     <a href="?status=" class="status-tab {% if not current_status %}active{% endif %}">
@@ -30,30 +43,29 @@
     </a>
 </div>
 
+<!-- Floating Action Button for New Ticket (Mobile Only) -->
+<div class="floating-action-button d-none d-sm-none d-md-none d-lg-none d-xl-none" style="display: none;">
+  <i class="fas fa-plus"></i>
+</div>
+
 <!-- Search and Filter -->
-<div class="card mb-4">
+<div class="card search-card mb-4">
     <div class="card-body">
-        <form method="get" class="row g-3">
-            <div class="col-md-6">
-                <input type="text" name="search" class="form-control" 
-                       placeholder="Search by reference or subject..." 
-                       value="{{ search_query }}">
-            </div>
-            <div class="col-md-4">
-                <select name="category" class="form-select">
-                    <option value="">All Categories</option>
-                    {% for value, label in categories %}
-                    <option value="{{ value }}" {% if current_category == value %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search me-2"></i>Search
-                </button>
-            </div>
+        <form method="get" class="search-form">
+            <input type="text" name="search" class="form-control search-input" 
+                   placeholder="Search by reference or subject..." 
+                   value="{{ search_query }}">
+            <select name="category" class="form-select category-select">
+                <option value="">All Categories</option>
+                {% for value, label in categories %}
+                <option value="{{ value }}" {% if current_category == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary search-button">
+                <i class="fas fa-search me-2"></i>Search
+            </button>
         </form>
     </div>
 </div>
@@ -100,9 +112,10 @@
         </div>
         
         <div class="ticket-card-footer">
-            <a href="{% url 'support:ticket_detail' ticket.id %}" class="btn btn-sm btn-outline-primary">
+            <a href="{% url 'support:ticket_detail' ticket.id %}" class="btn btn-sm view-details-btn">
                 View Details <i class="fas fa-arrow-right ms-1"></i>
             </a>
+            
         </div>
     </div>
     {% endfor %}
@@ -110,29 +123,32 @@
 
 <!-- Pagination -->
 {% if page_obj.has_other_pages %}
-<nav class="mt-4">
-    <ul class="pagination justify-content-center">
+<div class="pagination-container">
+    <div class="pagination-info">
+        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
+    </div>
+    <div class="pagination-controls">
         {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">
-                Previous
-            </a>
-        </li>
+        <a href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-navigation prev">
+            Previous
+        </a>
         {% endif %}
         
-        <li class="page-item disabled">
-            <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-        </li>
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="page-number active">{{ num }}</span>
+        {% else %}
+        <a href="?page={{ num }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-number">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
         
         {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">
-                Next
-            </a>
-        </li>
+        <a href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-navigation next">
+            Next
+        </a>
         {% endif %}
-    </ul>
-</nav>
+    </div>
+</div>
 {% endif %}
 
 {% else %}
@@ -141,9 +157,161 @@
     <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
     <h4>No tickets found</h4>
     <p class="text-muted mb-4">You haven't created any support tickets yet.</p>
-    <a href="{% url 'support:create_ticket' %}" class="btn btn-primary">
+    <a href="{% url 'support:create_ticket' %}" class="btn btn-success">
         <i class="fas fa-plus me-2"></i>Create Your First Ticket
     </a>
 </div>
 {% endif %}
+{% endblock %}
+{% block support_js %}
+<script>
+// ===== SUPPORT PORTAL JAVASCRIPT =====
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile sidebar toggle
+  const hamburgerMenu = document.querySelector('.hamburger-menu');
+  const sidebar = document.querySelector('.sidebar');
+  const mainContent = document.querySelector('.main-content');
+  
+  if (hamburgerMenu) {
+    hamburgerMenu.addEventListener('click', function() {
+      this.classList.toggle('active');
+      sidebar.classList.toggle('open');
+      mainContent.classList.toggle('full-width');
+    });
+  }
+  
+  // Sparkle icon toggle for quick advice
+  const sparkleIcons = document.querySelectorAll('.sparkle-icon');
+  sparkleIcons.forEach(icon => {
+    icon.addEventListener('click', function() {
+      const ticketCard = this.closest('.ticket-card');
+      const advicePanel = ticketCard.querySelector('.quick-advice-panel');
+      
+      if (advicePanel) {
+        advicePanel.classList.toggle('show');
+        this.classList.toggle('active');
+        
+        // Add some animation
+        if (advicePanel.classList.contains('show')) {
+          advicePanel.style.animation = 'fadeIn 0.3s ease-in';
+        } else {
+          advicePanel.style.animation = 'fadeOut 0.3s ease-out';
+        }
+      }
+    });
+  });
+  
+  // Status tab highlighting
+  const statusTabs = document.querySelectorAll('.status-tab');
+  statusTabs.forEach(tab => {
+    tab.addEventListener('click', function(e) {
+      // Remove active class from all tabs
+      statusTabs.forEach(t => t.classList.remove('active'));
+      // Add active class to clicked tab
+      this.classList.add('active');
+    });
+  });
+  
+  // Pagination controls
+  const pageNumbers = document.querySelectorAll('.page-number');
+  const prevButton = document.querySelector('.page-navigation.prev');
+  const nextButton = document.querySelector('.page-navigation.next');
+  
+  pageNumbers.forEach(pageNum => {
+    pageNum.addEventListener('click', function() {
+      // Remove active class from all page numbers
+      pageNumbers.forEach(p => p.classList.remove('active'));
+      // Add active class to clicked page number
+      this.classList.add('active');
+    });
+  });
+  
+  // Mobile floating action button for new ticket
+  const fabButton = document.querySelector('.floating-action-button');
+  if (fabButton) {
+    fabButton.addEventListener('click', function() {
+      window.location.href = '/support/create/';
+    });
+  }
+  
+  // Responsive behavior for search form
+  function adjustSearchForm() {
+    const searchForm = document.querySelector('.search-form');
+    const searchInput = document.querySelector('.search-input');
+    const categorySelect = document.querySelector('.category-select');
+    const searchButton = document.querySelector('.search-button');
+    
+    if (window.innerWidth <= 768) {
+      // On mobile, stack the search elements
+      searchForm.style.flexDirection = 'column';
+      searchInput.style.width = '100%';
+      categorySelect.style.width = '100%';
+      searchButton.style.width = '100%';
+    } else {
+      // On desktop, make them horizontal
+      searchForm.style.flexDirection = 'row';
+      searchInput.style.width = 'auto';
+      categorySelect.style.width = 'auto';
+      searchButton.style.width = 'auto';
+    }
+  }
+  
+  // Initialize on load
+  adjustSearchForm();
+  
+  // Adjust on window resize
+  window.addEventListener('resize', adjustSearchForm);
+  
+  // Add smooth scrolling to anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+  
+  // Add hover effects to cards
+  const ticketCards = document.querySelectorAll('.ticket-card');
+  ticketCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 15px 25px -5px rgba(0, 0, 0, 0.1)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.05)';
+    });
+  });
+});
+
+// ===== ANIMATIONS =====
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(10px); }
+  }
+`;
+document.head.appendChild(styleSheet);
+
+
+  // Show FAB only on very small screens
+  if (window.innerWidth <= 576) {
+    const fab = document.querySelector('.floating-action-button');
+    if (fab) {
+      fab.style.display = 'flex';
+      fab.addEventListener('click', function() {
+        window.location.href = "{% url 'support:create_ticket' %}";
+      });
+    }
+  }
+</script>
 {% endblock %}

@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate, login, logout
 from .otp_service import OTPService
 from .password_service import PasswordService
 from .account_service import AccountService
+from authentication.utils.session_utils import refresh_session_on_login
+
 
 class AuthManager:
     @staticmethod
@@ -12,16 +14,24 @@ class AuthManager:
         if request.method == 'POST':
             Username = request.POST.get('un')
             Password = request.POST.get('password')
+            
             profile = OTPService.get_profile_by_nic(Username)
             if profile is None:
                 messages.error(request, 'User with this ID No. not found!')
                 return render(request, 'Login.html')
+            
             user = authenticate(username=Username, password=Password)
             if user and user.is_active:
+                # Use session utility to properly initialize session
                 login(request, user)
+                refresh_session_on_login(request, user)
+                
+                messages.success(request, 'Welcome back to ChamaSpace!')
                 return redirect('user_dashboard:home')
+            
             messages.error(request, 'Invalid credentials or account inactive')
             return redirect('Login')
+        
         return render(request, 'Login.html')
 
     @staticmethod
@@ -72,6 +82,26 @@ class AuthManager:
 
     @staticmethod
     def logout_view(request):
+        """
+        Enhanced logout with proper session cleanup.
+        """
+        # Check if logout is intentional or forced
+        logout_reason = request.GET.get('reason', 'manual')
+        
         logout(request)
-        messages.info(request, 'You have been Logged Out')
+        
+        # Set appropriate message based on logout reason
+        if logout_reason == 'idle':
+            messages.warning(
+                request,
+                'You were logged out due to inactivity to keep your account secure.'
+            )
+        elif logout_reason == 'expired':
+            messages.info(
+                request,
+                'Your session has expired. Please login again.'
+            )
+        else:
+            messages.info(request, 'You have been logged out successfully.')
+        
         return redirect('Login')

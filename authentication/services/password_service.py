@@ -1,8 +1,14 @@
 import random
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth import logout  
 from django.contrib.auth.models import User
+from django.utils import timezone
 from .otp_service import OTPService
+from authentication.utils.session_utils import invalidate_all_user_sessions
+from authentication.models import Profile
+
+
 
 class PasswordService:
     @staticmethod
@@ -29,6 +35,8 @@ class PasswordService:
             messages.error(request, 'Invalid verification code')
         return render(request, 'reset_password_otp.html')
 
+    
+
     @staticmethod
     def update_password(request):
         username = request.session.get('Username')
@@ -37,6 +45,25 @@ class PasswordService:
             user = User.objects.get(username=username)
             user.set_password(new_password)
             user.save()
-            messages.info(request, 'Password updated successfully')
+            
+            # Update profile timestamp
+            try:
+                profile = user.profile
+                profile.password_changed_at = timezone.now()
+                profile.save(update_fields=["password_changed_at"])
+            except Profile.DoesNotExist:
+                pass
+
+            # Invalidate other sessions
+            invalidate_all_user_sessions(user, exclude_current=None)
+
+            # Logout current session and clear session data
+            logout(request)
+            request.session.flush()
+            
+            messages.success(
+                request,
+                'Password updated successfully. Please login with your new password.'
+            )
             return redirect('Login')
         return render(request, 'update_password.html')

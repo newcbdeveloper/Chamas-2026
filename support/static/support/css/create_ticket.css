@@ -1,0 +1,210 @@
+/* === ChamaSpace Support Ticket — Fintech Modern === */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --emerald-600: #059669;
+    --emerald-500: #10b981;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --amber-500: #f59e0b;
+    --rose-600: #e11d48;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--slate-50);
+    color: #1e293b;
+}
+
+/* === Cards === */
+.card {
+    border: none;
+    border-radius: 32px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    background: white;
+    overflow: hidden;
+}
+
+.card-header {
+    border-bottom: 1px solid var(--slate-200);
+}
+
+/* === Form Controls === */
+#id_category,
+.form-control,
+.form-select {
+    border: 1px solid var(--slate-200);
+    background-color: var(--slate-50);
+    border-radius: 16px !important;
+    padding: 14px 18px;
+    font-weight: 500;
+    font-size: 1rem;
+    min-height: 48px;
+}
+
+.form-control:focus,
+.form-select:focus,
+#id_category:focus {
+    border-color: var(--emerald-600);
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+}
+
+/* Hide native dropdown arrow */
+#id_category {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-left: 2.5rem !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+textarea.form-control {
+    min-height: 160px;
+    resize: vertical;
+}
+
+/* === Dropzone === */
+.dropzone {
+    position: relative;
+    border: 2px dashed var(--slate-200);
+    border-radius: 16px;
+    background-color: var(--slate-50);
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    padding: 24px;
+}
+
+.dropzone:hover,
+.dropzone.border-success {
+    border-color: var(--emerald-600);
+    background-color: #f0fdf9;
+}
+
+.dropzone input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+/* === Buttons === */
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 16px !important;
+    font-weight: 600;
+    transition: transform 0.15s ease;
+    min-height: 52px;
+}
+
+.btn-lg:active {
+    transform: scale(0.97);
+}
+
+.btn-success {
+    background-color: var(--emerald-600);
+    border-color: var(--emerald-600);
+}
+
+.btn-success:hover {
+    background-color: #047857;
+    border-color: #047857;
+}
+
+.btn-outline-secondary {
+    border: 1px solid var(--slate-200);
+    color: var(--slate-500);
+    background-color: white;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--slate-50);
+}
+
+/* === Sidebar Cards === */
+.card-security {
+    background: #fffbeb !important;
+    border-left: 4px solid var(--amber-500) !important;
+}
+
+.bg-amber-500 {
+    background-color: var(--amber-500) !important;
+}
+
+.card-ai {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf9) !important;
+    border: 1px solid var(--slate-200);
+}
+
+/* Badges */
+.badge-urgent {
+    background-color: var(--rose-600);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* === Responsive Mobile === */
+@media (max-width: 768px) {
+    h2.h4 {
+        font-size: 1.25rem;
+        letter-spacing: 0;
+    }
+
+    .form-label {
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+    }
+
+    .form-control,
+    .form-select,
+    #id_category {
+        font-size: 0.95rem;
+        min-height: 52px;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .btn-lg {
+        font-size: 0.95rem;
+    }
+
+    .col-lg-8,
+    .col-lg-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .d-flex.gap-3 {
+        flex-direction: column;
+    }
+}
+
+/* === Utilities === */
+.text-emerald-600 { color: var(--emerald-600); }
+.text-amber-500 { color: var(--amber-500); }
+.text-slate-700 { color: var(--slate-700); }

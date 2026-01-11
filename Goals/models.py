@@ -9,8 +9,43 @@ from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+
+
+class GoalCategory(models.Model):
+    """
+    Predefined categories for goals with associated images, icons, and colors.
+    These are system-controlled and cannot be modified by users.
+    """
+    key = models.CharField(max_length=50, unique=True, primary_key=True)
+    display_name = models.CharField(max_length=100)
+    default_image = models.CharField(max_length=200)  # Filename like 'emergency.jpg'
+    default_icon = models.CharField(max_length=50)    # Icon name like 'shield-check'
+    theme_color = models.CharField(max_length=7)      # Hex color like '#166534'
+    
+    class Meta:
+        verbose_name = "Goal Category"
+        verbose_name_plural = "Goal Categories"
+        ordering = ['display_name']
+    
+    def __str__(self):
+        return self.display_name
+    
+    def get_image_url(self):
+        """Returns the full static URL path for the category image"""
+        return f'images/goals/{self.default_image}'
+
 class Goal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='User')
+
+    # Field for category
+    category = models.ForeignKey(
+        GoalCategory, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        help_text="Category determines the goal's image and theme"
+    )
+
     SAVING_TYPES = (
         ('regular', 'Regular Saving'),
         ('fixed', 'Fixed Saving'),
