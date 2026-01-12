@@ -25,13 +25,14 @@ jobs:
           docker build -t chamaspace_app:staging .
           docker tag chamaspace_app:staging jeldinvestment/chamaspace_app:staging
 
-      - name: Push Docker Image (staging)
+      - name: Log in and Push (staging)
         uses: docker/login-action@v3
         with:
           username: jeldinvestment
           password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Push Docker Image
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u jeldinvestment --password-stdin
           docker push jeldinvestment/chamaspace_app:staging
 
       - name: Upload the application code to server (staging dir)
