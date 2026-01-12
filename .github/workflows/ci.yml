@@ -71,7 +71,12 @@ jobs:
 
             echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u jeldinvestment --password-stdin
             docker pull jeldinvestment/chamaspace_app
-            docker rm -f chamaspace_app caddy;
-            docker run -d --name chamaspace_app --network chamaspace_network -p 8000:8000 -e ENVIRONMENT=production --restart always -v chama_db:/db --restart always  jeldinvestment/chamaspace_app sh -c "python manage.py migrate && python manage.py create_superuser && python manage.py collectstatic --noinput && gunicorn Chamabora.wsgi:application --bind 0.0.0.0:8000" ;
-            docker run -d --name caddy --network chamaspace_network -p 80:80 -p 443:443 -v $(pwd)/Caddyfile:/etc/caddy/Caddyfile -v $(pwd)/data:/data --restart always caddy;
+            docker rm -f chamaspace_app caddy redis celery celery_beat flower;
+            docker run -d --name chamaspace_app --network chamaspace_default -p 8000:8000 -e ENVIRONMENT=production --restart always -v chama_db:/db -v /var/www/ChamaSpace/media:/app/media  jeldinvestment/chamaspace_app sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn Chamabora.wsgi:application --bind 0.0.0.0:8000" ;
+            docker run -d --name caddy --network chamaspace_default -p 80:80 -p 443:443 -v $(pwd)/Caddyfile:/etc/caddy/Caddyfile -v $(pwd)/data:/data -v /var/www/ChamaSpace/media:/var/www/ChamaSpace/media --restart always caddy;
+            docker run -d --name redis --network chamaspace_default -v redis-data:/data redis:7
+            docker run -d --name celery --network chamaspace_default -e CELERY_BROKER_URL="redis://redis:6379/0" jeldinvestment/chamaspace_app:latest celery -A Chamabora worker --loglevel=info --concurrency=4
+            docker run -d --name celery_beat --network chamaspace_default -e CELERY_BROKER_URL="redis://redis:6379/0" jeldinvestment/chamaspace_app:latest celery -A Chamabora beat -l info
+            docker run -d --name flower --network chamaspace_default -e CELERY_BROKER_URL="redis://redis:6379/0" -p 5555:5555 jeldinvestment/chamaspace_app:latest celery -A Chamabora flower -l info --basic_auth=admin:Pass@123
+
 
